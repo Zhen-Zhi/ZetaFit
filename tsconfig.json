@@ -3,9 +3,10 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"],
+      "@components/*": ["./src/components/*"],
+      "@asset/*": ["./assets/*"],
+      "@constants/*": ["./src//constants/*"]
     }
   },
   "include": [
