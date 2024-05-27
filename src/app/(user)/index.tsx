@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground, TouchableOpacity, Animated } from 'react-native'
+import { StyleSheet, Text, View, Image, Pressable, ImageBackground, TouchableOpacity, Animated, Modal } from 'react-native'
 import React, { useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as Progress from 'react-native-progress';
@@ -9,7 +9,9 @@ import AnimatedPressable from '@/src/components/AnimatedPressable';
 // const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 const HomeScreen = () => {
-  const animatedValue = useRef(new Animated.Value(1)).current;
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}]
 
   return (
     <SafeAreaView className='flex-1 bg-slate-100 pt-2'>
@@ -20,24 +22,24 @@ const HomeScreen = () => {
         <View className='flex flex-row w-3/5'>
 
           {/* Avatar Image */}
-          <View className='border rounded-lg m-2'>
-            <Pressable className='bg-transparent' onPress={() => {}}> 
+          <AnimatedPressable className='border rounded-lg m-2' pressInValue={0.93}>
+            <View className='bg-transparent'> 
               <Image
                 className='h-16 w-16 aspect-square border'
                 source={require('@asset/images/CyberKongz - Collection _ OpenSea (1).jpg')}  
               />
-            </Pressable>
-          </View>
+            </View>
+          </AnimatedPressable>
           
           {/* Level Bar and Username*/}
           <ImageBackground 
             source={require('@asset/images/star.png')}
-            className='absolute z-10 w-10 aspect-square left-16 ml-3'
+            className='absolute z-10 w-12 aspect-square top-[-7px] left-[67px] ml-3'
           >
-            <Text className='absolute z-10 text-lg ml-4 mt-1.5 text-black font-extrabold'>5</Text>
+            <Text className='absolute z-10 text-lg ml-2 mt-3 w-8 text-center text-black font-extrabold'>1</Text>
           </ImageBackground>
           <View className='flex flex-col mt-2'>
-            <Progress.Bar className='h-7 justify-center'
+            <Progress.Bar className='h-7 justify-center left-[12px]'
               progress={0.5}
               width={140}
               height={28}
@@ -46,7 +48,7 @@ const HomeScreen = () => {
               borderWidth={2}
               borderRadius={10}
             >
-              <Text className='absolute text-white font-extrabold self-center'>50000/1000</Text>
+              <Text className='absolute text-white font-extrabold self-center'>50/100</Text>
             </Progress.Bar>
             <Text className='text-lg font-bold'>Username</Text>
           </View>
@@ -73,26 +75,54 @@ const HomeScreen = () => {
 
       {/* Clan Name and More setting */}
       <View className='flex flex-row mx-2 h-12'>
+
+        {/* Clan */}
         <AnimatedPressable 
           style={styles.image} 
-          className='bg-slate-300 flex-1 flex-row mr-2 rounded-lg'
+          className='bg-slate-100 border border-slate-400 flex-1 flex-row mr-2 rounded-lg'
           pressInValue={0.97}
           >
           <Image
-            className='w-16 ml-2 mt-4 aspect-square border'
+            className='w-16 ml-2 mt-4 aspect-square'
             source={require('@asset/images/CyberKongz - Collection _ OpenSea (1).jpg')} 
           />
           <Text className='text-center font-extrabold text-lg p-1'>Clan Name</Text>
         </AnimatedPressable>
         
         {/* More functions list */}
-        <AnimatedPressable
-          className='bg-slate-300 justify-center rounded-lg p-3'
-          pressInValue={0.9}
-        >
-          <Ionicons name="list" size={26} color="black" />
-        </AnimatedPressable>
+          <AnimatedPressable
+            onPress={() => setModalVisible(true)}
+            className='bg-slate-100 border border-slate-400 justify-center rounded-lg p-3'
+            pressInValue={0.9}
+          >
+            <Ionicons name="list" size={26} color="black" />
+          </AnimatedPressable>
+        
       </View>
+
+      <Modal
+        animationType='none'
+        visible={modalVisible}
+        presentationStyle='overFullScreen'
+        transparent={true}
+      >
+        <View className='bg-black/40 flex-1'>
+          <View className='flex w-3/5 rounded-2xl bg-slate-200 self-end top-[146px] mr-2 p-1'>
+            {ListOptions.map((option) => {
+              return (
+                <AnimatedPressable
+                  onPress={() => setModalVisible(false)}
+                  pressInValue={0.95}
+                  className='border border-slate-400 h-10 rounded-xl m-1'
+                >
+                  <Text className='my-auto text-center'>{option.name}</Text>
+                </AnimatedPressable>
+              )
+            })}
+          </View>
+        </View>
+        
+      </Modal>
     </SafeAreaView>
     
   )
