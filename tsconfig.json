@@ -6,7 +6,8 @@
       "@/*": ["./*"],
       "@components/*": ["./src/components/*"],
       "@asset/*": ["./assets/*"],
-      "@constants/*": ["./src//constants/*"]
+      "@constants/*": ["./src/constants/*"],
+      "@app/*": ["./src/app/*"]
     }
   },
   "include": [

@@ -39,7 +39,7 @@ const SignInScreen = () => {
                 className='border-b border-slate-400 rounded-lg mx-8 p-3' 
                 placeholder='johndoe@mail.com' 
               />
-              <Link href={''} asChild>
+              <Link href={'#'} asChild>
                 <Text className='text-right mx-8 mt-0.5'>Forgot Password?</Text>
               </Link>
             </View>
@@ -47,13 +47,14 @@ const SignInScreen = () => {
             <AnimatedPressable
               className='rounded-full bg-sky-200 mx-auto p-2 w-56 mt-4 h-12'
               pressInValue={0.95}
+              onPress={() => router.replace('/(user)')}
             >
               <Text className='font-semibold text-center my-auto text-lg'>Sign In</Text>
             </AnimatedPressable>
             <AnimatedPressable
               className='flex mx-auto p-2'
               pressInValue={0.95}
-              onPress={() => router.replace('')}
+              onPress={() => router.replace('/sign_up')}
             >
               <Text className='mx-auto text-lg font-semibold text-blue-700'>Create Account</Text>
             </AnimatedPressable>

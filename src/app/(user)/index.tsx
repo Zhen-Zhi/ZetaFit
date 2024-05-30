@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground, TouchableOpacity, Animated, Modal, FlatList } from 'react-native'
+import { StyleSheet, Text, View, Image, Pressable, ImageBackground, TouchableOpacity, Animated, Modal, FlatList, TouchableWithoutFeedback } from 'react-native'
 import React, { useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as Progress from 'react-native-progress';
 import { Ionicons } from '@expo/vector-icons';
 import AnimatedPressable from '@/src/components/AnimatedPressable';
 import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
+import { router } from 'expo-router';
 
 // to create a animated component
 // const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -16,12 +17,15 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView edges={['top']} className='flex-1 bg-slate-100 pt-2'>
-      {/* <ImageBackground className='flex-1' source={require('@asset/images/bg-home.png')}> */}
+      <ImageBackground
+        className='flex-1' 
+        source={require('@asset/images/background_image.png')}
+      >
       {/* Top Part, Avatar, Level Bar, Username, Virtual Currency */}
       <View className='flex flex-row justify-between'>
 
         {/* Avartar Image, Level Bar, Username */}
-        <View className='flex flex-row w-3/5'>
+        <AnimatedPressable pressInValue={0.98} className='flex flex-row w-3/5'>
 
           {/* Avatar Image */}
           <AnimatedPressable className='border rounded-lg m-2' pressInValue={0.93}>
@@ -34,7 +38,7 @@ const HomeScreen = () => {
           </AnimatedPressable>
           
           {/* Level Bar and Username*/}
-          <ImageBackground 
+          <ImageBackground
             source={require('@asset/images/star.png')}
             className='absolute z-10 w-12 aspect-square top-[-7px] left-[67px] ml-3'
           >
@@ -54,21 +58,21 @@ const HomeScreen = () => {
             </Progress.Bar>
             <Text className='text-lg font-bold'>Username</Text>
           </View>
-        </View>
+        </AnimatedPressable>
 
         {/* Virtual Currency */}
         <View className='flex flex-col w-2/5'>
-          <View className='border border-slate-300 h-7 rounded-xl mt-2 mx-2 flex flex-row justify-between'>
+          <View style={styles.shadowAndriod} className='border border-slate-300 h-7 rounded-xl mt-2 mx-2 flex flex-row justify-between bg-white'>
             <Image 
               className='w-5 mx-4 my-auto aspect-square'
-              source={require('@asset/images/react-logo.png')} 
+              source={require('@asset/images/coin_icon.png')} 
             />
             <Text className='text-right mx-2 my-auto'>9999</Text>
           </View>
-          <View className='border border-slate-300 mt-1 h-7 rounded-xl mx-2 flex flex-row justify-between'>
+          <View style={styles.shadowAndriod} className='border border-slate-300 mt-1 h-7 rounded-xl mx-2 flex flex-row justify-between bg-white'>
             <Image 
               className='w-5 mx-4 my-auto aspect-square'
-              source={require('@asset/images/favicon.png')} 
+              source={require('@asset/images/diamond_icon.png')} 
             />
             <Text className='text-right mx-2 my-auto'>9999</Text>
           </View>
@@ -80,8 +84,8 @@ const HomeScreen = () => {
 
         {/* Clan */}
         <AnimatedPressable 
-          style={styles.image} 
-          className='bg-slate-100 border border-slate-400 flex-1 flex-row mr-2 rounded-lg'
+          style={[styles.image, styles.shadowAndriod]} 
+          className='bg-white border border-slate-400 flex-1 flex-row mr-2 rounded-lg'
           pressInValue={0.97}
           >
           <Image
@@ -92,25 +96,26 @@ const HomeScreen = () => {
         </AnimatedPressable>
         
         {/* More functions list */}
-          <AnimatedPressable
-            onPress={() => setModalVisible(true)}
-            className='bg-slate-100 border border-slate-400 justify-center rounded-lg p-3'
-            pressInValue={0.9}
-          >
-            <Ionicons name="list" size={26} color="black" />
-          </AnimatedPressable>
+        <AnimatedPressable
+          style={styles.shadowAndriod}
+          onPress={() => setModalVisible(true)}
+          className='bg-white border border-slate-400 justify-center rounded-lg p-3'
+          pressInValue={0.9}
+        >
+          <Ionicons name="list" size={26} color="black" />
+        </AnimatedPressable>
         
       </View>
 
       {/* Function list options*/}
       <Modal
-        animationType='none'
+        animationType='fade'
         visible={modalVisible}
         presentationStyle='overFullScreen'
         transparent={true}
       >
-        <View className='bg-black/40 flex-1'>
-          <View className='flex w-3/5 rounded-2xl bg-slate-200 self-end top-[146px] mr-2 p-1'>
+        <Pressable onPress={() => setModalVisible(false)} className='bg-black/40 flex-1'>
+          <View className='flex w-3/5 rounded-2xl bg-white self-end top-[146px] mr-2 p-1'>
             {ListOptions.map((option, index) => {
               return (
                 <AnimatedPressable
@@ -119,12 +124,19 @@ const HomeScreen = () => {
                   pressInValue={0.95}
                   className='border border-slate-400 h-10 rounded-xl m-1'
                 >
-                  <Text className='my-auto text-center'>{option.name}</Text>
+                  <Text className='my-auto text-center font-semibold'>{option.name}</Text>
                 </AnimatedPressable>
               )
             })}
+            <AnimatedPressable 
+              pressInValue={0.95} 
+              className='border border-slate-400 h-10 rounded-xl mt-4 mb-1 mx-1'
+              onPress={() => router.replace('/(auth)/sign_in')}
+            >
+              <Text className='my-auto text-center font-semibold text-red-600'>Sign Out</Text>
+            </AnimatedPressable>
           </View>
-        </View>
+        </Pressable>
         
       </Modal>
       
@@ -142,6 +154,7 @@ const HomeScreen = () => {
         </AnimatedPressable>
       </View>
 
+      {/* Active challenges part */}
       <View className='m-3 absolute bottom-0'>
         <Text className='font-extrabold text-xl'>Active Challenges</Text>
         <FlatList
@@ -153,7 +166,7 @@ const HomeScreen = () => {
           showsHorizontalScrollIndicator={false}
         />
       </View>
-      {/* </ImageBackground> */}
+      </ImageBackground>
     </SafeAreaView>
     
   )
@@ -164,5 +177,8 @@ export default HomeScreen
 const styles = StyleSheet.create({
   image: {
     alignItems: 'center', // Centers horizontally
+  },
+  shadowAndriod: {
+    elevation: 15
   }
 })
