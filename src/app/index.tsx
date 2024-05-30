@@ -4,7 +4,7 @@ import { Link, Redirect } from 'expo-router'
 
 const index = () => {
   return (
-    <Redirect href={'/(user)'} />
+    <Redirect href={'/(auth)/sign_up'} />
     // <View>
     //   <Link href={'/(user)'}>
     //     <Text>index</Text>

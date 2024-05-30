@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground, TouchableOpacity, Animated, Modal } from 'react-native'
+import { StyleSheet, Text, View, Image, Pressable, ImageBackground, TouchableOpacity, Animated, Modal, FlatList } from 'react-native'
 import React, { useRef, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as Progress from 'react-native-progress';
 import { Ionicons } from '@expo/vector-icons';
 import AnimatedPressable from '@/src/components/AnimatedPressable';
+import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
 
 // to create a animated component
 // const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -14,7 +15,8 @@ const HomeScreen = () => {
   const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}]
 
   return (
-    <SafeAreaView className='flex-1 bg-slate-100 pt-2'>
+    <SafeAreaView edges={['top']} className='flex-1 bg-slate-100 pt-2'>
+      {/* <ImageBackground className='flex-1' source={require('@asset/images/bg-home.png')}> */}
       {/* Top Part, Avatar, Level Bar, Username, Virtual Currency */}
       <View className='flex flex-row justify-between'>
 
@@ -26,7 +28,7 @@ const HomeScreen = () => {
             <View className='bg-transparent'> 
               <Image
                 className='h-16 w-16 aspect-square border'
-                source={require('@asset/images/CyberKongz - Collection _ OpenSea (1).jpg')}  
+                source={require('@asset/images/CyberKongz.jpg')}  
               />
             </View>
           </AnimatedPressable>
@@ -84,7 +86,7 @@ const HomeScreen = () => {
           >
           <Image
             className='w-16 ml-2 mt-4 aspect-square'
-            source={require('@asset/images/CyberKongz - Collection _ OpenSea (1).jpg')} 
+            source={require('@asset/images/CyberKongz.jpg')} 
           />
           <Text className='text-center font-extrabold text-lg p-1'>Clan Name</Text>
         </AnimatedPressable>
@@ -100,6 +102,7 @@ const HomeScreen = () => {
         
       </View>
 
+      {/* Function list options*/}
       <Modal
         animationType='none'
         visible={modalVisible}
@@ -108,9 +111,10 @@ const HomeScreen = () => {
       >
         <View className='bg-black/40 flex-1'>
           <View className='flex w-3/5 rounded-2xl bg-slate-200 self-end top-[146px] mr-2 p-1'>
-            {ListOptions.map((option) => {
+            {ListOptions.map((option, index) => {
               return (
                 <AnimatedPressable
+                  key={index}
                   onPress={() => setModalVisible(false)}
                   pressInValue={0.95}
                   className='border border-slate-400 h-10 rounded-xl m-1'
@@ -123,6 +127,33 @@ const HomeScreen = () => {
         </View>
         
       </Modal>
+      
+      {/* middle image - main */}
+      <View className='mx-auto mt-16 mb-6'>
+        <Image
+          className='w-64 h-48 rounded-xl'
+          source={require('@asset/images/ZetaFit logo.png')} 
+        />
+        <AnimatedPressable
+          className='m-1 h-[40px] w-[240px] bg-slate-200 p-1 rounded justify-center mt-3'
+          pressInValue={0.98}
+        >
+          <Text className='text-center font-extrabold text-lg'>Add Activity</Text>
+        </AnimatedPressable>
+      </View>
+
+      <View className='m-3 absolute bottom-0'>
+        <Text className='font-extrabold text-xl'>Active Challenges</Text>
+        <FlatList
+          data={ListOptions}
+          renderItem={() => (
+            <ActiveChallengesCard />
+          )}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+        />
+      </View>
+      {/* </ImageBackground> */}
     </SafeAreaView>
     
   )
