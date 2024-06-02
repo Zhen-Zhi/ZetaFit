@@ -5,76 +5,78 @@ import AnimatedPressable from '@/src/components/AnimatedPressable'
 
 const SignInScreen = () => {
   return (
-    <View
-      className='flex-1 bg-slate-200'
+    <ImageBackground
+      className='flex-1'
+      source={require('@asset/images/background_image.png')}
     >
-      <ImageBackground
-        className='flex-1'
-        source={require('@asset/images/background_image.png')}
+      <TouchableWithoutFeedback 
+        onPress={() => Keyboard.dismiss()}
       >
-      <Stack.Screen options={{ title: 'Create Account' }} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height' }
-        className='flex-1 m-2 pt-2 justify-end'
-      >
-        <Image
-          className='w-72 h-56 rounded-xl mx-auto mt-10 mb-3'
-          source={require('@asset/images/ZetaFit logo.png')} 
-        />
-
-        <TouchableWithoutFeedback 
-          onPress={() => Keyboard.dismiss()}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height' }
+          className='flex-1 m-2 pt-2 justify-end'
         >
+          {/* Top image logo */}
+          <Image
+            className='w-72 h-56 rounded-xl mx-auto mt-10 mb-3'
+            source={require('@asset/images/ZetaFit logo.png')} 
+          />
+
+          {/* sign up field */}
           <View className='bg-white/80 pt-2 pb-8 rounded-xl'>
-          <View className='py-2'>
-            <Text className='font-bold text-lg mx-8 mt-2'>Email</Text>
-            <TextInput 
-              className='border-b border-slate-400 rounded-lg mx-8 p-3' 
-              placeholder='johndoe@mail.com' 
-            />
-          </View>
-          
-          <View className='py-2'>
-            <Text className='font-bold text-lg mx-8'>Password</Text>
-            <TextInput 
-              secureTextEntry
-              className='border-b border-slate-400 rounded-lg mx-8 p-2' 
-              placeholder='johndoe@mail.com' 
-            />
+            {/* email */}
+            <View className='py-2'>
+              <Text className='font-bold text-lg mx-8 mt-2'>Email</Text>
+              <TextInput 
+                className='border-b border-slate-400 rounded-lg mx-8 p-3' 
+                placeholder='johndoe@mail.com' 
+              />
+            </View>
+            
+            {/* password */}
+            <View className='py-2'>
+              <Text className='font-bold text-lg mx-8'>Password</Text>
+              <TextInput 
+                secureTextEntry
+                className='border-b border-slate-400 rounded-lg mx-8 p-2' 
+                placeholder='johndoe@mail.com' 
+              />
+            </View>
+
+            {/* confirm password */}
+            <View className='py-2'>
+              <Text className='font-bold text-lg mx-8'>Confirm Password</Text>
+              <TextInput 
+                secureTextEntry
+                className='border-b border-slate-400 rounded-lg mx-8 p-3' 
+                placeholder='johndoe@mail.com' 
+              />
+            </View>
+
+            {/* create account button */}
+            <AnimatedPressable
+              className='rounded-full bg-sky-200 mx-auto p-2 w-56 mt-4 h-12'
+              pressInValue={0.95}
+              onPress={() => router.replace('/username')}
+            >
+              <Text className='font-semibold text-center my-auto text-lg'>Create Account</Text>
+            </AnimatedPressable>
+
+            {/* sign in button */}
+            <AnimatedPressable
+              className='mx-auto flex p-2'
+              pressInValue={0.95}
+              onPress={() => router.replace('/sign_in')}
+            >
+              <Text className='mx-auto text-lg font-semibold text-blue-700'>Sign In</Text>
+            </AnimatedPressable>
           </View>
 
-          <View className='py-2'>
-            <Text className='font-bold text-lg mx-8'>Confirm Password</Text>
-            <TextInput 
-              secureTextEntry
-              className='border-b border-slate-400 rounded-lg mx-8 p-3' 
-              placeholder='johndoe@mail.com' 
-            />
-          </View>
-
-          <AnimatedPressable
-            className='rounded-full bg-sky-200 mx-auto p-2 w-56 mt-4 h-12'
-            pressInValue={0.95}
-          >
-            <Text className='font-semibold text-center my-auto text-lg'>Create Account</Text>
-          </AnimatedPressable>
-          <AnimatedPressable
-            className='mx-auto flex p-2'
-            pressInValue={0.95}
-            onPress={() => router.replace('/sign_in')}
-          >
-            <Text className='mx-auto text-lg font-semibold text-blue-700'>Sign In</Text>
-          </AnimatedPressable>
-          </View>
-        </TouchableWithoutFeedback>
-
-        {/* Container to push content to the top as KeyboardAvoidingView need justify-end */}
-        <View className='flex-1' />
-                  
-        
-      </KeyboardAvoidingView>
-      </ImageBackground>
-    </View>
+          {/* Container to push content to the top as KeyboardAvoidingView need justify-end */}
+          <View className='flex-1' />
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
+    </ImageBackground>
   )
 }
 

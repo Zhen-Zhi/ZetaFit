@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground, TouchableOpacity, Animated, Modal, FlatList, TouchableWithoutFeedback } from 'react-native'
-import React, { useRef, useState } from 'react'
+import { StyleSheet, Text, View, Image, Pressable, ImageBackground, Modal, FlatList } from 'react-native'
+import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as Progress from 'react-native-progress';
 import { Ionicons } from '@expo/vector-icons';
@@ -62,14 +62,14 @@ const HomeScreen = () => {
 
         {/* Virtual Currency */}
         <View className='flex flex-col w-2/5'>
-          <View style={styles.shadowAndriod} className='border border-slate-300 h-7 rounded-xl mt-2 mx-2 flex flex-row justify-between bg-white'>
+          <View style={styles.shadowAndriod} className='border border-slate-300 h-7 rounded-xl mt-2 mx-2 flex flex-row justify-between bg-white shadow shadow-slate-400'>
             <Image 
               className='w-5 mx-4 my-auto aspect-square'
               source={require('@asset/images/coin_icon.png')} 
             />
             <Text className='text-right mx-2 my-auto'>9999</Text>
           </View>
-          <View style={styles.shadowAndriod} className='border border-slate-300 mt-1 h-7 rounded-xl mx-2 flex flex-row justify-between bg-white'>
+          <View style={styles.shadowAndriod} className='border border-slate-300 mt-1 h-7 rounded-xl mx-2 flex flex-row justify-between bg-white shadow shadow-slate-400'>
             <Image 
               className='w-5 mx-4 my-auto aspect-square'
               source={require('@asset/images/diamond_icon.png')} 
@@ -85,7 +85,7 @@ const HomeScreen = () => {
         {/* Clan */}
         <AnimatedPressable 
           style={[styles.image, styles.shadowAndriod]} 
-          className='bg-white border border-slate-400 flex-1 flex-row mr-2 rounded-lg'
+          className='bg-white border border-slate-400 flex-1 flex-row mr-2 rounded-lg shadow shadow-slate-400'
           pressInValue={0.97}
           >
           <Image
@@ -99,7 +99,7 @@ const HomeScreen = () => {
         <AnimatedPressable
           style={styles.shadowAndriod}
           onPress={() => setModalVisible(true)}
-          className='bg-white border border-slate-400 justify-center rounded-lg p-3'
+          className='bg-white border border-slate-400 justify-center rounded-lg p-3 shadow shadow-slate-400'
           pressInValue={0.9}
         >
           <Ionicons name="list" size={26} color="black" />

@@ -5,11 +5,6 @@ import { Link, Redirect } from 'expo-router'
 const index = () => {
   return (
     <Redirect href={'/(auth)/sign_in'} />
-    // <View>
-    //   <Link href={'/(user)'}>
-    //     <Text>index</Text>
-    //   </Link>
-    // </View>
   )
 }
 

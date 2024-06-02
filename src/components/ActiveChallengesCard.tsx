@@ -7,7 +7,7 @@ const ActiveChallengesCard = () => {
   return (
     <AnimatedPressable
       style={styles.activeChallangesPressable}
-      className='border-2 border-slate-400 rounded-xl h-auto m-2 p-2 bg-white'
+      className='border-2 border-slate-400 rounded-xl h-auto m-2 p-2 bg-white shadow shadow-slate-400'
       pressInValue={0.96}
     >
       <Image 
