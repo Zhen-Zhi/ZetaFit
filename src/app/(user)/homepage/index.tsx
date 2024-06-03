@@ -1,19 +1,28 @@
-import { StyleSheet, Text, View, Image, Pressable, ImageBackground, Modal, FlatList } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, Text, View, Image, ImageBackground, Modal, FlatList, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as Progress from 'react-native-progress';
 import { Ionicons } from '@expo/vector-icons';
 import AnimatedPressable from '@/src/components/AnimatedPressable';
 import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
-import { router } from 'expo-router';
+import MoreOptionsModal from './optionListModal';
+import { useNavigation } from 'expo-router';
 
-// to create a animated component
-// const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
 const HomeScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
-  const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}]
+  // define a event listerner to set modal visible false
+  // come back from profile via back will not set to false without this
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      setModalVisible(false);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <SafeAreaView edges={['top']} className='flex-1 bg-slate-100 pt-2'>
@@ -114,30 +123,7 @@ const HomeScreen = () => {
         presentationStyle='overFullScreen'
         transparent={true}
       >
-        <Pressable onPress={() => setModalVisible(false)} className='bg-black/40 flex-1'>
-          <View className='flex w-3/5 rounded-2xl bg-white self-end top-[146px] mr-2 p-1'>
-            {ListOptions.map((option, index) => {
-              return (
-                <AnimatedPressable
-                  key={index}
-                  onPress={() => setModalVisible(false)}
-                  pressInValue={0.95}
-                  className='border border-slate-400 h-10 rounded-xl m-1'
-                >
-                  <Text className='my-auto text-center font-semibold'>{option.name}</Text>
-                </AnimatedPressable>
-              )
-            })}
-            <AnimatedPressable 
-              pressInValue={0.95} 
-              className='border border-slate-400 h-10 rounded-xl mt-4 mb-1 mx-1'
-              onPress={() => router.replace('/(auth)/sign_in')}
-            >
-              <Text className='my-auto text-center font-semibold text-red-600'>Sign Out</Text>
-            </AnimatedPressable>
-          </View>
-        </Pressable>
-        
+        <MoreOptionsModal onClose={() => setModalVisible(false)} />
       </Modal>
       
       {/* middle image - main */}

@@ -1,24 +1,25 @@
-import { StyleSheet, Text, View, Pressable, Animated, ViewStyle } from 'react-native'
-import React, { CSSProperties, PropsWithChildren, useRef } from 'react'
+import { StyleSheet, Pressable, Animated } from 'react-native'
+import React, { ReactNode, forwardRef, useRef } from 'react'
 import { StyleProps } from 'react-native-reanimated';
 
 // to create a animated component
 const AnimatedButton = Animated.createAnimatedComponent(Pressable);
 
 type AnimatedPressableProps = {
-  onPress?: () => void | null,
-  style?: StyleProps,
-  className?: string
-  pressInValue: number
+  onPress?: () => void | null;
+  style?: StyleProps;
+  className?: string;
+  pressInValue: number;
+  children?: ReactNode;
 }
 
-const AnimatedPressable = ({ children, onPress, style, className, pressInValue }: PropsWithChildren<AnimatedPressableProps>) => {
+const AnimatedPressable = forwardRef<typeof Pressable, AnimatedPressableProps>((props, ref) => {
   const animatedValue = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
     Animated.spring(animatedValue, {
       speed: 100,
-      toValue: pressInValue,
+      toValue: props.pressInValue,
       useNativeDriver: true,
     }).start();
   };
@@ -35,14 +36,14 @@ const AnimatedPressable = ({ children, onPress, style, className, pressInValue }
     <AnimatedButton
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      onPress={onPress}
-      style={[style, { transform: [{ scale: animatedValue}] }]}
-      className={className}
+      onPress={props.onPress}
+      style={[props.style, { transform: [{ scale: animatedValue}] }]}
+      className={props.className}
     >
-      {children}
+      {props.children}
     </AnimatedButton>
   )
-}
+})
 
 export default AnimatedPressable
 
