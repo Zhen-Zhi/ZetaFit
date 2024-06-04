@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Image, TextInput, KeyboardAvoidingView, Platfor
 import React from 'react'
 import { Link, Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
+import { themeColors } from '@/src/constants/Colors'
 
 const SignInScreen = () => {
   return (
@@ -18,12 +19,12 @@ const SignInScreen = () => {
         >
           {/* top image logo */}
           <Image
-            className='w-72 h-56 rounded-xl mx-auto mt-16 mb-6'
+            className='w-72 h-56 rounded-xl mx-auto mt-8 mb-6'
             source={require('@asset/images/ZetaFit logo.png')} 
           />
 
           {/* username field */}
-          <View className='bg-white/80 pt-2 pb-8 rounded-xl'>
+          <View className='bg-[#f8f8f8]/70 pt-2 pb-8 rounded-xl'>
             {/* username */}
             <View className='py-2'>
               <Text className='font-bold text-xl mx-8 mt-2'>Enter your username</Text>
@@ -37,11 +38,12 @@ const SignInScreen = () => {
 
             {/* confirm button */}
             <AnimatedPressable
-              className='rounded-full bg-sky-200 mx-auto p-2 w-56 mt-4 h-12'
+              style={{ backgroundColor: themeColors.primary }}
+              className='rounded-full bg-sky-200 mx-auto p-2 w-56 mt-10 h-12'
               pressInValue={0.95}
               onPress={() => router.replace('/(user)/homepage')}
             >
-              <Text className='font-semibold text-center my-auto text-lg'>Confirm</Text>
+              <Text className='font-semibold text-white text-center my-auto text-lg'>Confirm</Text>
             </AnimatedPressable>
           </View>
         

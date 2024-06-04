@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Image, TextInput, KeyboardAvoidingView, Platfor
 import React from 'react'
 import { Link, Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
+import { themeColors } from '@/src/constants/Colors'
 
 const SignInScreen = () => {
   return (
@@ -23,12 +24,12 @@ const SignInScreen = () => {
           />
 
           {/* sign up field */}
-          <View className='bg-white/80 pt-2 pb-8 rounded-xl'>
+          <View className='bg-[#f8f8f8]/80 pt-2 pb-8 rounded-xl'>
             {/* email */}
             <View className='py-2'>
               <Text className='font-bold text-lg mx-8 mt-2'>Email</Text>
               <TextInput 
-                className='border-b border-slate-400 rounded-lg mx-8 p-3' 
+                className='border-b border-slate-400 rounded-lg mx-8 p-1.5' 
                 placeholder='johndoe@mail.com' 
               />
             </View>
@@ -38,7 +39,7 @@ const SignInScreen = () => {
               <Text className='font-bold text-lg mx-8'>Password</Text>
               <TextInput 
                 secureTextEntry
-                className='border-b border-slate-400 rounded-lg mx-8 p-2' 
+                className='border-b border-slate-400 rounded-lg mx-8 p-1.5' 
                 placeholder='johndoe@mail.com' 
               />
             </View>
@@ -48,18 +49,19 @@ const SignInScreen = () => {
               <Text className='font-bold text-lg mx-8'>Confirm Password</Text>
               <TextInput 
                 secureTextEntry
-                className='border-b border-slate-400 rounded-lg mx-8 p-3' 
+                className='border-b border-slate-400 rounded-lg mx-8 p-1.5' 
                 placeholder='johndoe@mail.com' 
               />
             </View>
 
             {/* create account button */}
             <AnimatedPressable
-              className='rounded-full bg-sky-200 mx-auto p-2 w-56 mt-4 h-12'
+              style={{ backgroundColor: themeColors.primary }}
+              className='rounded-full mx-auto p-2 w-56 mt-4 h-12'
               pressInValue={0.95}
               onPress={() => router.replace('/username')}
             >
-              <Text className='font-semibold text-center my-auto text-lg'>Create Account</Text>
+              <Text className='font-semibold text-white text-center my-auto text-lg'>Create Account</Text>
             </AnimatedPressable>
 
             {/* sign in button */}
@@ -68,7 +70,7 @@ const SignInScreen = () => {
               pressInValue={0.95}
               onPress={() => router.replace('/sign_in')}
             >
-              <Text className='mx-auto text-lg font-semibold text-blue-700'>Sign In</Text>
+              <Text style={{ color: themeColors.primary }}className='mx-auto text-lg font-semibold'>Sign In</Text>
             </AnimatedPressable>
           </View>
 

@@ -6,6 +6,7 @@
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
+// default
 export const Colors = {
   light: {
     text: '#11181C',
@@ -24,3 +25,11 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+// colors that is used
+export const themeColors = {
+  primary: '#053b50',
+  secondary: '#176b87',
+  tetiary: '#64ccc5',
+  backgroundColor: '#f8f8f8'
+}

@@ -92,14 +92,14 @@ const HomeScreen = () => {
       <View className='flex flex-row mx-2 h-12'>
 
         {/* Clan */}
-        <AnimatedPressable 
+        <AnimatedPressable
           style={[styles.image, styles.shadowAndriod]} 
-          className='bg-white border border-slate-400 flex-1 flex-row mr-2 rounded-lg shadow shadow-slate-400'
+          className='bg-white border border-slate-400 flex-1 flex-row mr-2 mt-1.5 rounded-lg shadow shadow-slate-400'
           pressInValue={0.97}
           >
           <Image
-            className='w-16 ml-2 mt-4 aspect-square'
-            source={require('@asset/images/CyberKongz.jpg')} 
+            className='w-10 h-14 mx-2'
+            source={require('@asset/images/logo_clan.png')} 
           />
           <Text className='text-center font-extrabold text-lg p-1'>Clan Name</Text>
         </AnimatedPressable>
@@ -108,10 +108,12 @@ const HomeScreen = () => {
         <AnimatedPressable
           style={styles.shadowAndriod}
           onPress={() => setModalVisible(true)}
-          className='bg-white border border-slate-400 justify-center rounded-lg p-3 shadow shadow-slate-400'
+          className='bg-white border border-slate-400 rounded-lg shadow shadow-slate-400 mt-1.5'
           pressInValue={0.9}
         >
-          <Ionicons name="list" size={26} color="black" />
+          <View className='mx-3 my-auto'>
+            <Ionicons name="list" size={22} color="black" />
+          </View>
         </AnimatedPressable>
         
       </View>
