@@ -27,30 +27,33 @@ const SignInScreen = () => {
           <View className='bg-[#f8f8f8]/80 pt-2 pb-8 rounded-xl'>
             {/* email */}
             <View className='py-2'>
-              <Text className='font-bold text-lg mx-8 mt-2'>Email</Text>
+              <Text style={{ color: themeColors.primary }} className='font-bold text-lg mx-8 mt-2'>Email</Text>
               <TextInput 
                 className='border-b border-slate-400 rounded-lg mx-8 p-1.5' 
                 placeholder='johndoe@mail.com' 
+                style={{ color: themeColors.primary }}
               />
             </View>
             
             {/* password */}
             <View className='py-2'>
-              <Text className='font-bold text-lg mx-8'>Password</Text>
+              <Text style={{ color: themeColors.primary }} className='font-bold text-lg mx-8'>Password</Text>
               <TextInput 
                 secureTextEntry
                 className='border-b border-slate-400 rounded-lg mx-8 p-1.5' 
                 placeholder='johndoe@mail.com' 
+                style={{ color: themeColors.primary }}
               />
             </View>
 
             {/* confirm password */}
             <View className='py-2'>
-              <Text className='font-bold text-lg mx-8'>Confirm Password</Text>
+              <Text style={{ color: themeColors.primary }} className='font-bold text-lg mx-8'>Confirm Password</Text>
               <TextInput 
                 secureTextEntry
                 className='border-b border-slate-400 rounded-lg mx-8 p-1.5' 
-                placeholder='johndoe@mail.com' 
+                placeholder='johndoe@mail.com'
+                style={{ color: themeColors.primary }} 
               />
             </View>
 

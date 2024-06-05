@@ -7,6 +7,7 @@ import AnimatedPressable from '@/src/components/AnimatedPressable';
 import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
 import MoreOptionsModal from './optionListModal';
 import { useNavigation } from 'expo-router';
+import { themeColors } from '@/src/constants/Colors';
 
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
@@ -65,7 +66,7 @@ const HomeScreen = () => {
             >
               <Text className='absolute text-white font-extrabold self-center'>50/100</Text>
             </Progress.Bar>
-            <Text className='text-lg font-bold'>Username</Text>
+            <Text style={{ color: themeColors.primary }} className='text-lg font-bold'>Username</Text>
           </View>
         </AnimatedPressable>
 
@@ -76,14 +77,14 @@ const HomeScreen = () => {
               className='w-5 mx-4 my-auto aspect-square'
               source={require('@asset/images/coin_icon.png')} 
             />
-            <Text className='text-right mx-2 my-auto'>9999</Text>
+            <Text style={{ color: themeColors.primary }} className='text-right mx-2 my-auto'>9999</Text>
           </View>
           <View style={styles.shadowAndriod} className='border border-slate-300 mt-1 h-7 rounded-xl mx-2 flex flex-row justify-between bg-white shadow shadow-slate-400'>
             <Image 
               className='w-5 mx-4 my-auto aspect-square'
               source={require('@asset/images/diamond_icon.png')} 
             />
-            <Text className='text-right mx-2 my-auto'>9999</Text>
+            <Text style={{ color: themeColors.primary }} className='text-right mx-2 my-auto'>9999</Text>
           </View>
         </View>
       </View>
@@ -101,7 +102,7 @@ const HomeScreen = () => {
             className='w-10 h-14 mx-2'
             source={require('@asset/images/logo_clan.png')} 
           />
-          <Text className='text-center font-extrabold text-lg p-1'>Clan Name</Text>
+          <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>Clan Name</Text>
         </AnimatedPressable>
         
         {/* More functions list */}
@@ -112,7 +113,7 @@ const HomeScreen = () => {
           pressInValue={0.9}
         >
           <View className='mx-3 my-auto'>
-            <Ionicons name="list" size={22} color="black" />
+            <Ionicons name="list" size={22} color={themeColors.primary} />
           </View>
         </AnimatedPressable>
         
@@ -124,6 +125,7 @@ const HomeScreen = () => {
         visible={modalVisible}
         presentationStyle='overFullScreen'
         transparent={true}
+        onRequestClose={() =>setModalVisible(false)}
       >
         <MoreOptionsModal onClose={() => setModalVisible(false)} />
       </Modal>
@@ -144,7 +146,7 @@ const HomeScreen = () => {
 
       {/* Active challenges part */}
       <View className='m-3 absolute bottom-0'>
-        <Text className='font-extrabold text-xl'>Active Challenges</Text>
+        <Text style={{ color: themeColors.primary }} className='font-extrabold text-xl'>Active Challenges</Text>
         <FlatList
           data={ListOptions}
           renderItem={() => (

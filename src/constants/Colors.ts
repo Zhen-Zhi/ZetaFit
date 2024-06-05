@@ -33,3 +33,10 @@ export const themeColors = {
   tetiary: '#64ccc5',
   backgroundColor: '#f8f8f8'
 }
+
+export const clanColors = {
+  primary: '#769fcd',
+  secondary: '#b9d7ea',
+  tetiary: '#d6e6f2',
+  backgroundColor: '#f7fbfc'
+}

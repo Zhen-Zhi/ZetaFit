@@ -19,6 +19,7 @@ const ActiveChallengesCard = () => {
         <Text 
           numberOfLines={1}
           className='text-md font-bold m-2'
+          style={{ color: themeColors.primary }}
         >1000-minute run challenges</Text>
         <Progress.Bar
           width={190}

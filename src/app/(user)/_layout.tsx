@@ -44,13 +44,13 @@ export default function TabLayout() {
           iconName = 'home'
         }
         else if(route.name == 'clan') {
-          iconName = 'group'
+          iconName = 'shield'
         }
 
         return (
           <FontAwesome 
             name={iconName as keyof typeof FontAwesome.glyphMap} 
-            size={24} 
+            size={26} 
             color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'}
           />
         )
@@ -67,7 +67,7 @@ export default function TabLayout() {
         display: isKeyboardVisible ? 'none' : 'flex',
       },
       tabBarIconStyle: {
-        height: 20,
+        height: 25,
       },
       tabBarItemStyle: {
         height: 50,

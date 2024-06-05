@@ -32,8 +32,9 @@ const SignInScreen = () => {
           <View className='bg-[#f8f8f8]/70 pt-2 pb-8 rounded-xl'>
             {/* email */}
             <View className='py-2'>
-              <Text className='font-bold text-xl mx-8 mt-2'>Email</Text>
+              <Text style={{ color: themeColors.primary }} className='font-bold text-xl mx-8 mt-2'>Email</Text>
               <TextInput 
+                style={{ color: themeColors.primary }}
                 className='border-b border-slate-400 rounded-lg mx-8 p-3' 
                 placeholder='johndoe@mail.com' 
               />
@@ -41,11 +42,12 @@ const SignInScreen = () => {
             
             {/* password */}
             <View className='py-1'>
-              <Text className='font-bold text-xl mx-8'>Password</Text>
+              <Text style={{ color: themeColors.primary }} className='font-bold text-xl mx-8'>Password</Text>
               <TextInput 
                 secureTextEntry
                 className='border-b border-slate-400 rounded-lg mx-8 p-3' 
                 placeholder='johndoe@mail.com' 
+                style={{ color: themeColors.primary }}
               />
               <Link href={'#'} asChild>
                 <Text style={{ color: themeColors.primary }} className='text-right mx-8 mt-0.5 font-medium'>Forgot Password?</Text>

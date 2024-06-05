@@ -27,10 +27,11 @@ const SignInScreen = () => {
           <View className='bg-[#f8f8f8]/70 pt-2 pb-8 rounded-xl'>
             {/* username */}
             <View className='py-2'>
-              <Text className='font-bold text-xl mx-8 mt-2'>Enter your username</Text>
+              <Text style={{ color: themeColors.primary }} className='font-bold text-xl mx-8 mt-2'>Enter your username</Text>
               <TextInput 
                 className='border-b border-slate-400 rounded-lg mx-8 p-3' 
-                placeholder='John Doe' 
+                placeholder='John Doe'
+                style={{ color: themeColors.primary }} 
               />
               {/* validation ?? */}
               <Text className='mx-10 my-1 text-red-600'>This username is already taken!</Text>

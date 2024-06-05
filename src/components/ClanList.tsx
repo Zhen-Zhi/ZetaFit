@@ -3,6 +3,7 @@ import React from 'react'
 import AnimatedPressable from './AnimatedPressable'
 import { FontAwesome6 } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
+import { themeColors } from '../constants/Colors';
 
 type Clan = {
   id: number;
@@ -27,23 +28,23 @@ const ClanList = ({ clan }: ClanListProps) => {
     >
       <View className='flex flex-row p-1'>
         <Image
-          className='aspect-square w-16 rounded-xl'
-          source={require('@asset/images/CyberKongz.jpg')}
+          className='w-10 h-14 rounded-xl'
+          source={require('@asset/images/logo_clan.png')}
         />
         <View className='flex-1 flex-col ml-3'>
-          <Text numberOfLines={1} className='font-bold text-xl mb-1'>{clan.clanName}</Text>
+          <Text style={{ color: themeColors.primary }} numberOfLines={1} className='font-bold text-xl mb-1'>{clan.clanName}</Text>
           <View className='flex-row justify-between w-9/12'>
             <View className='flex-row'>
               <View className='m-auto mr-1'>
                 <FontAwesome6 name="user-group" size={18} color="rgba(9, 65, 240, 0.8)" />
               </View>
-              <Text className=' bg-slate-200 rounded-lg px-2 text-lg font-semibold'>{clan.numberOfMember}/{clan.maxMember}</Text>
+              <Text style={{ color: themeColors.primary }} className=' bg-slate-200 rounded-lg px-2 text-lg font-semibold'>{clan.numberOfMember}/{clan.maxMember}</Text>
             </View>
             <View className='flex-row'>
               <View className='m-auto mr-1'>
                 <FontAwesome6 name="fire" size={24} color="rgba(240, 93, 9, 0.8)" />
               </View>
-              <Text className=' bg-slate-200 rounded-lg px-2 text-lg font-semibold'>{clan.activeScore}</Text>
+              <Text style={{ color: themeColors.primary }} className=' bg-slate-200 rounded-lg px-2 text-lg font-semibold'>{clan.activeScore}</Text>
             </View>
           </View>
         </View>

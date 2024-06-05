@@ -8,7 +8,8 @@ export default function HomePageStack() {
   return (
     <Stack>
       <Stack.Screen name='index' options={{ headerShown: false }}/>
-      <Stack.Screen name='profile' options={{
+      <Stack.Screen name='optionListModal' options={{ headerShown: false }}/>
+      {/* <Stack.Screen name='profile' options={{
         headerShown: true,
         headerRight: () => 
           <AnimatedPressable 
@@ -19,7 +20,7 @@ export default function HomePageStack() {
               <FontAwesome6 name="pencil" size={24} color="rgb(102, 102, 102)" />
             </View>
           </AnimatedPressable>
-      }}/>
+      }}/> */}
     </Stack>
   )
 }
