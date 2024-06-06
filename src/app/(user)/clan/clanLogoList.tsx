@@ -1,5 +1,6 @@
-import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle, Image, FlatList } from 'react-native'
+import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle, Image, FlatList, ImageBackground } from 'react-native'
 import React from 'react'
+import AnimatedPressable from '@/src/components/AnimatedPressable';
 
 type ClanLogoListModalProps = {
   onClose: () => void;
@@ -29,22 +30,40 @@ const clanLogo = [
   {
     id: 6,
     image: require('@asset/images/clan_logo/clan_logo_6.png'),
+  },
+  {
+    id: 7,
+    image: require('@asset/images/clan_logo/clan_logo_7.png'),
+  },
+  {
+    id: 8,
+    image: require('@asset/images/clan_logo/clan_logo_8.png'),
+  },
+  {
+    id: 9,
+    image: require('@asset/images/clan_logo/clan_logo_9.png'),
   }
 ];
 
 const ClanLogoListModal = ({ onClose }: ClanLogoListModalProps) => {
   return (
-    <Pressable className='flex-1' onPress={onClose}>
-      <View className='bg-white h-3/5 m-10 border my-auto'>
+    <Pressable className='flex-1 bg-black/50' onPress={onClose}>
+      <ImageBackground source={require('@asset/images/background_image.png')} >
+      <View className='bg-white h-auto rounded-xl overflow-show m-10 my-auto'>
         <FlatList
           data={clanLogo}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <Image className='w-20 h-24' source={item.image} />}
-          contentContainerStyle={{ gap: 10 }}
+          renderItem={({ item }) => 
+            <AnimatedPressable pressInValue={0.95}>
+              <Image className='w-20 h-24' source={item.image} />
+            </AnimatedPressable>
+          }
+          contentContainerStyle={{ margin: 5, gap: 10 }}
           columnWrapperStyle={{ gap: 10, justifyContent: 'center' }}
           numColumns={3}
         />
       </View>
+      </ImageBackground>
     </Pressable>
     
   )

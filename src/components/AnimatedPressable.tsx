@@ -47,4 +47,4 @@ const AnimatedPressable = forwardRef<typeof Pressable, AnimatedPressableProps>((
 
 export default AnimatedPressable
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

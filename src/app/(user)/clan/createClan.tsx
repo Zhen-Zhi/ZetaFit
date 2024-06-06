@@ -4,6 +4,7 @@ import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import ClanLogoListModal from './clanLogoList';
+import AwesomeButton from "react-native-really-awesome-button";
 
 type CreateClanScreenProps = {
   onClose: () => void
@@ -13,32 +14,44 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
   const [modalVisible, setModalVisible] = useState(false)
 
   return (
-    <Pressable className='bg-black/70 flex-1' onPress={onClose}>
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height' }
-      className='flex-1 justify-end'
+      className='justify-end bg-black flex-1'
     >
-    {/* <View className='flex-none'> */}
     <ImageBackground
-      imageStyle={{ borderRadius: 20, width: '96%', marginLeft: '2%' }}
-      className='mx-4 mt-24'
+      // imageStyle={{ borderRadius: 20, width: '96%', marginLeft: '2%' }}
+      className='h-full'
       source={require('@asset/images/background_image.png')}
     >
-      <View style={{ backgroundColor: themeColors.secondary }} className='flex-row justify-normal py-1 px-4 rounded-t-lg'>
+      <View className='flex-row justify-normal pt-3 pb-2 px-4 bg-white border-b border-slate-400'>
         <AnimatedPressable 
           pressInValue={0.9} 
-          className='z-10'
+          className='absolute left-2 top-2 z-10'
           onPress={onClose}
         >
           <View className='p-1'>
-            <FontAwesome5 name="arrow-left" size={24} color={themeColors.backgroundColor} />
+            <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
           </View>
         </AnimatedPressable>
-        <Text style={{ color: themeColors.backgroundColor }} className='text-center m-auto text-xl font-semibold'>Create New Clan</Text>
+        <Text style={{ color: themeColors.primary }} className='text-center m-auto text-xl font-semibold'>Create New Clan</Text>
       </View>
 
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} className=''>
         <View className='bg-[#f8f8f8]/50 mx-2 p-4 rounded-xl'>
+          <Image
+            style={{ width: 130, height: 160 }}
+            className='mx-auto mt-4'
+            source={require('@asset/images/clan_logo/clan_logo_3.png')}
+          />
+          {/* <AwesomeButton style={{ margin: 'auto', marginTop: 10 }} width={160} backgroundColor={themeColors.primary} height={45} raiseLevel={4} springRelease={false} >
+            <Text className='text-white font-bold'>Select Clan Logo</Text>
+          </AwesomeButton> */}
+          <AnimatedPressable 
+            pressInValue={0.95}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={{ color: themeColors.secondary }} className='text-lg font-bold mx-auto mt-2'>Select Clan Logo</Text>
+          </AnimatedPressable>
           <View className='my-2 flex-col'>
             <Text style={{ color: themeColors.primary }} className='text-lg font-bold my-auto'>Clan Name</Text>
             <TextInput
@@ -48,7 +61,7 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
               style={{ color: themeColors.primary }}
             />
           </View>
-          <View className='my-2 flex-row'>
+          {/* <View className='my-2 flex-row'>
             <Text style={{ color: themeColors.primary }} className='text-lg font-bold my-auto'>Clan Logo</Text>
             <Image
               style={{ maxHeight: 80, maxWidth: 65 }}
@@ -66,7 +79,7 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
                 <Text className='font-bold text-center text-white my-auto'>Browse</Text>
               </View>
             </AnimatedPressable>
-          </View>
+          </View> */}
           <View className='my-2'>
             <Text style={{ color: themeColors.primary }} className='text-lg font-bold my-auto'>Clan Descriptions</Text>
             <TextInput
@@ -81,10 +94,13 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
           <AnimatedPressable
             style={{ backgroundColor: themeColors.secondary }}
             className='w-3/5 mx-auto h-10 rounded-lg my-auto mt-8'
-            pressInValue={0.98}
+            pressInValue={0.95}
           >
             <Text className='text-lg text-white font-bold text-center my-auto'>Create Clan</Text>
           </AnimatedPressable>
+          {/* <AwesomeButton style={{ margin: 'auto', marginTop: 10 }} width={160} backgroundColor={themeColors.primary} height={45} raiseLevel={4} springRelease={false} >
+            <Text className='text-white font-bold'>Create Clan</Text>
+          </AwesomeButton> */}
         </View>
       </TouchableWithoutFeedback>
       <Modal
@@ -97,10 +113,8 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
         <ClanLogoListModal onClose={() => setModalVisible(false)}/>
       </Modal>
     </ImageBackground>
-    {/* </View> */}
     <View className='flex-1' />
     </KeyboardAvoidingView>
-    </Pressable>
   )
 }
 
