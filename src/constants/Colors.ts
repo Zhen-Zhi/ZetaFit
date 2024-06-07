@@ -31,12 +31,14 @@ export const themeColors = {
   primary: '#053b50',
   secondary: '#176b87',
   tetiary: '#64ccc5',
-  backgroundColor: '#f8f8f8'
+  backgroundColor: '#f8f8f8',
+  danger: '#dc2626',
 }
 
 export const clanColors = {
   primary: '#769fcd',
   secondary: '#b9d7ea',
   tetiary: '#d6e6f2',
-  backgroundColor: '#f7fbfc'
+  backgroundColor: '#f7fbfc',
+  
 }

@@ -18,7 +18,7 @@ const ActiveChallengesCard = () => {
       <View className='mt-2'>
         <Text 
           numberOfLines={1}
-          className='text-md font-bold m-2'
+          className='text-md font-bold my-2 mx-1'
           style={{ color: themeColors.primary }}
         >1000-minute run challenges</Text>
         <Progress.Bar

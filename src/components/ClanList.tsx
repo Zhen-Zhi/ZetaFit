@@ -19,7 +19,7 @@ type ClanListProps = {
 
 const ClanList = ({ clan }: ClanListProps) => {
   return (
-    <Link href={`/clan/${clan.id}`} asChild>
+    <Link href={`/clan/clan_details/${clan.id}`} asChild>
     <AnimatedPressable 
       className='border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 bg-white'
       pressInValue={0.98}

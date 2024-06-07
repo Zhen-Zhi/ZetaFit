@@ -12,6 +12,16 @@ type CreateClanScreenProps = {
 
 const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
   const [modalVisible, setModalVisible] = useState(false)
+  const [clanLogo, setClanLogo] = useState<{ id: number; image: any; }>({id: 1, image: require('@asset/images/clan_logo/clan_logo_1.png')})
+  const [amount, setAmount] = useState(0);
+
+  const increment = () => {
+    setAmount(prevAmount => prevAmount + 100);
+  };
+
+  const decrement = () => {
+    setAmount(prevAmount => prevAmount > 0 ? prevAmount - 100 : 0);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -41,7 +51,8 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
           <Image
             style={{ width: 130, height: 160 }}
             className='mx-auto mt-4'
-            source={require('@asset/images/clan_logo/clan_logo_3.png')}
+            // source={require(`@asset/images/clan_logo/clan_logo_1.png`)}
+            source={clanLogo.image}
           />
           {/* <AwesomeButton style={{ margin: 'auto', marginTop: 10 }} width={160} backgroundColor={themeColors.primary} height={45} raiseLevel={4} springRelease={false} >
             <Text className='text-white font-bold'>Select Clan Logo</Text>
@@ -61,25 +72,6 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
               style={{ color: themeColors.primary }}
             />
           </View>
-          {/* <View className='my-2 flex-row'>
-            <Text style={{ color: themeColors.primary }} className='text-lg font-bold my-auto'>Clan Logo</Text>
-            <Image
-              style={{ maxHeight: 80, maxWidth: 65 }}
-              source={require('@asset/images/clan_logo/clan_logo_4.png')}
-              className='mx-5'
-            />
-            <AnimatedPressable
-              style={{ backgroundColor: themeColors.secondary }}
-              pressInValue={0.95}
-              className='border border-slate-400 w-24 h-10 rounded-lg my-auto'
-              onPress={() => setModalVisible(true)}
-            >
-              <View className='flex-row my-auto ml-1'>
-                <MaterialIcons name="expand-more" size={24} color='white' />
-                <Text className='font-bold text-center text-white my-auto'>Browse</Text>
-              </View>
-            </AnimatedPressable>
-          </View> */}
           <View className='my-2'>
             <Text style={{ color: themeColors.primary }} className='text-lg font-bold my-auto'>Clan Descriptions</Text>
             <TextInput
@@ -91,16 +83,35 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
             />
           </View>
 
+          <View className='my-2 flex-col'>
+            <Text style={{ color: themeColors.primary }} className='text-lg font-bold my-auto'>Required ActiveScore</Text>
+            <View className='flex-row'>
+            <AnimatedPressable pressInValue={0.96} onPress={decrement}>
+             <Image className='h-6 w-4 my-auto' source={require('@asset/images/arrow_left.png')} />
+            </AnimatedPressable>
+            <TextInput
+              value={amount.toString()}
+              className='p-3 w-1/4 text-center text-lg font-bold'
+              style={{ color: themeColors.primary }}
+            />
+            <AnimatedPressable pressInValue={0.96} onPress={increment}>
+              <Image className='h-6 w-4 my-auto' source={require('@asset/images/arrow_right.png')} />
+            </AnimatedPressable>
+            </View>
+          </View>
+
+          <View className='flex-row justify-center mt-8'>
+            <Image className='aspect-square w-8' source={require('@asset/images/coin_icon.png')} />
+            <Text style={{ color: themeColors.primary }} className='my-auto mx-2 text-lg font-bold'>2000</Text>
+          </View>
+
           <AnimatedPressable
             style={{ backgroundColor: themeColors.secondary }}
-            className='w-3/5 mx-auto h-10 rounded-lg my-auto mt-8'
+            className='w-3/5 mx-auto h-10 rounded-lg my-auto mt-2'
             pressInValue={0.95}
           >
             <Text className='text-lg text-white font-bold text-center my-auto'>Create Clan</Text>
           </AnimatedPressable>
-          {/* <AwesomeButton style={{ margin: 'auto', marginTop: 10 }} width={160} backgroundColor={themeColors.primary} height={45} raiseLevel={4} springRelease={false} >
-            <Text className='text-white font-bold'>Create Clan</Text>
-          </AwesomeButton> */}
         </View>
       </TouchableWithoutFeedback>
       <Modal
@@ -108,9 +119,9 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
         visible={modalVisible}
         presentationStyle='overFullScreen'
         transparent={true}
-        onRequestClose={() =>setModalVisible(false)}
+        onRequestClose={() => setModalVisible(false)}
       >
-        <ClanLogoListModal onClose={() => setModalVisible(false)}/>
+        <ClanLogoListModal onClose={() => setModalVisible(false)} onSelectLogo={(logo) => setClanLogo(logo)}/>
       </Modal>
     </ImageBackground>
     <View className='flex-1' />

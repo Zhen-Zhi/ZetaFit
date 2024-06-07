@@ -6,7 +6,7 @@ import { StyleProps } from 'react-native-reanimated';
 const AnimatedButton = Animated.createAnimatedComponent(Pressable);
 
 type AnimatedPressableProps = {
-  onPress?: () => void | null;
+  onPress?: () => void | string | null;
   style?: StyleProps;
   className?: string;
   pressInValue: number;
