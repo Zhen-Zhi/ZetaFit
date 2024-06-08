@@ -113,7 +113,7 @@ const ClanLogoListModal = ({ onClose, onSelectLogo }: ClanLogoListModalProps) =>
         source={require('@asset/images/background_image.png')}
       >
       <View className='h-auto rounded-xl overflow-show m-10 my-8'>
-        <AnimatedPressable pressInValue={0.9} className='z-10 absolute'>
+        <AnimatedPressable pressInValue={0.9} className='z-10 absolute' onPress={onClose}>
           <View>
             <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
           </View>

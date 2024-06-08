@@ -5,6 +5,8 @@ import { themeColors } from '@/src/constants/Colors'
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import ClanLogoListModal from './clanLogoList';
 import AwesomeButton from "react-native-really-awesome-button";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Stack } from 'expo-router';
 
 type CreateClanScreenProps = {
   onClose: () => void
@@ -29,11 +31,11 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
       className='justify-end bg-black flex-1'
     >
     <ImageBackground
-      // imageStyle={{ borderRadius: 20, width: '96%', marginLeft: '2%' }}
       className='h-full'
       source={require('@asset/images/background_image.png')}
     >
-      <View className='flex-row justify-normal pt-3 pb-2 px-4 bg-white border-b border-slate-400'>
+      <View className='flex-row justify-normal pt-3 pb-2 px-4 bg-white border-b border-slate-300'>
+        <Stack.Screen />
         <AnimatedPressable 
           pressInValue={0.9} 
           className='absolute left-2 top-2 z-10'

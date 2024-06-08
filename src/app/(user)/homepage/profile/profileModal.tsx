@@ -1,4 +1,4 @@
-import { ImageBackground, Image, StyleSheet, Text, View, FlatList, ScrollView, Modal } from 'react-native'
+import { ImageBackground, Image, StyleSheet, Text, View, FlatList, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import * as ImagePicker from 'expo-image-picker';
 import { randomUUID } from 'expo-crypto';
@@ -49,7 +49,7 @@ const ProfileScreen = ({ onClose }: ModalProps) => {
 
   return (
     <ImageBackground
-      className='flex-1 my-auto mx-2' 
+      className='flex-1' 
       source={require('@asset/images/background_image.png')}
     >
       <View style={{ backgroundColor: themeColors.backgroundColor }} className='flex-row justify-between pt-3 pb-2 px-4 border-b border-slate-300'>

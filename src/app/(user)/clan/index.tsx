@@ -8,6 +8,7 @@ import { clanListData } from '@/src/constants/dummyData'
 import CreateClanScreen from './createClan';
 import { Stack } from 'expo-router';
 import { themeColors } from '@/src/constants/Colors';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 type Clan = {
   clanName: string;
@@ -81,7 +82,11 @@ const ClanScreen = () => {
             transparent={true}
             onRequestClose={() =>setModalVisible(false)}
           >
-            <CreateClanScreen onClose={() => setModalVisible(false)} />
+            <SafeAreaProvider>
+              <SafeAreaView edges={['top']} className='flex-1'>
+                <CreateClanScreen onClose={() => setModalVisible(false)} />
+              </SafeAreaView>
+            </SafeAreaProvider>
           </Modal>
         </View>
 

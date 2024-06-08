@@ -5,6 +5,7 @@ import { Redirect, router } from 'expo-router'
 import { themeColors } from '@/src/constants/Colors';
 import { FontAwesome } from '@expo/vector-icons';
 import ProfileScreen from './profile/profileModal';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 type MoreOptionsModalProps = {
   onClose: () => void;
@@ -67,10 +68,13 @@ const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
         transparent={true}
         onRequestClose={() =>setModalVisible(false)}
       >
-        <ProfileScreen onClose={() => setModalVisible(false)} />
+        <SafeAreaProvider>
+          <SafeAreaView edges={['top']} className='flex-1 bg-white'>
+            <ProfileScreen onClose={() => setModalVisible(false)} />
+          </SafeAreaView>
+        </SafeAreaProvider>
       </Modal>
     </Pressable>
-
   )
 }
 

@@ -4,6 +4,7 @@ import MemberScreen from './clanMember';
 import ClanTestingScreen from './clanDetails';
 import { themeColors } from '@/src/constants/Colors';
 
+
 const Tab = createMaterialTopTabNavigator();
 
 const TabLayout = () => {
