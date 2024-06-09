@@ -11,6 +11,7 @@ type AnimatedPressableProps = {
   className?: string;
   pressInValue: number;
   children?: ReactNode;
+  disabled?: boolean;
 }
 
 const AnimatedPressable = forwardRef<typeof Pressable, AnimatedPressableProps>((props, ref) => {
@@ -39,6 +40,7 @@ const AnimatedPressable = forwardRef<typeof Pressable, AnimatedPressableProps>((
       onPress={props.onPress}
       style={[props.style, { transform: [{ scale: animatedValue}] }]}
       className={props.className}
+      disabled={props.disabled}
     >
       {props.children}
     </AnimatedButton>

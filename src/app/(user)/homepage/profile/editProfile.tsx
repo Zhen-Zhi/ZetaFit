@@ -7,6 +7,8 @@ import * as FileSystem from 'expo-file-system'
 import AnimatedPressable from '@/src/components/AnimatedPressable';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { themeColors } from '@/src/constants/Colors';
+import Checkbox from 'expo-checkbox';
+import AchievementElement from './achievementElement';
 
 type ModalProps = {
   onClose: () => void;
@@ -91,15 +93,14 @@ const EditProfileScreen = ({ onClose }: ModalProps) => {
           </View>
 
           <View className='mt-4 p-2'>
-            <Text style={{ color: themeColors.primary }} className='text-lg font-medium my-2'>Achivements</Text>
+            <Text style={{ color: themeColors.primary }} className='text-lg font-medium my-2'>Show Achivements</Text>
             {/* <View className='border-b border-slate-400' /> */}
             <FlatList
-              numColumns={3}
               data={[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}
-              renderItem={({ item }) => <View className='p-1'><Image className='w-24 h-24' source={require('@asset/images/badges.png')} /></View>}
+              initialNumToRender={5}
+              renderItem={({ item }) => <AchievementElement />}
               scrollEnabled={false}
               contentContainerStyle={{ gap: 10 }}
-              columnWrapperStyle={{ gap: 10 }}
               ListFooterComponent={<View className='h-16' />}
             />
           </View>

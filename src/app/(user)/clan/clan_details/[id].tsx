@@ -1,7 +1,7 @@
 import { ImageBackground, StyleSheet, Text, View, Image, FlatList, SafeAreaView, Modal, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import { Stack, router, useLocalSearchParams } from 'expo-router'
-import { FontAwesome6 } from '@expo/vector-icons'
+import { FontAwesome6, Ionicons } from '@expo/vector-icons'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import ClanMember from '@/src/components/ClanMember'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
@@ -82,8 +82,13 @@ const ClanDetailsScreen = () => {
       >
         <Pressable className='bg-black/60 flex-1' onPress={() => setModalVisible(false)}>
           <View className='bg-white m-auto w-[75%] rounded-lg border-4 border-slate-200'>
-            <View className='p-2 border-b-2 border-slate-300'>
+            <View className='p-2 border-b-2 border-slate-300 flex-row justify-between'>
               <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Leave Clan</Text>
+              <AnimatedPressable pressInValue={0.8} onPress={() => setModalVisible(false)}>
+                <View className='my-auto'>
+                  <Ionicons name="close-sharp" size={24} color="black" />
+                </View>
+              </AnimatedPressable>
             </View>
             <View style={{ backgroundColor: themeColors.backgroundColor }} className='p-4'>
               <Text style={{ color: themeColors.primary }} className='font-bold text-lg'>Are you sure you want to leave clan?</Text>

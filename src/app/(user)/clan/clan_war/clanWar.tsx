@@ -46,16 +46,19 @@ const ClanWarScreen = () => {
             <View className='mx-6 my-10'>
               <Text className='text-xl font-bold mb-2'>Samsung Galaxy</Text>
               <Text className='font-semibold text-md'>Clan Health</Text>
-              <Progress.Bar className='my-1'
+              <View className='mt-1 flex-row'>
+                <FontAwesome6 name="shield-heart" size={22} color='red' />
+              <Progress.Bar className='my-1 ml-2'
                 progress={0.9}
                 height={14}
-                width={130}
+                width={115}
                 color={themeColors.tetiary}
                 unfilledColor={themeColors.secondary}
                 borderWidth={1}
                 borderRadius={0}
                 borderColor={themeColors.primary}
               />
+              </View>
               <Text>900/1000</Text>
               <AnimatedPressable 
                 style={{ backgroundColor: themeColors.secondary }}
@@ -74,21 +77,25 @@ const ClanWarScreen = () => {
             <View className='mx-6 my-10'>
               <Text style={{ color: themeColors.danger }} className='text-xl font-bold mb-2'>Samsung Galaxy</Text>
               <Text className='font-semibold text-md'>Clan Health</Text>
-              <Progress.Bar className='my-1'
+              <View className='mt-1 flex-row'>
+                <FontAwesome6 name="shield-heart" size={22} color='red' />
+              <Progress.Bar className='my-1 ml-2'
                 progress={0.9}
                 height={14}
-                width={130}
+                width={115}
                 color={themeColors.tetiary}
                 unfilledColor={themeColors.secondary}
                 borderWidth={1}
                 borderRadius={0}
                 borderColor={themeColors.primary}
               />
+              </View>
               <Text>900/1000</Text>
               <AnimatedPressable 
                 style={{ backgroundColor: themeColors.danger }}
                 className='rounded mt-auto p-2'
                 pressInValue={0.96}
+                disabled
               >
                 <Text style={{ color: themeColors.backgroundColor }} className='font-semibold text-md mx-auto'>Attack</Text>
               </AnimatedPressable>
