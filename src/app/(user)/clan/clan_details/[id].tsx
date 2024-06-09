@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, Text, View, Image, FlatList, SafeAreaView } from 'react-native'
+import { ImageBackground, StyleSheet, Text, View, Image, FlatList, SafeAreaView, Modal, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import { Stack, router, useLocalSearchParams } from 'expo-router'
 import { FontAwesome6 } from '@expo/vector-icons'
@@ -13,6 +13,16 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 const ClanDetailsScreen = () => {
   const { id } = useLocalSearchParams()
   const [haveClan, setHaveClan] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleCLanInOut = () => {
+    if(haveClan) {
+      setModalVisible(true)
+    }
+    else {
+      setHaveClan(true)
+    }
+  }
 
   return (
     <ImageBackground
@@ -51,7 +61,7 @@ const ClanDetailsScreen = () => {
             style={{ backgroundColor: haveClan ? themeColors.danger : themeColors.secondary }}
             className='w- rounded-xl p-3 mt-auto'
             pressInValue={0.95}
-            onPress={() => setHaveClan(!haveClan)}
+            onPress={() => handleCLanInOut()}
             >
             {haveClan 
               ? 
@@ -62,10 +72,33 @@ const ClanDetailsScreen = () => {
           </AnimatedPressable>
         </View>
       </View>
-      
-      
-      
       <TabLayout />
+      <Modal
+        animationType='fade'
+        visible={modalVisible}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setModalVisible(false)}
+      >
+        <Pressable className='bg-black/60 flex-1' onPress={() => setModalVisible(false)}>
+          <View className='bg-white m-auto w-[75%] rounded-lg border-4 border-slate-200'>
+            <View className='p-2 border-b-2 border-slate-300'>
+              <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Leave Clan</Text>
+            </View>
+            <View style={{ backgroundColor: themeColors.backgroundColor }} className='p-4'>
+              <Text style={{ color: themeColors.primary }} className='font-bold text-lg'>Are you sure you want to leave clan?</Text>
+            </View>
+            <View className='flex-row justify-between'>
+              <AnimatedPressable style={{ backgroundColor: themeColors.secondary }} className='flex-1' pressInValue={0.95} onPress={() => setModalVisible(false)}>
+                <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Stay</Text>
+              </AnimatedPressable>
+              <AnimatedPressable style={{ backgroundColor: themeColors.danger }} className='flex-1 h-10' pressInValue={0.95} onPress={() => {setModalVisible(false); setHaveClan(false)}}>
+                <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Leave</Text>
+              </AnimatedPressable>
+            </View>
+          </View>
+        </Pressable>
+      </Modal>
     </View>
     </ImageBackground>
   )

@@ -5,7 +5,7 @@ import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
 import * as Progress from 'react-native-progress';
-import ClanWarAttackDetailsScreen from './clanWarAttackDetails'
+import ClanWarBattleLogScreen from './clanWarBattleLog'
 
 const ClanWarScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -112,7 +112,7 @@ const ClanWarScreen = () => {
         transparent={true}
         onRequestClose={() =>setModalVisible(false)}
       >
-        <ClanWarAttackDetailsScreen onClose={() => setModalVisible(false)}/>
+        <ClanWarBattleLogScreen onClose={() => setModalVisible(false)}/>
       </Modal>
     </SafeAreaView>
   )

@@ -1,35 +1,46 @@
-import { ImageBackground, Pressable, StyleSheet, Text, View, Image } from 'react-native'
+import { ImageBackground, Pressable, StyleSheet, Text, View, Image, FlatList, TouchableWithoutFeedback } from 'react-native'
 import React from 'react'
 import { Stack } from 'expo-router'
 import { FontAwesome5 } from '@expo/vector-icons'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import ClanWarAttackDetialsScreen from './clanWarAttackDetials'
+import ClanWarDefenseDetialsScreen from './clanWarDefenseDetails'
 
 const Tab = createMaterialTopTabNavigator();
 
 const Attack = () => (
-  <Text className='flex-1'>Attack</Text>
+  <FlatList
+    className='mt-2'
+    data={[1,2,3,4,5]}
+    renderItem={({ item }) => <ClanWarAttackDetialsScreen />}
+  />
 );
 
 const Defense = () => (
-  <Text className='flex-1'>Defense</Text>
+  <FlatList
+    className='mt-2'
+    data={[1,2,3,4,5]}
+    renderItem={({ item }) => <ClanWarDefenseDetialsScreen />}
+  />
 );
 
-type ClanWarAttackDetailsScreenProps = {
+type ClanWarBattleLogProps = {
   onClose: () => void
 }
 
-const ClanWarAttackDetailsScreen = ({ onClose }: ClanWarAttackDetailsScreenProps) => {
+const ClanWarBattleLogScreen = ({ onClose }: ClanWarBattleLogProps) => {
   return (
-    <Pressable className='flex-1 bg-black/50'>
+    <Pressable className='flex-1 bg-black/50' onPress={onClose}>
+    <Pressable className='flex-1 my-16 mx-8' onPress={(event) => event.stopPropagation()}>
     <Stack.Screen />
     <ImageBackground
       source={require('@asset/images/background_image.png')}
       imageStyle={{ borderRadius: 20 }}
-      className='flex-1 my-16 mx-8'
+      className='flex-1'
     >
-    <View>
+    <View className='bg-white/40 rounded-xl'>
       <Image
         source={require('@asset/images/battle_log_logo.png')} 
         className='h-36 w-36 mx-auto my-2'
@@ -69,9 +80,10 @@ const ClanWarAttackDetailsScreen = ({ onClose }: ClanWarAttackDetailsScreenProps
     </Tab.Navigator>
     </ImageBackground>
     </Pressable>
+    </Pressable>
   )
 }
 
-export default ClanWarAttackDetailsScreen
+export default ClanWarBattleLogScreen
 
 const styles = StyleSheet.create({})
