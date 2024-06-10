@@ -6,9 +6,13 @@ import { themeColors } from '@/src/constants/Colors'
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
 import * as Progress from 'react-native-progress';
 import ClanWarBattleLogScreen from './clanWarBattleLog'
+import ClanWarAttackDetialsScreen from './clanWarAttackDetials'
+import ClanWarActionScreenModal from './clanWarActions'
 
 const ClanWarScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [actionModalVisible, setActionModalVisible] = useState(false);
+  const [actionType, setActionType] = useState('attack');
 
   return (
     <SafeAreaView className='flex-1'>
@@ -79,26 +83,36 @@ const ClanWarScreen = () => {
               <Text className='font-semibold text-md'>Clan Health</Text>
               <View className='mt-1 flex-row'>
                 <FontAwesome6 name="shield-heart" size={22} color='red' />
-              <Progress.Bar className='my-1 ml-2'
-                progress={0.9}
-                height={14}
-                width={115}
-                color={themeColors.tetiary}
-                unfilledColor={themeColors.secondary}
-                borderWidth={1}
-                borderRadius={0}
-                borderColor={themeColors.primary}
-              />
+                <Progress.Bar className='my-1 ml-2'
+                  progress={0.9}
+                  height={14}
+                  width={115}
+                  color={themeColors.tetiary}
+                  unfilledColor={themeColors.secondary}
+                  borderWidth={1}
+                  borderRadius={0}
+                  borderColor={themeColors.primary}
+                />
               </View>
               <Text>900/1000</Text>
-              <AnimatedPressable 
-                style={{ backgroundColor: themeColors.danger }}
-                className='rounded mt-auto p-2'
-                pressInValue={0.96}
-                disabled
-              >
-                <Text style={{ color: themeColors.backgroundColor }} className='font-semibold text-md mx-auto'>Attack</Text>
-              </AnimatedPressable>
+              <View className='flex-row mt-auto'>
+                <AnimatedPressable 
+                  style={{ backgroundColor: themeColors.danger }}
+                  className='rounded flex-1 mx-0.5 p-2'
+                  pressInValue={0.96}
+                  onPress={() => {setActionModalVisible(true); setActionType('attack')}}
+                  >
+                  <Text style={{ color: themeColors.backgroundColor }} className='font-semibold text-md mx-auto'>Attack</Text>
+                </AnimatedPressable>
+                <AnimatedPressable 
+                  style={{ backgroundColor: themeColors.secondary }}
+                  className='rounded flex-1 p-2'
+                  pressInValue={0.96}
+                  onPress={() => {setActionModalVisible(true); setActionType('defense')}}
+                  >
+                  <Text style={{ color: themeColors.backgroundColor }} className='font-semibold text-md mx-auto'>Defense</Text>
+                </AnimatedPressable>
+              </View>
             </View>
             <View className='ml-auto mr-4 mb-2'>
               <Image className='w-44 h-52 mt-2' source={require('@asset/images/clan_logo/clan_logo_2.png')} />
@@ -120,6 +134,15 @@ const ClanWarScreen = () => {
         onRequestClose={() =>setModalVisible(false)}
       >
         <ClanWarBattleLogScreen onClose={() => setModalVisible(false)}/>
+      </Modal>
+      <Modal
+        animationType='fade'
+        visible={actionModalVisible}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setActionModalVisible(false)}
+      >
+        <ClanWarActionScreenModal actionType={actionType} onClose={() => setActionModalVisible(false)} />
       </Modal>
     </SafeAreaView>
   )

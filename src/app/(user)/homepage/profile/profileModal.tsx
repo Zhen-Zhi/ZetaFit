@@ -62,21 +62,14 @@ const ProfileScreen = ({ onClose }: ModalProps) => {
             />
             <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>Clan Name</Text>
           </AnimatedPressable>
-          {/* <AnimatedPressable 
-            onPress={onClose}
-            style={[styles.image, styles.shadowAndriod]} 
-            className='bg-white border border-slate-400 h-12 flex-row my-4 mx-2 rounded-lg shadow shadow-slate-400'
-            pressInValue={0.97}
-            >
-            <Image
-              className='w-16 ml-2 mt-4 aspect-square'
-              source={require('@asset/images/CyberKongz.jpg')} 
-            />
-            <Text className='text-center font-extrabold text-lg p-1'>Clan Name</Text>
-          </AnimatedPressable> */}
 
           <View className='mt-4 p-2'>
-            <Text style={{ color: themeColors.primary }} className='text-lg font-medium my-2'>Achivements</Text>
+            <Text style={{ color: themeColors.primary }} className='text-lg font-medium my-2'>Battle Pets</Text>
+            <Image
+              className='w-56 h-56 mx-auto'
+              source={require('@asset/images/pets/dragon.png')} 
+            />
+            <Text style={{ color: themeColors.primary }} className='text-xl font-semibold my-2 text-center'>Turtle</Text>
           </View>
 
           <View className='mt-4 p-2'>

@@ -131,10 +131,10 @@ const HomeScreen = () => {
       </Modal>
       
       {/* middle image - main */}
-      <View className='mx-auto mt-16 mb-6'>
+      <View className='mx-auto mt-12 mb-6'>
         <Image
-          className='w-64 h-48 rounded-xl'
-          source={require('@asset/images/ZetaFit logo.png')} 
+          className='w-56 h-56 mx-auto'
+          source={require('@asset/images/pets/dragon.png')} 
         />
         <AnimatedPressable
           className='m-1 h-[40px] w-[240px] bg-slate-200 p-1 rounded justify-center mt-3'
