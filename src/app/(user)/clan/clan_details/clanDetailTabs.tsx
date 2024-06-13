@@ -1,15 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import MemberScreen from './clanMember';
-import ClanTestingScreen from './clanDetails';
+import ClanDetailsScreen from './clanDetails';
 import { themeColors } from '@/src/constants/Colors';
+import ClanActivityLogScreen from './clanActivityLog';
 
+type TabLayoutProps = {
+  haveClan: boolean;
+}
 
 const Tab = createMaterialTopTabNavigator();
 
-const TabLayout = () => {
+const TabLayout = ({ haveClan }: TabLayoutProps) => {
+  const [currentTab, setCurrentTab] = useState(haveClan ? 'clanActivityLog' : 'member');
+  
+  useEffect(() => {
+    // Update the current tab based on the haveClan prop
+    setCurrentTab(haveClan ? 'clanActivityLog' : 'member');
+  }, [haveClan]);
+  
   return (
     <Tab.Navigator
+      initialRouteName={'clanActivityLog'}
       sceneContainerStyle={{backgroundColor: 'transparent',}}
       screenOptions={{
         tabBarPressColor: 'transparent',
@@ -27,7 +39,10 @@ const TabLayout = () => {
       }}
     >
       <Tab.Screen name="member" component={MemberScreen} options={{ tabBarLabel: 'Members' }} />
-      <Tab.Screen name="clanDetails" component={ClanTestingScreen} options={{ tabBarLabel: 'Details' }} />
+      {haveClan && (
+        <Tab.Screen name="clanActivityLog" component={ClanActivityLogScreen} options={{ tabBarLabel: 'Activity' }} />
+      )}
+      <Tab.Screen name="clanDetails" component={ClanDetailsScreen} options={{ tabBarLabel: 'Details' }} />
     </Tab.Navigator>
   );
 }

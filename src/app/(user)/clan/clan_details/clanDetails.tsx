@@ -8,7 +8,7 @@ import AnimatedPressable from '@/src/components/AnimatedPressable';
 import EditRequireActiveScoreModal from './editRequireActiveScore';
 import AddClanHealthModal from './addClanHealth';
 
-const ClanTestingScreen = () => {
+const ClanDetailsScreen = () => {
   const [editModalVisible, setEditModalVisible] = useState(false)
   const [healthModalVisible, setHealthModalVisible] = useState(false)
   const [haveClan, setHaveClan] = useState(true)
@@ -139,6 +139,6 @@ const ClanTestingScreen = () => {
   )
 }
 
-export default ClanTestingScreen
+export default ClanDetailsScreen
 
 const styles = StyleSheet.create({})

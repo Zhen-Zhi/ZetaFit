@@ -7,8 +7,9 @@ import ClanMember from '@/src/components/ClanMember'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import MemberScreen from './clanMember'
 import TabLayout from './clanDetailTabs'
-import { themeColors } from '@/src/constants/Colors'
+import { clanColors, themeColors } from '@/src/constants/Colors'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AnimatedModal from '@/src/components/AnimatedModal'
 
 const ClanDetailsScreen = () => {
   const { id } = useLocalSearchParams()
@@ -51,28 +52,28 @@ const ClanDetailsScreen = () => {
       }} />
       <View className='flex-row mb-3'>
         <Image 
-          className='w-32 h-40 ml-8 mr-4'
+          className='w-32 h-40 mx-4'
           source={require('@asset/images/clan_logo/clan_logo_1.png')}
         />
         <View className='flex-1 pr-4'>
-          <Text style={{ color: themeColors.primary }} className='text-[24px] font-[800]'>Samsung galaxy</Text>
-          <Text numberOfLines={4} style={{ color: themeColors.secondary }} className='font-semibold mt-1 text-left'>The quick brown fox jumps over the lazy dog.The quick brown fox jumps</Text>
+          <Text style={{ color: themeColors.primary }} className='text-[24px] text-left font-[800]'>Samsung galaxy</Text>
+          <Text numberOfLines={4} style={{ color: themeColors.secondary }} className='font-semibold mt-1 text-justify'>The quick brown fox jumps over the lazy dog.The quick brown fox jumps</Text>
           <AnimatedPressable 
             style={{ backgroundColor: haveClan ? themeColors.danger : themeColors.secondary }}
-            className='w- rounded-xl p-3 mt-auto'
+            className='w-[75%] rounded-xl p-2 mt-auto'
             pressInValue={0.95}
             onPress={() => handleCLanInOut()}
             >
             {haveClan 
               ? 
-              <Text style={{ color: themeColors.backgroundColor }} className='font-bold text-md text-center' >Leave Clan</Text>
+              <Text style={{ color: themeColors.backgroundColor }} className='font-bold text-lg text-center' >Leave</Text>
               :
-              <Text style={{ color: themeColors.backgroundColor }} className='font-bold text-md text-center' >Join Clan</Text>
+              <Text style={{ color: themeColors.backgroundColor }} className='font-bold text-lg text-center' >Join Clan</Text>
             }
           </AnimatedPressable>
         </View>
       </View>
-      <TabLayout />
+      <TabLayout haveClan={haveClan} />
       <Modal
         animationType='fade'
         visible={modalVisible}
@@ -80,29 +81,18 @@ const ClanDetailsScreen = () => {
         transparent={true}
         onRequestClose={() =>setModalVisible(false)}
       >
-        <Pressable className='bg-black/60 flex-1' onPress={() => setModalVisible(false)}>
-          <View className='bg-white m-auto w-[75%] rounded-lg border-4 border-slate-200'>
-            <View className='p-2 border-b-2 border-slate-300 flex-row justify-between'>
-              <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Leave Clan</Text>
-              <AnimatedPressable pressInValue={0.8} onPress={() => setModalVisible(false)}>
-                <View className='my-auto'>
-                  <Ionicons name="close-sharp" size={24} color="black" />
-                </View>
-              </AnimatedPressable>
-            </View>
-            <View style={{ backgroundColor: themeColors.backgroundColor }} className='p-4'>
-              <Text style={{ color: themeColors.primary }} className='font-bold text-lg'>Are you sure you want to leave clan?</Text>
-            </View>
-            <View className='flex-row justify-between'>
-              <AnimatedPressable style={{ backgroundColor: themeColors.secondary }} className='flex-1' pressInValue={0.95} onPress={() => setModalVisible(false)}>
-                <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Stay</Text>
-              </AnimatedPressable>
-              <AnimatedPressable style={{ backgroundColor: themeColors.danger }} className='flex-1 h-10' pressInValue={0.95} onPress={() => {setModalVisible(false); setHaveClan(false)}}>
-                <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Leave</Text>
-              </AnimatedPressable>
-            </View>
+        <AnimatedModal modalVisible={modalVisible} onClose={() => setModalVisible(false)}>
+          <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Leave Clan</Text>
+          <Text style={{ color: themeColors.primary }} className='font-bold text-lg'>Are you sure you want to leave clan?</Text>
+          <View className='flex-row justify-around mt-6'>
+            <AnimatedPressable style={{ backgroundColor: themeColors.secondary }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => setModalVisible(false)}>
+            <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Stay</Text>
+            </AnimatedPressable>
+            <AnimatedPressable style={{ backgroundColor: themeColors.danger }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => {setModalVisible(false); setHaveClan(false)}}>
+            <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Leave</Text>
+            </AnimatedPressable>
           </View>
-        </Pressable>
+        </AnimatedModal>
       </Modal>
     </View>
     </ImageBackground>

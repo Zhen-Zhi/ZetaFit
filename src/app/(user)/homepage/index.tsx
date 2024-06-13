@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Image, ImageBackground, Modal, FlatList, Activi
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as Progress from 'react-native-progress';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import AnimatedPressable from '@/src/components/AnimatedPressable';
 import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
 import MoreOptionsModal from './optionListModal';
@@ -132,15 +132,32 @@ const HomeScreen = () => {
       
       {/* middle image - main */}
       <View className='mx-auto mt-12 mb-6'>
-        <Image
-          className='w-56 h-56 mx-auto'
-          source={require('@asset/images/pets/dragon.png')} 
-        />
+        <AnimatedPressable pressInValue={0.95}>
+          <Image
+            className='w-56 h-56 mx-auto'
+            source={require('@asset/images/pets/turtle.png')} 
+            />
+        </AnimatedPressable>
+        <View className='flex-row justify-between mt-2'>
+          <View className='flex-row flex-1'>
+            <View className='my-auto'>
+              <FontAwesome6 name="fire" size={24} color="rgba(240, 93, 9, 0.8)" />
+            </View>
+            <Text style={{ color: themeColors.primary }} className='bg-slate-200 rounded-lg px-2 text-lg text-center font-semibold flex-1 mx-2'>9999</Text>
+          </View>
+          <View className='flex-row flex-1'>
+            <View className='my-auto'>
+              <FontAwesome6 name="bolt-lightning" size={24} color='orange' />
+            </View>
+            <Text style={{ color: themeColors.primary }} className='bg-slate-200 rounded-lg px-2 text-lg text-center font-semibold flex-1 mx-2'>20</Text>
+          </View>
+        </View>
         <AnimatedPressable
-          className='m-1 h-[40px] w-[240px] bg-slate-200 p-1 rounded justify-center mt-3'
+          style={{ backgroundColor: themeColors.secondary }}
+          className='m-1 h-[40px] w-[240px] bg-slate-200 p-1 rounded-lg justify-center mt-1 flex-row'
           pressInValue={0.98}
         >
-          <Text className='text-center font-extrabold text-lg'>Add Activity</Text>
+          <Text style={{ color: themeColors.backgroundColor }} className='text-center font-extrabold text-lg'>Add Activity</Text>
         </AnimatedPressable>
       </View>
 
