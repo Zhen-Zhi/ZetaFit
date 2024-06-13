@@ -1,11 +1,11 @@
 import { ImageBackground, StyleSheet, Text, View, Image, FlatList, SafeAreaView, Modal, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import { Stack, router, useLocalSearchParams } from 'expo-router'
-import { FontAwesome6, Ionicons } from '@expo/vector-icons'
+import { Entypo, FontAwesome6, Ionicons } from '@expo/vector-icons'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import ClanMember from '@/src/components/ClanMember'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import MemberScreen from './clanMember'
+import MemberScreen from './clanMemberList'
 import TabLayout from './clanDetailTabs'
 import { clanColors, themeColors } from '@/src/constants/Colors'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -22,6 +22,7 @@ const ClanDetailsScreen = () => {
     }
     else {
       setHaveClan(true)
+      router.push('/clan/clan_details/clanActivityLog');
     }
   }
 
@@ -58,19 +59,31 @@ const ClanDetailsScreen = () => {
         <View className='flex-1 pr-4'>
           <Text style={{ color: themeColors.primary }} className='text-[24px] text-left font-[800]'>Samsung galaxy</Text>
           <Text numberOfLines={4} style={{ color: themeColors.secondary }} className='font-semibold mt-1 text-justify'>The quick brown fox jumps over the lazy dog.The quick brown fox jumps</Text>
-          <AnimatedPressable 
-            style={{ backgroundColor: haveClan ? themeColors.danger : themeColors.secondary }}
-            className='w-[75%] rounded-xl p-2 mt-auto'
-            pressInValue={0.95}
-            onPress={() => handleCLanInOut()}
-            >
-            {haveClan 
-              ? 
-              <Text style={{ color: themeColors.backgroundColor }} className='font-bold text-lg text-center' >Leave</Text>
-              :
-              <Text style={{ color: themeColors.backgroundColor }} className='font-bold text-lg text-center' >Join Clan</Text>
-            }
-          </AnimatedPressable>
+          <View className='flex-row mt-auto justify-between'>
+            <AnimatedPressable 
+              style={{ backgroundColor: haveClan ? themeColors.danger : themeColors.secondary }}
+              className='w-[75%] rounded-xl p-2'
+              pressInValue={0.95}
+              onPress={() => handleCLanInOut()}
+              >
+              {haveClan 
+                ? 
+                <Text style={{ color: themeColors.backgroundColor }} className='font-bold text-lg text-center' >Leave</Text>
+                :
+                <Text style={{ color: themeColors.backgroundColor }} className='font-bold text-lg text-center' >Join Clan</Text>
+              }
+            </AnimatedPressable>
+            { haveClan && <AnimatedPressable 
+              style={{ backgroundColor: themeColors.secondary }}
+              className='w-[20%] rounded-xl p-2'
+              pressInValue={0.95}
+              onPress={() => router.push('/clan/clan_details/clanActivityLog')}
+              >
+                <View className='m-auto'>
+                  <Entypo name="chat" size={24} color="white" />
+                </View>
+            </AnimatedPressable>}
+          </View>
         </View>
       </View>
       <TabLayout haveClan={haveClan} />

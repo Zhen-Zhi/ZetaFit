@@ -34,7 +34,7 @@ const MemberScreen = () => {
       <FlatList
         className='mt-1 mb-2 mx-0.5'
         data={[1,2,3,4,5,6,7,8,9,10]}
-        renderItem={({ item }) => <ClanMember />}
+        renderItem={({ item }) => <ClanMember id={1} />}
         keyExtractor={(item) => item.toString()}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ gap: 3 }}

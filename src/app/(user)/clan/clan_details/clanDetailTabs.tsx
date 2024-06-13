@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import MemberScreen from './clanMember';
+import MemberScreen from './clanMemberList';
 import ClanDetailsScreen from './clanDetails';
 import { themeColors } from '@/src/constants/Colors';
 import ClanActivityLogScreen from './clanActivityLog';
@@ -39,9 +39,6 @@ const TabLayout = ({ haveClan }: TabLayoutProps) => {
       }}
     >
       <Tab.Screen name="member" component={MemberScreen} options={{ tabBarLabel: 'Members' }} />
-      {haveClan && (
-        <Tab.Screen name="clanActivityLog" component={ClanActivityLogScreen} options={{ tabBarLabel: 'Activity' }} />
-      )}
       <Tab.Screen name="clanDetails" component={ClanDetailsScreen} options={{ tabBarLabel: 'Details' }} />
     </Tab.Navigator>
   );

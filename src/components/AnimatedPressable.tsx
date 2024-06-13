@@ -7,6 +7,7 @@ const AnimatedButton = Animated.createAnimatedComponent(Pressable);
 
 type AnimatedPressableProps = {
   onPress?: () => void | string | null | Promise<void>;
+  onLongPress?: () => void | string | null | Promise<void>;
   style?: StyleProps;
   className?: string;
   pressInValue: number;
@@ -38,6 +39,7 @@ const AnimatedPressable = forwardRef<typeof Pressable, AnimatedPressableProps>((
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onPress={props.onPress}
+      onLongPress={props.onLongPress}
       style={[props.style, { transform: [{ scale: animatedValue}] }]}
       className={props.className}
       disabled={props.disabled}
