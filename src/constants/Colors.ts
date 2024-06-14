@@ -31,7 +31,7 @@ export const themeColors = {
   primary: '#053b50',
   secondary: '#176b87',
   tetiary: '#64ccc5',
-  backgroundColor: '#f8f8f8',
+  backgroundColor: '#f5f5f5',
   danger: '#dc2626',
 }
 

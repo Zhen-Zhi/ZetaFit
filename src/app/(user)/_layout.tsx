@@ -46,6 +46,9 @@ export default function TabLayout() {
         else if(route.name == 'clan') {
           iconName = 'shield'
         }
+        else if(route.name == 'challenges') {
+          iconName = 'trophy'
+        }
 
         return (
           <FontAwesome 
@@ -60,7 +63,7 @@ export default function TabLayout() {
         fontWeight: 700
       },
       tabBarStyle: {
-        height: 65,
+        height: 70,
         padding: 6,
         borderTopWidth: 1,
         borderColor: 'rgba(189, 189, 189, 0.8)',
@@ -76,6 +79,7 @@ export default function TabLayout() {
       tabBarInactiveTintColor: 'rgba(212, 212, 212, 0.8)',
       tabBarIndicatorStyle: { top: 0, backgroundColor: themeColors.secondary },
     })} >
+      <Stack.Screen name='challenges' options={{ title: 'Challenges' }} />
       <Stack.Screen name='homepage' options={{ title: 'Home' }} />
       <Stack.Screen name='clan' options={{ title: 'Clan' }} />
     </BottomTabs>

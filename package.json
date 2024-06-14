@@ -21,6 +21,7 @@
     "@react-navigation/native": "^6.0.2",
     "base64-arraybuffer": "^1.0.2",
     "expo": "~51.0.8",
+    "expo-checkbox": "~3.0.0",
     "expo-constants": "~16.0.1",
     "expo-crypto": "~13.0.2",
     "expo-file-system": "~17.0.1",
@@ -38,6 +39,7 @@
     "react-native": "0.74.1",
     "react-native-dropdown-select-list": "^2.0.5",
     "react-native-gesture-handler": "~2.16.1",
+    "react-native-linear-gradient": "^2.8.3",
     "react-native-pager-view": "6.3.0",
     "react-native-progress": "^5.0.1",
     "react-native-really-awesome-button": "^2.0.4",
@@ -48,7 +50,7 @@
     "react-native-tab-view": "^3.5.2",
     "react-native-vector-icons": "^10.1.0",
     "react-native-web": "~0.19.10",
-    "expo-checkbox": "~3.0.0"
+    "expo-linear-gradient": "~13.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

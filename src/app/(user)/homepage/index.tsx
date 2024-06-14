@@ -143,13 +143,17 @@ const HomeScreen = () => {
             <View className='my-auto'>
               <FontAwesome6 name="fire" size={24} color="rgba(240, 93, 9, 0.8)" />
             </View>
-            <Text style={{ color: themeColors.primary }} className='bg-slate-200 rounded-lg px-2 text-lg text-center font-semibold flex-1 mx-2'>9999</Text>
+            <View className='bg-slate-200 rounded-lg px-2 mx-2 flex-1'>
+              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>9999</Text>
+            </View>
           </View>
           <View className='flex-row flex-1'>
             <View className='my-auto'>
               <FontAwesome6 name="bolt-lightning" size={24} color='orange' />
             </View>
-            <Text style={{ color: themeColors.primary }} className='bg-slate-200 rounded-lg px-2 text-lg text-center font-semibold flex-1 mx-2'>20</Text>
+            <View className='bg-slate-200 rounded-lg px-2 mx-2 flex-1'>
+              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>200</Text>
+            </View>
           </View>
         </View>
         <AnimatedPressable

@@ -13,7 +13,7 @@ const ActiveChallengesCard = () => {
     >
       <Image 
         className='h-28 w-full rounded-t-md shadow-xl' 
-        source={require('@asset/images/1000-minute_run_challenges.png')} 
+        source={require('@asset/images/challenges_banner.png')} 
       />
       <View className='mt-2'>
         <Text 
@@ -28,7 +28,7 @@ const ActiveChallengesCard = () => {
           progress={0.4}
           borderWidth={0}
           color={themeColors.tetiary}
-          unfilledColor={themeColors.primary}
+          unfilledColor={themeColors.backgroundColor}
         />
       </View>
     </AnimatedPressable>
