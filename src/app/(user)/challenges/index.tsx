@@ -1,6 +1,6 @@
 import { ImageBackground, Platform, StyleSheet, Text, View, Image, FlatList, LayoutChangeEvent, ScrollView } from 'react-native'
 import React, { useRef, useState } from 'react'
-import { Stack } from 'expo-router'
+import { Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
 import { FontAwesome5 } from '@expo/vector-icons'
@@ -129,8 +129,14 @@ const ChallengesScreen = () => {
               </View>
             </AnimatedPressable>
           </View>
-          <Text className='text-xl font-bold mt-4 mb-2 bg-white/50'>Recommended For You</Text>
+          <View className='flex-row justify-between mt-1'>
+            <Text className='text-xl font-bold bg-white/50'>Recommended For You</Text>
+            <AnimatedPressable pressInValue={0.95} onPress={() => router.push('/challenges/allChallenges')}>
+              <Text style={{ color: themeColors.secondary }} className='my-auto mr-2 text-md font-semibold'>View All</Text>
+            </AnimatedPressable>
+          </View>
           { ReChallenges.map(( challenge ) => <ChallengesCard classNameAsProps='mt-2' data={challenge} />) }
+          <Text className='text-center text-slate-500 font-semibold'>You had reach the end</Text>
         </SafeAreaView>
         </ScrollView>
       </ImageBackground>

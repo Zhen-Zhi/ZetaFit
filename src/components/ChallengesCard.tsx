@@ -18,7 +18,6 @@ type ChallengesType = {
 };
 
 const ChallengesCard = ({ classNameAsProps, fullWidth, data }: ChallengesCardProps) => {
-  console.log(classNameAsProps)
   return (
     <AnimatedPressable
       className={classNameAsProps}
