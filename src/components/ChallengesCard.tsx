@@ -6,6 +6,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 import * as Progress from 'react-native-progress';
 
 type ChallengesCardProps = {
+  onPress ?: () => void;
   classNameAsProps ?: string;
   fullWidth ?: number;
   data ?: ChallengesType;
@@ -17,11 +18,12 @@ type ChallengesType = {
   progress ?: number;
 };
 
-const ChallengesCard = ({ classNameAsProps, fullWidth, data }: ChallengesCardProps) => {
+const ChallengesCard = ({ classNameAsProps, fullWidth, data, onPress }: ChallengesCardProps) => {
   return (
     <AnimatedPressable
       className={classNameAsProps}
       pressInValue={0.98}
+      onPress={onPress}
     >
       <View className='bg-white border-x border-t border-slate-400 rounded-xl'>
         <ImageBackground

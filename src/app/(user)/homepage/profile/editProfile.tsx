@@ -9,6 +9,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { themeColors } from '@/src/constants/Colors';
 import Checkbox from 'expo-checkbox';
 import AchievementElement from './achievementElement';
+import { LinearGradient } from 'expo-linear-gradient';
 
 type ModalProps = {
   onClose: () => void;
@@ -106,15 +107,22 @@ const EditProfileScreen = ({ onClose }: ModalProps) => {
           </View>
         </View>
       </ScrollView>
-      <View className='flex-1 justify-center items-center'>
+      <LinearGradient
+        className='h-32 w-full z-10 absolute bottom-0 justify-end'
+        colors={['transparent', '#fff']}
+        start={{ x: 0, y: 0 }}  // Gradient starts at the top
+        end={{ x: 0, y: 0.6 }}  // Gradient ends at the bottom
+      >
+      <View className='flex-1 justify-end items-center'>
         <AnimatedPressable
           style={{ backgroundColor: themeColors.secondary }}
           pressInValue={0.98}
-          className='absolute bottom-8 w-4/5 h-12 rounded-xl border-8 border-white/70'
+          className='w-4/5 p-1.5 rounded-xl mb-6'
           >
           <Text style={{ color: themeColors.backgroundColor }} className='text-center text-xl my-auto font-bold'>Save</Text>
         </AnimatedPressable>
       </View>
+      </LinearGradient>
     </ImageBackground>
   )
 }

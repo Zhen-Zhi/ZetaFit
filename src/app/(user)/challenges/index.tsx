@@ -135,7 +135,7 @@ const ChallengesScreen = () => {
               <Text style={{ color: themeColors.secondary }} className='my-auto mr-2 text-md font-semibold'>View All</Text>
             </AnimatedPressable>
           </View>
-          { ReChallenges.map(( challenge ) => <ChallengesCard classNameAsProps='mt-2' data={challenge} />) }
+          { ReChallenges.map(( challenge ) => <ChallengesCard key={challenge.id} classNameAsProps='mt-2' data={challenge} />) }
           <Text className='text-center text-slate-500 font-semibold'>You had reach the end</Text>
         </SafeAreaView>
         </ScrollView>

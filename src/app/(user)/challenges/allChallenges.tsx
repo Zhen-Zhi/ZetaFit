@@ -1,6 +1,6 @@
 import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, View, Image } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import { Stack } from 'expo-router'
+import { Stack, router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
@@ -76,7 +76,7 @@ const AllChanllengesScreen = () => {
           </View>
           <ScrollView ref={scrollViewRef} className='flex-1'>
             <View className='flex-row'>
-              <AnimatedPressable className='mx-2' pressInValue={0.95}>
+              <AnimatedPressable className='mx-2' pressInValue={0.95} onPress={() => router.back()}>
                 <View className='p-1 my-auto'>
                   <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
                 </View>
@@ -84,7 +84,7 @@ const AllChanllengesScreen = () => {
               <Text className='text-3xl font-bold bg-white/50'>All Chanllenges</Text>
             </View>
           <View className='mx-2.5'>
-            { displayedChallenges.map(( challenge ) => <ChallengesCard key={challenge.id} classNameAsProps='my-3' data={challenge} />) }
+            { displayedChallenges.map(( challenge ) => <ChallengesCard key={challenge.id} classNameAsProps='my-3' data={challenge} onPress={() => router.push(`/challenges/${challenge.id}`)} />) }
           </View>
           <View className='flex-row justify-between bg-white/50 mx-3'>
             <AnimatedPressable
