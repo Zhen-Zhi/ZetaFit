@@ -1,4 +1,4 @@
-import { ImageBackground, Platform, StyleSheet, Text, View, Image, FlatList, LayoutChangeEvent } from 'react-native'
+import { ImageBackground, Platform, StyleSheet, Text, View, Image, FlatList, LayoutChangeEvent, ScrollView } from 'react-native'
 import React, { useRef, useState } from 'react'
 import { Stack } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
@@ -6,28 +6,38 @@ import { themeColors } from '@/src/constants/Colors'
 import { FontAwesome5 } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ChallengesCard from '@/src/components/ChallengesCard'
+import { CurvedTransition } from 'react-native-reanimated'
 
-type ListItemType = {
+type ChallengesType = {
   id: number;
   name: string;
-  // any other properties
+  progress ?: number;
 };
 
-const ListOptions: ListItemType[] = [
-  { id: 1, name: 'Profile' },
-  { id: 2, name: 'Setting' },
-  { id: 3, name: 'Activities' },
+const Challenges: ChallengesType[] = [
+  { id: 1, name: '1000 Minute Run Challenges', progress: 0.3 },
+  { id: 2, name: 'Full Marathon', progress: 0.8 },
+  { id: 3, name: 'Swimming With Passion', progress: 0.15 },
+];
+
+const ReChallenges: ChallengesType[] = [
+  { id: 1, name: '1000 Minute Run Challenges' },
+  { id: 2, name: 'Full Marathon' },
+  { id: 3, name: 'Swimming With Passion' },
+  { id: 4, name: '1000 Minute Run Challenges' },
+  { id: 5, name: 'Full Marathon' },
+  { id: 6, name: 'Swimming With Passion' },
 ];
 
 const ChallengesScreen = () => {
-  const flatListRef = useRef<FlatList<ListItemType>>(null);
+  const flatListRef = useRef<FlatList<ChallengesType>>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flatListWidth, setFlatListWidth] = useState(0);
 
   const scrollToNextItem = () => {
     if (flatListRef.current) {
       const nextIndex = currentIndex + 1;
-      if (nextIndex < ListOptions.length) {
+      if (nextIndex < Challenges.length) {
         flatListRef.current.scrollToIndex({ index: nextIndex });
         setCurrentIndex(nextIndex);
       }
@@ -55,23 +65,17 @@ const ChallengesScreen = () => {
         className='flex-1'
         source={require('@asset/images/background_image.png')}
       >
+        <ScrollView className='mb-2'>
         <SafeAreaView edges={['top']} className='px-6 flex-1'>
           <Stack.Screen options={{ headerShown: false }} />
           <Text className='text-[32px] font-extrabold mt-6 bg-white/50'>Your Challenges</Text>
           
-          <View className='flex-row justify-between mt-2'>
-            <AnimatedPressable
-              className='mx-1'
-              pressInValue={0.9}
-              onPress={scrollToPreviousItem}
-            >
-              <Image className='h-6 w-4 my-auto' source={require('@asset/images/arrow_left.png')} />
-            </AnimatedPressable>
+          <View className='flex-row mt-2'>
             <FlatList
               ref={flatListRef}
               className='flex-1'
-              data={ListOptions}
-              renderItem={({ item }) => <ChallengesCard fullWidth={flatListWidth - 2} />} // 2 px for border
+              data={Challenges}
+              renderItem={({ item }) => <ChallengesCard data={item} fullWidth={flatListWidth - 2} />} // 2 px for border
               keyExtractor={item => item.name}
               contentContainerStyle= {{ gap: 10 }}
               horizontal
@@ -79,12 +83,31 @@ const ChallengesScreen = () => {
               onLayout={handleLayout}
               scrollEnabled={false}
             />
+          </View>
+          <View className='flex-row justify-between mt-2'>
             <AnimatedPressable
+              style={ currentIndex == 0 ? { opacity: 0.5 } : { opacity: 1 } }
+              className='mx-1'
+              pressInValue={0.9}
+              onPress={scrollToPreviousItem}
+              disabled={ currentIndex == 0 }
+            >
+              <View className='flex-row'>
+                <Image className='h-4 w-2 my-auto' source={require('@asset/images/arrow_left.png')} />
+                <Text className='mx-2 font-medium'>Previous</Text>
+              </View>
+            </AnimatedPressable>
+            <AnimatedPressable
+              style={ currentIndex == Challenges.length - 1 ? { opacity: 0.5 } : { opacity: 1 } }
               className='mx-1'
               pressInValue={0.9}
               onPress={scrollToNextItem}
+              disabled={ currentIndex == Challenges.length - 1 }
             >
-              <Image className='h-6 w-4 my-auto' source={require('@asset/images/arrow_right.png')} />
+              <View className='flex-row'>
+                <Text className='mx-2 font-medium'>Next</Text>
+                <Image className='h-4 w-2 my-auto' source={require('@asset/images/arrow_right.png')} />
+              </View>
             </AnimatedPressable>
           </View>
 
@@ -107,25 +130,9 @@ const ChallengesScreen = () => {
             </AnimatedPressable>
           </View>
           <Text className='text-xl font-bold mt-4 mb-2 bg-white/50'>Recommended For You</Text>
-          <AnimatedPressable
-            className='rounded-lg border border-slate-600 bg-white'
-            pressInValue={0.95}
-          >
-            <View className='flex-row'>
-            <Image
-              className='w-20 h-20 my-auto mx-1'
-              source={require('@asset/images/badges.png')}
-            />
-            <Image
-              className='flex-1 h-32 rounded-tr-lg'
-              source={require('@asset/images/challenges_banner.png')}
-            />
-            </View>
-            <View style={{ backgroundColor: themeColors.backgroundColor }} className='p-2'>
-              <Text className='text-lg font-bold'>1000 Minute Run Challenges</Text>
-            </View>
-          </AnimatedPressable>
+          { ReChallenges.map(( challenge ) => <ChallengesCard classNameAsProps='mt-2' data={challenge} />) }
         </SafeAreaView>
+        </ScrollView>
       </ImageBackground>
     </View>
   )

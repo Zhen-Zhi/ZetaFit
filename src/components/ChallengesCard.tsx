@@ -6,14 +6,22 @@ import {LinearGradient} from 'expo-linear-gradient';
 import * as Progress from 'react-native-progress';
 
 type ChallengesCardProps = {
-  className ?: string;
+  classNameAsProps ?: string;
   fullWidth ?: number;
+  data ?: ChallengesType;
 }
 
-const ChallengesCard = ({ className, fullWidth }: ChallengesCardProps) => {
+type ChallengesType = {
+  id: number;
+  name: string;
+  progress ?: number;
+};
+
+const ChallengesCard = ({ classNameAsProps, fullWidth, data }: ChallengesCardProps) => {
+  console.log(classNameAsProps)
   return (
     <AnimatedPressable
-      className=''
+      className={classNameAsProps}
       pressInValue={0.98}
     >
       <View className='bg-white border-x border-t border-slate-400 rounded-xl'>
@@ -21,7 +29,7 @@ const ChallengesCard = ({ className, fullWidth }: ChallengesCardProps) => {
           style={{ width: fullWidth }}
           className='h-[180px]'
           imageStyle={{ borderRadius: 8 }}
-          source={require('@asset/images/challenges_banner2.png')}
+          source={require('@asset/images/challenges_banner.png')}
         >
           <View className='flex-1 justify-end'>
             <LinearGradient
@@ -30,12 +38,12 @@ const ChallengesCard = ({ className, fullWidth }: ChallengesCardProps) => {
               start={{ x: 0, y: 0 }}  // Gradient starts at the top
               end={{ x: 0, y: 1 }}  // Gradient ends at the bottom
             >
-              <Text numberOfLines={2} className='text-white text-2xl font-bold m-2'>1000 Minute Run Challenges</Text>
+              {/* <Text numberOfLines={2} className='text-white text-2xl font-bold m-2'>1000 Minute Run Challenges</Text> */}
+              <Text numberOfLines={2} className='text-white text-2xl font-bold m-2'>{data?.name}</Text>
               <Progress.Bar
                 width={fullWidth}
                 height={8}
-                className=''
-                progress={0.6}
+                progress={data?.progress}
                 borderWidth={0}
                 color={themeColors.tetiary}
                 borderRadius={10}
