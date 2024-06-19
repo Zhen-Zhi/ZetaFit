@@ -35,10 +35,11 @@ export const themeColors = {
   danger: '#dc2626',
 }
 
-export const clanColors = {
-  primary: '#769fcd',
-  secondary: '#b9d7ea',
-  tetiary: '#d6e6f2',
-  backgroundColor: '#f7fbfc',
-  
+export const difficultiesColors = {
+  beginner: '#34d934',
+  intermediate: '#FFCC66',
+  expert: '#FF6666',
+  beginner_darker: '#1f8c1f',
+  intermediate_darker: '#ed9b2d',
+  expert_darker: '#FF3333',
 }

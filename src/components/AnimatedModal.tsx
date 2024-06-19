@@ -11,7 +11,7 @@ const AnimatedModalView = Animated.createAnimatedComponent(Pressable);
 type AnimatedModalProps = {
   onClose?: () => void | null;
   style?: StyleProps;
-  className?: string;
+  classNameAsProps?: string; // className is reserved word
   modalVisible?: boolean;
   children?: ReactNode;
 }
@@ -35,7 +35,7 @@ const AnimatedModal = forwardRef<typeof View, AnimatedModalProps>((props, ref) =
 
   return (
     <Pressable className='bg-black/60 flex-1' onPress={props.onClose}>
-      <AnimatedModalView onPress={(event) => event.stopPropagation()} className='m-auto w-[75%]' style={{ transform: [{ scale: scaleAnimation }]}}>
+      <AnimatedModalView onPress={(event) => event.stopPropagation()} className='m-auto w-[85%]' style={{ transform: [{ scale: scaleAnimation }]}}>
         <View style={{ backgroundColor: themeColors.primary }} className='p-2 border-t-4 border-x-2 border-slate-100 flex-row justify-end rounded-md'>
           <AnimatedPressable pressInValue={0.8} onPress={props.onClose}>
             <View className='my-auto'>
@@ -45,14 +45,13 @@ const AnimatedModal = forwardRef<typeof View, AnimatedModalProps>((props, ref) =
         </View>
         <View
           style={{ backgroundColor: themeColors.backgroundColor }}
-          className='w-[96%] p-4 mx-auto'
+          className={`w-[96%] p-4 mx-auto ${props.classNameAsProps}`}
         >
           {props.children}
         </View>
         <View style={{ backgroundColor: themeColors.primary }} className='w-full mx-auto h-4 border-x-2 border-b-4 border-white rounded-md' />
       </AnimatedModalView>
-      </Pressable>
-    // </Pressable>
+    </Pressable>
   )
 })
 

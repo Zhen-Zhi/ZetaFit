@@ -1,4 +1,4 @@
-import { ImageBackground, Platform, StyleSheet, Text, View, Image, FlatList, LayoutChangeEvent, ScrollView } from 'react-native'
+import { ImageBackground, Platform, StyleSheet, Text, View, Image, FlatList, LayoutChangeEvent, ScrollView, Modal } from 'react-native'
 import React, { useRef, useState } from 'react'
 import { Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
@@ -7,6 +7,7 @@ import { FontAwesome5 } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ChallengesCard from '@/src/components/ChallengesCard'
 import { CurvedTransition } from 'react-native-reanimated'
+import AnimatedModal from '@/src/components/AnimatedModal'
 
 type ChallengesType = {
   id: number;
@@ -21,7 +22,7 @@ const Challenges: ChallengesType[] = [
 ];
 
 const ReChallenges: ChallengesType[] = [
-  { id: 1, name: '1000 Minute Run Challenges' },
+  { id: 1, name: '1000 Minute Run Challenges, what if loong' },
   { id: 2, name: 'Full Marathon' },
   { id: 3, name: 'Swimming With Passion' },
   { id: 4, name: '1000 Minute Run Challenges' },
@@ -33,6 +34,8 @@ const ChallengesScreen = () => {
   const flatListRef = useRef<FlatList<ChallengesType>>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flatListWidth, setFlatListWidth] = useState(0);
+  const [selectedFilter, setSelectedFilter] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   const scrollToNextItem = () => {
     if (flatListRef.current) {
@@ -68,7 +71,17 @@ const ChallengesScreen = () => {
         <ScrollView className='mb-2'>
         <SafeAreaView edges={['top']} className='px-6 flex-1'>
           <Stack.Screen options={{ headerShown: false }} />
-          <Text className='text-[32px] font-extrabold mt-6 bg-white/50'>Your Challenges</Text>
+          <View className='flex-row mt-6 justify-between'>
+            <Text className='text-[32px] font-extrabold bg-white/50'>Your Challenges</Text>
+            <AnimatedPressable 
+              pressInValue={0.9}
+              onPress={() => setModalVisible(true)}
+            >
+              <View className='mt-3 mr-1'>
+                <FontAwesome5 name="question-circle" size={22} color="black" />
+              </View>
+            </AnimatedPressable>
+          </View>
           
           <View className='flex-row mt-2'>
             <FlatList
@@ -111,21 +124,23 @@ const ChallengesScreen = () => {
             </AnimatedPressable>
           </View>
 
-          <View className='mt-8 flex-row'>
+          <View className='mt-8 flex-row bg-white/50'>
             <AnimatedPressable 
               pressInValue={0.95}
-              className='border border-slate-600 rounded-lg p-2 mr-3 bg-white'
+              onPress={() => setSelectedFilter('Weekly')}
+              className={`border-2 rounded-lg p-2 mr-3 bg-white ${ selectedFilter == 'Weekly' ? 'border-emerald-500 bg-emerald-100/50' : 'border-slate-400' }`}
             >
               <View>
-                <Text className='font-bold'>Trending</Text>
+                <Text className='font-bold'>Weekly</Text>
               </View>
             </AnimatedPressable>
             <AnimatedPressable 
               pressInValue={0.95}
-              className='border border-slate-600 rounded-lg p-2 bg-white'
+              onPress={() => setSelectedFilter('Advanced')}
+              className={`border-2 rounded-lg p-2 bg-white ${ selectedFilter == 'Advanced' ? 'border-emerald-500 bg-emerald-100/50' : 'border-slate-400' }`}
             >
               <View>
-                <Text className='font-bold'>Latest</Text>
+                <Text className='font-bold'>Advanced</Text>
               </View>
             </AnimatedPressable>
           </View>
@@ -140,6 +155,47 @@ const ChallengesScreen = () => {
         </SafeAreaView>
         </ScrollView>
       </ImageBackground>
+
+      <Modal
+        animationType='fade'
+        visible={modalVisible}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setModalVisible(false)}
+      >
+        <AnimatedModal
+          classNameAsProps='flex max-h-[85%]'
+          onClose={() => setModalVisible(false)}
+        >
+          <ImageBackground
+            source={require('@asset/images/background_image.png')}
+            className='flex'
+          >
+            <ScrollView className='bg-white/30'>
+              <Text className='text-2xl text-center font-extrabold'>Challenges Event</Text>
+              <Text className='font-normal text-[16px] font-medium text-justify mt-2 mb-4'>
+                Greetings challenger, good luck on your challenges and remember these important rules:
+              </Text>
+              <Text className='font-normal text-[16px] font-medium text-justify my-2'>
+                1. Once you enter the challenges you cannot quit.
+              </Text>
+              <Text className='font-normal text-[16px] font-medium text-justify my-2'>
+                2. Complete the challenge within the specified time frame to qualify for rewards.
+              </Text>
+              <AnimatedPressable 
+                pressInValue={0.98}
+                className='rounded-lg p-1'
+                style={{ backgroundColor: themeColors.secondary }}
+                onPress={() => setModalVisible(false)}
+              >
+                <View className=''>
+                  <Text className='text-center font-extrabold text-white text-xl'>Okay</Text>
+                </View>
+              </AnimatedPressable>
+            </ScrollView>
+          </ImageBackground>
+        </AnimatedModal>
+      </Modal>
     </View>
   )
 }

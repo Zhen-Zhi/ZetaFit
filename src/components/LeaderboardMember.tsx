@@ -23,7 +23,7 @@ const LeaderboardMemberScreen = () => {
               <Text className='font-semibold text-slate-600'>Clan Name</Text>
             </View>
             <View className='flex-row my-auto mr-2 bg-slate-200 rounded-lg p-2'>
-              <FontAwesome6 name="fire" size={28} color="rgba(240, 93, 9, 0.8)" />
+            <Image className='w-6 h-8' source={require('@asset/images/attack_icon.png')}/>
               <Text className='text-center text-lg rounded font-semibold ml-2'>9999</Text>
             </View>
           </View>

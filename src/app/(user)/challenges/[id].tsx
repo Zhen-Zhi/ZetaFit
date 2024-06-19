@@ -1,25 +1,48 @@
-import { ImageBackground, StyleSheet, Text, View, Image, FlatList } from 'react-native'
+import { ImageBackground, StyleSheet, Text, View, Image, FlatList, Platform, Modal } from 'react-native'
 import React, { useState } from 'react'
-import { Stack, useLocalSearchParams } from 'expo-router'
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { themeColors } from '@/src/constants/Colors';
+import { Stack, router, useLocalSearchParams } from 'expo-router'
+import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
+import { difficultiesColors, themeColors } from '@/src/constants/Colors';
 import { ScrollView } from 'react-native';
 import LeaderboardMemberScreen from '@/src/components/LeaderboardMember';
 import AnimatedPressable from '@/src/components/AnimatedPressable';
 import * as Progress from 'react-native-progress';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import ChallengesActionScreenModal from './challengesActions';
 
 const ChallengesDetailsScreen = () => {
   const { id } = useLocalSearchParams();
   const [joinedChallenge, setJoinedChallenge] = useState(false)
+  const [actionModalVisible, setActionModalVisible] = useState(false)
 
   return (
-    <View className='flex-1'>
-      <Stack.Screen options={{ title: id?.toString() }} />
+    <SafeAreaView edges={['top']} className='flex-1'>
+      <Stack.Screen options={{ headerShown: false }} />
       <ImageBackground
         className='flex-1'
         source={require('@asset/images/background_image.png')}
       >
+        <View style={{ backgroundColor: themeColors.backgroundColor }} className='flex-row justify-between pt-3 pb-2 px-4 border-b border-slate-300'>
+        <AnimatedPressable 
+          pressInValue={0.9} 
+          className='z-10'
+          onPress={() => router.back()}
+        >
+          <View className='p-1'>
+            <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
+          </View>
+        </AnimatedPressable>
+        <Text style={{ color: themeColors.primary }} className='text-center my-auto text-xl font-semibold'>Challenge Detials</Text>
+        <AnimatedPressable pressInValue={0.9} className='z-10' disabled={!joinedChallenge} onPress={() => setActionModalVisible(true)}>
+          <View className='p-1'>
+            <Image
+              className={`w-6 h-8 ${joinedChallenge ? null : 'h-0'}`}
+              source={require('@asset/images/attack_icon.png')}
+            />
+          </View>
+        </AnimatedPressable>
+      </View>
         <ScrollView className='flex-1'>
         <View className='p-4'>
           <Image
@@ -32,13 +55,13 @@ const ChallengesDetailsScreen = () => {
               <Text className='font-bold text-[16px] my-auto mx-2'>15/6/2024 - 21/6/2024</Text>
             </View>
             <View className='flex-row'>
-              <MaterialCommunityIcons name="speedometer-slow" size={28} color={themeColors.primary} />
-              {/* <MaterialCommunityIcons name="speedometer-medium" size={24} color={themeColors.primary} />
-              <MaterialCommunityIcons name="speedometer" size={24} color={themeColors.primary} /> */}
-              <Text className='font-bold text-[16px] my-auto mx-2'>Intermediate</Text>
+              {/* <MaterialCommunityIcons name="speedometer-slow" size={28} color={difficultiesColors.beginner_darker} /> */}
+              <MaterialCommunityIcons name="speedometer-medium" size={28} color={difficultiesColors.intermediate_darker} />
+              {/* <MaterialCommunityIcons name="speedometer" size={28} color={difficultiesColors.expert_darker} /> */}
+              <Text style={{ color: difficultiesColors.expert_darker }} className='font-bold text-[16px] my-auto mx-2'>Intermediate</Text>
             </View>
           </View>
-          <Text className='text-center font-extrabold text-[36px] mt-3 bg-white/50'>Arctic Swin Advent</Text>
+          <Text className='text-center font-extrabold text-[36px] mt-3 bg-white/50'>Arctic Swin Adventure</Text>
           <View className='mt-4 bg-white/50'>
             <Text className='font-bold text-2xl'>Challenges Details</Text>
             <Text className='font-medium text-md mt-2 text-justify'>
@@ -67,12 +90,18 @@ const ChallengesDetailsScreen = () => {
           className='h-32 w-full z-10 absolute bottom-0 justify-end'
           colors={['transparent', '#fff']}
           start={{ x: 0, y: 0 }}  // Gradient starts at the top
-          end={{ x: 0, y: 0.6 }}  // Gradient ends at the bottom
+          end={{ x: 0, y: 0.55 }}  // Gradient ends at the bottom
         >
         {joinedChallenge 
           ? 
         <View className='mx-3 p-2 mb-2'>
-          <Text className='font-bold text-lg mb-1'>Your Progress</Text>
+          <View className='flex-row justify-between'>
+            <Text className='font-bold text-lg mb-1'>Your Progress</Text>
+            <View className='flex-row'>
+              <Image className='w-6 h-8 mb-1 mr-1.5' source={require('@asset/images/attack_icon.png')}/>
+              <Text className='font-bold text-lg mr-3 mb-1'>880/1000</Text>
+            </View>
+          </View>
           <Progress.Bar
             width={350}
             height={10}
@@ -95,7 +124,17 @@ const ChallengesDetailsScreen = () => {
         }
         </LinearGradient>
       </ImageBackground>
-    </View>
+
+      <Modal
+        animationType='fade'
+        visible={actionModalVisible}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setActionModalVisible(false)}
+      >
+        <ChallengesActionScreenModal onClose={() => setActionModalVisible(false)} />
+      </Modal>
+    </SafeAreaView>
   )
 }
 

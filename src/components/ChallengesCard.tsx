@@ -1,9 +1,10 @@
 import { ImageBackground, StyleSheet, Text, View, Image } from 'react-native'
 import React from 'react'
-import { themeColors } from '../constants/Colors'
+import { difficultiesColors, themeColors } from '../constants/Colors'
 import AnimatedPressable from './AnimatedPressable'
 import {LinearGradient} from 'expo-linear-gradient';
 import * as Progress from 'react-native-progress';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 type ChallengesCardProps = {
   onPress ?: () => void;
@@ -25,7 +26,7 @@ const ChallengesCard = ({ classNameAsProps, fullWidth, data, onPress }: Challeng
       pressInValue={0.98}
       onPress={onPress}
     >
-      <View className='bg-white border-x border-t border-slate-400 rounded-xl'>
+      <View className='bg-white border-x border-slate-600 border-t rounded-xl overflow-hidden'>
         <ImageBackground
           style={{ width: fullWidth }}
           className='h-[180px]'
@@ -39,8 +40,16 @@ const ChallengesCard = ({ classNameAsProps, fullWidth, data, onPress }: Challeng
               start={{ x: 0, y: 0 }}  // Gradient starts at the top
               end={{ x: 0, y: 1 }}  // Gradient ends at the bottom
             >
-              {/* <Text numberOfLines={2} className='text-white text-2xl font-bold m-2'>1000 Minute Run Challenges</Text> */}
-              <Text numberOfLines={2} className='text-white text-2xl font-bold m-2'>{data?.name}</Text>
+              <View className='flex-row px-2 mb-1'>
+                <View className='my-auto mr-2'>
+                  <Ionicons name="extension-puzzle-sharp" size={26} color={difficultiesColors.beginner} />
+                  {/* <Ionicons name="extension-puzzle-sharp" size={26} color={difficultiesColors.intermediate} /> */}
+                  {/* <Ionicons name="extension-puzzle-sharp" size={26} color={difficultiesColors.expert} /> */}
+                </View>
+                <Text numberOfLines={1} className='flex-1 text-white text-2xl font-bold'>
+                  {data?.name}
+                </Text>
+              </View>
               <Progress.Bar
                 width={fullWidth}
                 height={8}
@@ -61,4 +70,15 @@ const ChallengesCard = ({ classNameAsProps, fullWidth, data, onPress }: Challeng
 
 export default ChallengesCard
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  banner: {
+    position: 'absolute',
+    right: -40,
+    top: 20,
+    width: 160,
+    backgroundColor: 'black',
+    color: 'white',
+    padding: 1,
+    textAlign: 'center',
+  },
+})
