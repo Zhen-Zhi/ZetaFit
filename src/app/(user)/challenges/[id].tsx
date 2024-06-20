@@ -10,11 +10,22 @@ import * as Progress from 'react-native-progress';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ChallengesActionScreenModal from './challengesActions';
+import AnimatedModal from '@/src/components/AnimatedModal';
+import { Badge } from 'react-native-elements'
+
+type ChallengesDetialsProps = {
+  progress : number;
+}
+
+
 
 const ChallengesDetailsScreen = () => {
   const { id } = useLocalSearchParams();
-  const [joinedChallenge, setJoinedChallenge] = useState(false)
-  const [actionModalVisible, setActionModalVisible] = useState(false)
+  const [joinedChallenge, setJoinedChallenge] = useState(false);
+  const [actionModalVisible, setActionModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [rewardsModalVisible, setRewardsModalVisible] = useState(false)
+  const datass = { progress: false, claimed: false }
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
@@ -55,9 +66,9 @@ const ChallengesDetailsScreen = () => {
               <Text className='font-bold text-[16px] my-auto mx-2'>15/6/2024 - 21/6/2024</Text>
             </View>
             <View className='flex-row'>
-              {/* <MaterialCommunityIcons name="speedometer-slow" size={28} color={difficultiesColors.beginner_darker} /> */}
-              <MaterialCommunityIcons name="speedometer-medium" size={28} color={difficultiesColors.intermediate_darker} />
-              {/* <MaterialCommunityIcons name="speedometer" size={28} color={difficultiesColors.expert_darker} /> */}
+              <MaterialCommunityIcons name="speedometer-slow" size={28} color={difficultiesColors.beginner_darker} />
+              {/* <MaterialCommunityIcons name="speedometer-medium" size={28} color={difficultiesColors.intermediate_darker} />
+              <MaterialCommunityIcons name="speedometer" size={28} color={difficultiesColors.expert_darker} /> */}
               <Text style={{ color: difficultiesColors.expert_darker }} className='font-bold text-[16px] my-auto mx-2'>Intermediate</Text>
             </View>
           </View>
@@ -94,30 +105,48 @@ const ChallengesDetailsScreen = () => {
         >
         {joinedChallenge 
           ? 
-        <View className='mx-3 p-2 mb-2'>
-          <View className='flex-row justify-between'>
-            <Text className='font-bold text-lg mb-1'>Your Progress</Text>
-            <View className='flex-row'>
-              <Image className='w-6 h-8 mb-1 mr-1.5' source={require('@asset/images/attack_icon.png')}/>
-              <Text className='font-bold text-lg mr-3 mb-1'>880/1000</Text>
+          datass.progress 
+            ? 
+            <View className='mx-3 p-2 mb-2'>
+              <View className='flex-row justify-between'>
+                <Text className='font-bold text-lg mb-1'>Your Progress</Text>
+                <View className='flex-row'>
+                  <Image className='w-6 h-8 mb-1 mr-1.5' source={require('@asset/images/attack_icon.png')}/>
+                  <Text className='font-bold text-lg mr-3 mb-1'>880/1000</Text>
+                </View>
+              </View>
+              <Progress.Bar
+                width={350}
+                height={10}
+                progress={0.6}
+                borderWidth={0}
+                color={themeColors.tetiary}
+                borderRadius={10}
+                unfilledColor='red'
+              />
             </View>
-          </View>
-          <Progress.Bar
-            width={350}
-            height={10}
-            progress={0.6}
-            borderWidth={0}
-            color={themeColors.tetiary}
-            borderRadius={10}
-            unfilledColor='red'
-          />
-        </View>
+            :
+            <AnimatedPressable 
+              style={{ backgroundColor: datass.claimed ? themeColors.disabled : themeColors.secondary }}
+              className='mx-3 mb-2 rounded-lg p-1.5'
+              pressInValue={0.98}
+              disabled={datass.claimed}
+            >
+              <Text className='text-center text-lg text-white font-bold'>{ datass.claimed ? 'Claimed' : 'Claim Rewards'}</Text>
+              { !datass.claimed && <Badge
+                value={1}
+                textStyle={{ fontSize: 16, fontWeight: 700 }}
+                containerStyle={{ position: 'absolute', top: -12, right: -6 }} 
+                badgeStyle={{ height: 24, width: 80, borderRadius: 20 }} 
+                status="error"
+              />}
+            </AnimatedPressable>
         :
         <AnimatedPressable
           style={{ backgroundColor: themeColors.secondary }}
           className='mx-3 mb-2 rounded-lg p-1.5'
           pressInValue={0.98}
-          onPress={() => setJoinedChallenge(true)}
+          onPress={() => setModalVisible(true)}
         >
           <Text className='text-center text-lg text-white font-bold'>Join Challenges</Text>
         </AnimatedPressable>
@@ -125,6 +154,7 @@ const ChallengesDetailsScreen = () => {
         </LinearGradient>
       </ImageBackground>
 
+      {/* Challenges action modal (attack, defense) */}
       <Modal
         animationType='fade'
         visible={actionModalVisible}
@@ -134,10 +164,105 @@ const ChallengesDetailsScreen = () => {
       >
         <ChallengesActionScreenModal onClose={() => setActionModalVisible(false)} />
       </Modal>
+
+      {/* Join challenges confirmation modal */}
+      <Modal
+        animationType='fade'
+        visible={modalVisible}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setActionModalVisible(false)}
+      >
+        <AnimatedModal onClose={() => setModalVisible(false)}>
+          <View>
+            <Text className='font-bold text-2xl'>Join Challenge?</Text>
+            <Text className='font-medium my-3 text-lg'>Join Challenges this challenges?</Text>
+            <AnimatedPressable
+              style={{ backgroundColor: themeColors.secondary }}
+              pressInValue={0.98} 
+              className='p-1 rounded-lg'
+              onPress={() => {setModalVisible(false);setJoinedChallenge(true)}}
+            >
+              <View className='flex-row justify-center'>
+                <Image
+                  className='w-6 h-6 my-auto mr-1'
+                  source={require('@asset/images/coin_icon.png')}
+                />
+                <Text className='font-bold text-lg text-center text-white'>200</Text>
+              </View>
+            </AnimatedPressable>
+          </View>
+        </AnimatedModal>
+      </Modal>
+
+      {/* rewards modal */}
+      <Modal
+        animationType='fade'
+        // visible={rewardsModalVisible}
+        visible={true}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setRewardsModalVisible(false)}
+      >
+        <ImageBackground
+          className='flex-1' 
+          source={require('@asset/images/background_image.png')}
+        >
+          {/* <View style={{ backgroundColor: themeColors.backgroundColor }} className='flex-row justify-center pt-3 pb-2 px-4 border-b border-slate-300'>
+            <Text style={{ color: themeColors.primary }} className='text-center my-auto text-xl font-semibold'>Rewards</Text>
+          </View> */}
+          <View className='p-4'>
+            <Text className='font-lg font-bold text-3xl bg-white/50 text-center'>Rewards</Text>
+            <Text className='font-lg font-semibold text-lg bg-white/50 mt-8'>Awarded Badges</Text>
+            <Image
+              className='w-64 h-64 mx-auto'
+              source={require('@asset/images/badges.png')}
+            />
+            <Text className='font-semibold text-lg text-center'>Speed Demon</Text>
+            <View className='flex-row bg-white/50 p-4 mx-4 mt-6 justify-around'>
+              <View className='flex-row'>
+                <Image
+                  className='w-10 h-10'
+                  source={require('@asset/images/coin_icon.png')}
+                />
+                <Text className='text-lg font-bold mx-2 my-auto'>2000</Text>
+              </View>
+              <View className='flex-row'>
+                <Image
+                  className='w-10 h-10'
+                  source={require('@asset/images/diamond_icon.png')}
+                />
+                <Text className='text-lg font-bold mx-2 my-auto'>5</Text>
+              </View>
+            </View>
+            <View className='flex-row bg-white/50 justify-center'>
+              <Image
+                className='w-14 h-14'
+                source={require('@asset/images/crown.png')}
+              />
+              <Text className='text-lg font-bold mx-2 my-auto'>EXP 2000</Text>
+            </View>
+            <AnimatedPressable 
+              style={{ backgroundColor: themeColors.secondary }}
+              pressInValue={0.98}
+              className='rounded-lg py-2'
+            >
+              <Text className='font-lg font-bold text-lg text-white text-center'>Collect</Text>
+            </AnimatedPressable>
+          </View>
+        </ImageBackground>
+      </Modal>
     </SafeAreaView>
   )
 }
 
 export default ChallengesDetailsScreen
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  image: {
+    alignItems: 'center', // Centers horizontally
+  },
+  shadowAndriod: {
+    elevation: 15
+  }
+})

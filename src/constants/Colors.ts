@@ -33,10 +33,11 @@ export const themeColors = {
   tetiary: '#64ccc5',
   backgroundColor: '#f5f5f5',
   danger: '#dc2626',
+  disabled: '#bfbfbf'
 }
 
 export const difficultiesColors = {
-  beginner: '#34d934',
+  beginner: '#34c834',
   intermediate: '#FFCC66',
   expert: '#FF6666',
   beginner_darker: '#1f8c1f',

@@ -42,9 +42,10 @@ const ChallengesCard = ({ classNameAsProps, fullWidth, data, onPress }: Challeng
             >
               <View className='flex-row px-2 mb-1'>
                 <View className='my-auto mr-2'>
-                  <Ionicons name="extension-puzzle-sharp" size={26} color={difficultiesColors.beginner} />
+                  {/* <Ionicons name="extension-puzzle-sharp" size={26} color={difficultiesColors.beginner} /> */}
                   {/* <Ionicons name="extension-puzzle-sharp" size={26} color={difficultiesColors.intermediate} /> */}
                   {/* <Ionicons name="extension-puzzle-sharp" size={26} color={difficultiesColors.expert} /> */}
+                  <MaterialCommunityIcons name="speedometer" size={28} color={difficultiesColors.expert} />
                 </View>
                 <Text numberOfLines={1} className='flex-1 text-white text-2xl font-bold'>
                   {data?.name}

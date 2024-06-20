@@ -2,8 +2,8 @@ import { ImageBackground, Platform, StyleSheet, Text, View, Image, FlatList, Lay
 import React, { useRef, useState } from 'react'
 import { Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
-import { themeColors } from '@/src/constants/Colors'
-import { FontAwesome5 } from '@expo/vector-icons'
+import { difficultiesColors, themeColors } from '@/src/constants/Colors'
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ChallengesCard from '@/src/components/ChallengesCard'
 import { CurvedTransition } from 'react-native-reanimated'
@@ -171,17 +171,49 @@ const ChallengesScreen = () => {
             source={require('@asset/images/background_image.png')}
             className='flex'
           >
-            <ScrollView className='bg-white/30'>
-              <Text className='text-2xl text-center font-extrabold'>Challenges Event</Text>
-              <Text className='font-normal text-[16px] font-medium text-justify mt-2 mb-4'>
-                Greetings challenger, good luck on your challenges and remember these important rules:
+            <ScrollView className='bg-white/30 px-2'>
+              <View className='flex-row justify-center mb-3'>
+                <Image
+                  className='w-6 h-8'
+                  source={require('@asset/images/attack_icon.png')}
+                />
+                <Text className='text-2xl text-center font-extrabold mx-2'>Challenges Details</Text>
+                <Image
+                  className='w-6 h-8'
+                  source={require('@asset/images/attack_icon.png')}
+                />
+              </View>
+              <Text className='text-[16px] font-medium text-justify mt-2 mb-4'>
+                Greetings challenger, complete the challenges and get rewards!
               </Text>
-              <Text className='font-normal text-[16px] font-medium text-justify my-2'>
-                1. Once you enter the challenges you cannot quit.
+              <Text className='font-semibold text-lg text-justify mt-2'>Difficulties Level</Text>
+              {/* difficulties level */}
+              <View className='px-4 py-2 bg-slate-200 rounded-lg mb-4'>
+                <View className='flex-row'>
+                  <View className='my-auto'>
+                    <MaterialCommunityIcons name="speedometer-slow" size={32} color={difficultiesColors.beginner} />
+                  </View>
+                  <Text className='font-normal text-[16px] font-medium text-justify mx-4 my-auto'>Beginner Difficulties</Text>
+                </View>
+                <View className='flex-row'>
+                  <View className='my-auto'>
+                    <MaterialCommunityIcons name="speedometer-medium" size={32} color={difficultiesColors.intermediate} />
+                  </View>
+                  <Text className='font-normal text-[16px] font-medium text-justify mx-4 my-auto'>Intermediate Difficulties</Text>
+                </View>
+                <View className='flex-row'>
+                  <View className='my-auto'>
+                    <MaterialCommunityIcons name="speedometer" size={32} color={difficultiesColors.expert} />
+                  </View>
+                  <Text className='font-normal text-[16px] font-medium text-justify mx-4 my-auto'>Expert Difficulties</Text>
+                </View>
+              </View>
+
+              <Text className='font-semibold text-lg text-justify mt-2'>Challenges Refresh</Text>
+              <Text className='text-[16px] font-medium text-justify mb-4'>
+                Every challenges ends on specific end date at <Text className='font-bold text-red-600'>4:00pm</Text>
               </Text>
-              <Text className='font-normal text-[16px] font-medium text-justify my-2'>
-                2. Complete the challenge within the specified time frame to qualify for rewards.
-              </Text>
+
               <AnimatedPressable 
                 pressInValue={0.98}
                 className='rounded-lg p-1'
