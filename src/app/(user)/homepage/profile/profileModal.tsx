@@ -57,8 +57,8 @@ const ProfileScreen = ({ onClose }: ModalProps) => {
             pressInValue={0.97}
             >
             <Image
-              className='w-16 h-24 mx-2 mb-8'
-              source={require('@asset/images/logo_clan.png')} 
+              className='w-20 h-24 mx-2'
+              source={require('@asset/images/clan_logo/clan_logo_6.png')} 
             />
             <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>Clan Name</Text>
           </AnimatedPressable>

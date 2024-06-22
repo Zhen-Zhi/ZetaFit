@@ -164,7 +164,7 @@ const ChallengesScreen = () => {
         onRequestClose={() =>setModalVisible(false)}
       >
         <AnimatedModal
-          classNameAsProps='flex max-h-[85%]'
+          classNameAsProps='flex max-h-[90%]'
           onClose={() => setModalVisible(false)}
         >
           <ImageBackground

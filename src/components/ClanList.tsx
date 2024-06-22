@@ -28,8 +28,8 @@ const ClanList = ({ clan }: ClanListProps) => {
     >
       <View className='flex flex-row p-1'>
         <Image
-          className='w-10 h-14 rounded-xl'
-          source={require('@asset/images/logo_clan.png')}
+          className='w-12 h-14 rounded-xl'
+          source={require('@asset/images/clan_logo/clan_logo_8.png')}
         />
         <View className='flex-1 flex-col ml-3'>
           <Text style={{ color: themeColors.primary }} numberOfLines={1} className='font-bold text-xl mb-1'>{clan.clanName}</Text>

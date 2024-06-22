@@ -12,12 +12,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ChallengesActionScreenModal from './challengesActions';
 import AnimatedModal from '@/src/components/AnimatedModal';
 import { Badge } from 'react-native-elements'
+import RewardsScreen from '@/src/components/Rewards';
 
 type ChallengesDetialsProps = {
   progress : number;
 }
-
-
 
 const ChallengesDetailsScreen = () => {
   const { id } = useLocalSearchParams();
@@ -99,7 +98,7 @@ const ChallengesDetailsScreen = () => {
         </ScrollView>
         <LinearGradient
           className='h-32 w-full z-10 absolute bottom-0 justify-end'
-          colors={['transparent', '#fff']}
+          colors={['#ffffff00', '#ffffff']}
           start={{ x: 0, y: 0 }}  // Gradient starts at the top
           end={{ x: 0, y: 0.55 }}  // Gradient ends at the bottom
         >
@@ -131,6 +130,10 @@ const ChallengesDetailsScreen = () => {
               className='mx-3 mb-2 rounded-lg p-1.5'
               pressInValue={0.98}
               disabled={datass.claimed}
+              onPress={() => {
+                setRewardsModalVisible(true);
+                datass.claimed = true
+              }}
             >
               <Text className='text-center text-lg text-white font-bold'>{ datass.claimed ? 'Claimed' : 'Claim Rewards'}</Text>
               { !datass.claimed && <Badge
@@ -199,58 +202,15 @@ const ChallengesDetailsScreen = () => {
       <Modal
         animationType='fade'
         // visible={rewardsModalVisible}
-        visible={true}
+        visible={rewardsModalVisible}
         presentationStyle='overFullScreen'
         transparent={true}
         onRequestClose={() =>setRewardsModalVisible(false)}
       >
-        <ImageBackground
-          className='flex-1' 
-          source={require('@asset/images/background_image.png')}
-        >
-          {/* <View style={{ backgroundColor: themeColors.backgroundColor }} className='flex-row justify-center pt-3 pb-2 px-4 border-b border-slate-300'>
-            <Text style={{ color: themeColors.primary }} className='text-center my-auto text-xl font-semibold'>Rewards</Text>
-          </View> */}
-          <View className='p-4'>
-            <Text className='font-lg font-bold text-3xl bg-white/50 text-center'>Rewards</Text>
-            <Text className='font-lg font-semibold text-lg bg-white/50 mt-8'>Awarded Badges</Text>
-            <Image
-              className='w-64 h-64 mx-auto'
-              source={require('@asset/images/badges.png')}
-            />
-            <Text className='font-semibold text-lg text-center'>Speed Demon</Text>
-            <View className='flex-row bg-white/50 p-4 mx-4 mt-6 justify-around'>
-              <View className='flex-row'>
-                <Image
-                  className='w-10 h-10'
-                  source={require('@asset/images/coin_icon.png')}
-                />
-                <Text className='text-lg font-bold mx-2 my-auto'>2000</Text>
-              </View>
-              <View className='flex-row'>
-                <Image
-                  className='w-10 h-10'
-                  source={require('@asset/images/diamond_icon.png')}
-                />
-                <Text className='text-lg font-bold mx-2 my-auto'>5</Text>
-              </View>
-            </View>
-            <View className='flex-row bg-white/50 justify-center'>
-              <Image
-                className='w-14 h-14'
-                source={require('@asset/images/crown.png')}
-              />
-              <Text className='text-lg font-bold mx-2 my-auto'>EXP 2000</Text>
-            </View>
-            <AnimatedPressable 
-              style={{ backgroundColor: themeColors.secondary }}
-              pressInValue={0.98}
-              className='rounded-lg py-2'
-            >
-              <Text className='font-lg font-bold text-lg text-white text-center'>Collect</Text>
-            </AnimatedPressable>
-          </View>
-        </ImageBackground>
+        <RewardsScreen
+          onClose={() => setRewardsModalVisible(false)}
+          modalVisible={rewardsModalVisible}
+        />
       </Modal>
     </SafeAreaView>
   )

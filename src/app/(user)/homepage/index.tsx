@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, ImageBackground, Modal, FlatList, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, View, Image, ImageBackground, Modal, FlatList, ActivityIndicator, } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as Progress from 'react-native-progress';
@@ -48,25 +48,25 @@ const HomeScreen = () => {
           </AnimatedPressable>
           
           {/* Level Bar and Username*/}
-          <ImageBackground
-            source={require('@asset/images/star.png')}
-            className='absolute z-10 w-12 aspect-square top-[-7px] left-[67px] ml-3'
-          >
-            <Text className='absolute z-10 text-lg ml-2 mt-3 w-8 text-center text-black font-extrabold'>1</Text>
-          </ImageBackground>
-          <View className='flex flex-col mt-2'>
-            <Progress.Bar className='h-7 justify-center left-[12px]'
-              progress={0.5}
-              width={140}
-              height={28}
-              color='rgba(0,109,255,1)'
-              unfilledColor='rgba(143,148,155,1)'
+          <Image
+            source={require('@asset/images/crown.png')}
+            className='absolute z-10 h-12 w-12 aspect-square top-[-7px] left-[67px] ml-3'
+          />
+          <View className='flex-col mt-2'>
+            <Progress.Bar className='justify-center left-[24px]'
+              progress={0.2}
+              width={130}
+              height={24}
+              color={themeColors.tetiary}
+              unfilledColor={themeColors.secondary}
               borderWidth={2}
-              borderRadius={10}
+              borderColor={themeColors.primary}
+              borderRadius={4}
             >
-              <Text className='absolute text-white font-extrabold self-center'>50/100</Text>
+              <Text className='absolute text-white font-extrabold self-center'>Level 1</Text>
             </Progress.Bar>
-            <Text style={{ color: themeColors.primary }} className='text-lg font-bold'>Username</Text>
+            <Text style={{ color: themeColors.primary }} className='font-medium text-xs ml-1 mb-[-4px]'>100 / 200</Text>
+            <Text style={{ color: themeColors.primary }} className='text-lg font-bold ml-1'>Username</Text>
           </View>
         </AnimatedPressable>
 
@@ -99,8 +99,8 @@ const HomeScreen = () => {
           pressInValue={0.97}
           >
           <Image
-            className='w-10 h-14 mx-2'
-            source={require('@asset/images/logo_clan.png')} 
+            className='w-12 h-14 mx-2'
+            source={require('@asset/images/clan_logo/clan_logo_3.png')} 
           />
           <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>Clan Name</Text>
         </AnimatedPressable>
@@ -158,7 +158,7 @@ const HomeScreen = () => {
         </View>
         <AnimatedPressable
           style={{ backgroundColor: themeColors.secondary }}
-          className='m-1 h-[40px] w-[240px] bg-slate-200 p-1 rounded-lg justify-center mt-1 flex-row'
+          className='m-1 h-[40px] w-[240px] bg-slate-200 p-1 rounded-lg justify-center mt-2 flex-row'
           pressInValue={0.98}
         >
           <Text style={{ color: themeColors.backgroundColor }} className='text-center font-extrabold text-lg'>Add Activity</Text>
