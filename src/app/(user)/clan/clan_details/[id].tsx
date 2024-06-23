@@ -1,15 +1,16 @@
-import { ImageBackground, StyleSheet, Text, View, Image, FlatList, SafeAreaView, Modal, Pressable } from 'react-native'
+import { ImageBackground, StyleSheet, Text, View, Image, FlatList, Modal, Pressable, Platform } from 'react-native'
 import React, { useState } from 'react'
 import { Stack, router, useLocalSearchParams } from 'expo-router'
-import { Entypo, FontAwesome6, Ionicons } from '@expo/vector-icons'
+import { Entypo, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import ClanMember from '@/src/components/ClanMember'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import MemberScreen from './clanMemberList'
 import TabLayout from './clanDetailTabs'
-import { clanColors, themeColors } from '@/src/constants/Colors'
+import { themeColors } from '@/src/constants/Colors'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AnimatedModal from '@/src/components/AnimatedModal'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const ClanDetailsScreen = () => {
   const { id } = useLocalSearchParams()
@@ -27,14 +28,38 @@ const ClanDetailsScreen = () => {
   }
 
   return (
+    <SafeAreaView edges={['top']} className='flex-1'>
     <ImageBackground
       source={require('@asset/images/background_image.png')}
       className='flex-1'
     >
     
     {/* Clan Details top part */}
-    <View className='mt-4 mb-42 flex-1'>
-      <Stack.Screen 
+    <View className='flex-1'>
+      <Stack.Screen options={{ headerShown: false }} />
+      <View style={{ backgroundColor: themeColors.backgroundColor }} className={`pb-2 px-4 border-b border-slate-300`}>
+        <AnimatedPressable 
+          pressInValue={0.9} 
+          className='z-10 absolute left-3 bottom-2'
+          onPress={() => router.replace('/clan')}
+        >
+          <View className='p-1'>
+            <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
+          </View>
+        </AnimatedPressable>
+        <AnimatedPressable 
+          pressInValue={0.9} 
+          className={`z-10 absolute right-3 bottom-3 ${ !haveClan && 'h-0' }`}
+          onPress={() => router.push('clan/clan_war/clanWar')}
+        >
+          <View className='my-auto'>
+            <MaterialCommunityIcons name="sword-cross" size={28} color={themeColors.primary} />
+          </View>
+        </AnimatedPressable>
+        <Text style={{ color: themeColors.primary }} className='text-center mt-auto text-[28px] font-extrabold'>CLAN</Text>
+      </View>
+      
+      {/* <Stack.Screen 
         options={{ title: 'Clan Name', 
         headerRight: () => 
           haveClan 
@@ -42,7 +67,9 @@ const ClanDetailsScreen = () => {
             <AnimatedPressable 
               pressInValue={0.9}
               className='rounded'
-              onPress={() => router.push('/clan/clan_war/clanWar')}
+              onPress={() => {
+                router.push('clan/clan_war/clanWar')
+              }}
             >
               <View className='my-auto'>
                 <MaterialCommunityIcons name="sword-cross" size={28} color={themeColors.primary} />
@@ -50,8 +77,8 @@ const ClanDetailsScreen = () => {
             </AnimatedPressable>
           :
             null
-      }} />
-      <View className='flex-row mb-3'>
+      }} /> */}
+      <View className='flex-row my-3'>
         <Image 
           className='w-32 h-40 mx-4'
           source={require('@asset/images/clan_logo/clan_logo_1.png')}
@@ -109,6 +136,7 @@ const ClanDetailsScreen = () => {
       </Modal>
     </View>
     </ImageBackground>
+    </SafeAreaView>
   )
 }
 

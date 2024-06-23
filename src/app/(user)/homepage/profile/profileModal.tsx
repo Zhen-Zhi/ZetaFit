@@ -8,6 +8,7 @@ import AnimatedPressable from '@/src/components/AnimatedPressable';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { themeColors } from '@/src/constants/Colors';
 import EditProfileScreen from './editProfile';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 type ModalProps = {
   onClose: () => void;
@@ -31,7 +32,7 @@ const ProfileScreen = ({ onClose }: ModalProps) => {
             <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
           </View>
         </AnimatedPressable>
-        <Text style={{ color: themeColors.primary }} className='text-center my-auto text-xl font-semibold'>Profile</Text>
+        <Text style={{ color: themeColors.primary }} className='text-center my-auto text-2xl font-extrabold'>Profile</Text>
         <AnimatedPressable pressInValue={0.9} className='z-10' onPress={() => setModalVisible(true)}>
         <View className='p-1'>
             <FontAwesome5 name="pencil-alt" size={24} color={themeColors.primary} />
@@ -94,7 +95,12 @@ const ProfileScreen = ({ onClose }: ModalProps) => {
         transparent={true}
         onRequestClose={() =>setModalVisible(false)}
       >
-        <EditProfileScreen onClose={() => setModalVisible(false)} />
+        <SafeAreaProvider>
+          <SafeAreaView edges={['top']} className='flex-1'>
+            <EditProfileScreen onClose={() => setModalVisible(false)} />
+          </SafeAreaView>
+        </SafeAreaProvider>
+          
       </Modal>
     </ImageBackground>
   )

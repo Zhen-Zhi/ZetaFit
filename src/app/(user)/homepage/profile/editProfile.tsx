@@ -66,7 +66,7 @@ const EditProfileScreen = ({ onClose }: ModalProps) => {
             <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
           </View>
         </AnimatedPressable>
-        <Text style={{ color: themeColors.primary }} className='text-center my-auto text-xl font-semibold'>Profile</Text>
+        <Text style={{ color: themeColors.primary }} className='text-center my-auto text-xl font-bold'>Profile</Text>
         <AnimatedPressable pressInValue={0.9} className='h-0' onPress={() => {console.log('pressed')}}>
         <View className='p-1'>
             <FontAwesome5 name="pencil-alt" size={24} color={themeColors.primary} />
@@ -109,7 +109,7 @@ const EditProfileScreen = ({ onClose }: ModalProps) => {
       </ScrollView>
       <LinearGradient
         className='h-32 w-full z-10 absolute bottom-0 justify-end'
-        colors={['transparent', '#fff']}
+        colors={['#ffffff00', '#fff']}
         start={{ x: 0, y: 0 }}  // Gradient starts at the top
         end={{ x: 0, y: 0.6 }}  // Gradient ends at the bottom
       >

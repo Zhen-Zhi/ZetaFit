@@ -69,7 +69,7 @@ const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
         onRequestClose={() =>setModalVisible(false)}
       >
         <SafeAreaProvider>
-          <SafeAreaView edges={['top']} className='flex-1 bg-white'>
+          <SafeAreaView edges={['top']} className='flex-1'>
             <ProfileScreen onClose={() => setModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>

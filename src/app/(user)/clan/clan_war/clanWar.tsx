@@ -1,24 +1,67 @@
-import { ImageBackground, SafeAreaView, StyleSheet, Text, View, Image, Platform, Modal } from 'react-native'
+import { ImageBackground, StyleSheet, Text, View, Image, Platform, Modal } from 'react-native'
 import React, { useState } from 'react'
-import { Stack, router } from 'expo-router'
+import { Redirect, Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
 import * as Progress from 'react-native-progress';
 import ClanWarBattleLogScreen from './clanWarBattleLog'
-import ClanWarAttackDetialsScreen from './clanWarAttackDetials'
 import ClanWarActionScreenModal from './clanWarActions'
+import ClanWarResultScreen from './clanWarResult'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const ClanWarScreen = () => {
+  const [clanWar, setClanWar] = useState(false)
   const [modalVisible, setModalVisible] = useState(false);
   const [actionModalVisible, setActionModalVisible] = useState(false);
   const [actionType, setActionType] = useState('attack');
+  const [warEnded, setWarEnded] = useState(true);
+
+  if (clanWar == false) {
+    return (
+      <SafeAreaView edges={['top']} className='flex-1'>
+        <ImageBackground className='flex-1' source={require('@asset/images/background_image.png')}>
+          <Stack.Screen options={{ headerShown: false }} />
+          <View style={{ backgroundColor: themeColors.backgroundColor }} className={`pt-3 pb-2 px-4 border-b border-slate-300`}>
+            <AnimatedPressable 
+              pressInValue={0.9} 
+              className='z-10 absolute left-3 bottom-2'
+              onPress={() => router.back()}
+            >
+              <View className='p-1'>
+                <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
+              </View>
+            </AnimatedPressable>
+            <Text style={{ color: themeColors.primary }} className='text-center mt-auto text-[28px] font-extrabold'>BATTLEGROUND</Text>
+          </View>
+
+          <Image
+            className='w-64 h-64 mx-auto mt-24'
+            source={require('@asset/images/clan_war_logo.png')}
+          />
+          <Text className='text-xl font-bold text-center mt-2 text-slate-500'>No Active Clan War</Text>
+          <AnimatedPressable
+            style={{ backgroundColor: themeColors.secondary }}
+            pressInValue={0.98}
+            className='p-2 mx-auto rounded-lg mt-6 flex-row'
+            onPress={() => setClanWar(true)}
+          >
+            <View className='my-auto ml-3'>
+              <FontAwesome6 name="magnifying-glass" size={24} color="white" />
+            </View>
+            <Text className='text-xl ml-3 mr-6 my-4 font-bold text-center text-white'>Search Battle</Text>
+          </AnimatedPressable>
+        </ImageBackground>
+      </SafeAreaView>
+    )
+  }
 
   return (
-    <SafeAreaView className='flex-1'>
+    <SafeAreaView edges={['top']} className='flex-1'>
+    <View className='flex-1'>
       <Stack.Screen options={{ headerShown: false }} />
       <ImageBackground className='flex-1' source={require('@asset/images/background_image.png')}>
-        <View style={{ backgroundColor: themeColors.backgroundColor }} className={`pt-3 pb-2 px-4 border-b border-slate-300 ${Platform.OS == 'ios' ? 'h-12' : 'h-20'}`}>
+        <View style={{ backgroundColor: themeColors.backgroundColor }} className={`pt-1 pb-2 px-4 border-b border-slate-300`}>
           <AnimatedPressable 
             pressInValue={0.9} 
             className='z-10 absolute left-3 bottom-2'
@@ -144,6 +187,17 @@ const ClanWarScreen = () => {
       >
         <ClanWarActionScreenModal actionType={actionType} onClose={() => setActionModalVisible(false)} />
       </Modal>
+      <Modal
+        animationType='fade'
+        visible={warEnded}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setWarEnded(false)}
+      >
+        <ClanWarResultScreen modalVisible={warEnded} onClose={() => setWarEnded(false)} />
+      </Modal>
+
+    </View>
     </SafeAreaView>
   )
 }

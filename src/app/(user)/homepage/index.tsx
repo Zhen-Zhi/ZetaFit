@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, ImageBackground, Modal, FlatList, ActivityIndicator, } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import * as Progress from 'react-native-progress';
 import { FontAwesome, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import AnimatedPressable from '@/src/components/AnimatedPressable';
@@ -26,11 +26,11 @@ const HomeScreen = () => {
   }, [navigation]);
 
   return (
-    <SafeAreaView edges={['top']} className='flex-1 bg-slate-100 pt-2'>
-      <ImageBackground
-        className='flex-1' 
-        source={require('@asset/images/background_image.png')}
-      >
+    <ImageBackground
+      className='flex-1' 
+      source={require('@asset/images/background_image.png')}
+    >
+      <SafeAreaView edges={['top']} className='flex-1 pt-2'>
       {/* Top Part, Avatar, Level Bar, Username, Virtual Currency */}
       <View className='flex flex-row justify-between'>
 
@@ -127,7 +127,11 @@ const HomeScreen = () => {
         transparent={true}
         onRequestClose={() =>setModalVisible(false)}
       >
-        <MoreOptionsModal onClose={() => setModalVisible(false)} />
+        <SafeAreaProvider className='flex-1'>
+          <SafeAreaView className='flex-1' edges={['top']}>
+            <MoreOptionsModal onClose={() => setModalVisible(false)} />
+          </SafeAreaView>
+        </SafeAreaProvider>
       </Modal>
       
       {/* middle image - main */}
@@ -177,9 +181,8 @@ const HomeScreen = () => {
           showsHorizontalScrollIndicator={false}
         />
       </View>
-      </ImageBackground>
-    </SafeAreaView>
-    
+      </SafeAreaView>
+    </ImageBackground>
   )
 }
 

@@ -6,6 +6,7 @@ import AnimatedModal from './AnimatedModal'
 import { router, useLocalSearchParams } from 'expo-router'
 import { themeColors } from '../constants/Colors'
 import ProfileScreen from '../app/(user)/homepage/profile/profileModal'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 
 type ClanMemberProps = {
   id: number;
@@ -74,13 +75,24 @@ const ClanMember = ({ id }: ClanMemberProps) => {
             >
               <Text style={{ color: themeColors.secondary }} className='text-lg text-center font-bold text-white'>View Profile</Text>
             </AnimatedPressable>
-            <AnimatedPressable
-              style={{ backgroundColor: themeColors.backgroundColor }}
-              className='p-1 rounded-lg border border-slate-500 my-1'
-              pressInValue={0.95}
-            >
-              <Text style={{ color: themeColors.secondary }} className='text-lg text-center font-bold text-white'>Promote</Text>
-            </AnimatedPressable>
+
+            <View className='flex-row mt-1'>
+              <AnimatedPressable
+                style={{ backgroundColor: themeColors.backgroundColor }}
+                className='p-1 rounded-lg border border-slate-500 my-1 flex-1 mr-1'
+                pressInValue={0.95}
+                >
+                <Text style={{ color: themeColors.secondary }} className='text-lg text-center font-bold text-white'>Promote</Text>
+              </AnimatedPressable>
+              <AnimatedPressable
+                style={{ backgroundColor: themeColors.backgroundColor }}
+                className='p-1 rounded-lg border border-slate-500 my-1 flex-1 ml-1'
+                pressInValue={0.95}
+                >
+                <Text style={{ color: themeColors.danger }} className='text-lg text-center font-bold text-white'>Demote</Text>
+              </AnimatedPressable>
+            </View>
+
             <AnimatedPressable
               style={{ backgroundColor: themeColors.danger }}
               className='p-1.5 rounded-lg mt-2'
@@ -91,6 +103,7 @@ const ClanMember = ({ id }: ClanMemberProps) => {
           </View>
       </AnimatedModal>
       </Modal>
+
       <Modal
         animationType='fade'
         visible={profileModalVisible}
@@ -98,7 +111,11 @@ const ClanMember = ({ id }: ClanMemberProps) => {
         transparent={true}
         onRequestClose={() =>setModalVisible(false)}
       >
-        <ProfileScreen onClose={() => setProfileModalVisible(false)} />
+        <SafeAreaProvider className='flex-1'>
+          <SafeAreaView className='flex-1' edges={['top']}>
+            <ProfileScreen onClose={() => setProfileModalVisible(false)} />
+          </SafeAreaView>
+        </SafeAreaProvider>
       </Modal>
     </View>
   )

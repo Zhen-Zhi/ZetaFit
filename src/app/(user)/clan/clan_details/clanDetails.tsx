@@ -25,7 +25,7 @@ const ClanDetailsScreen = () => {
   return (
     <View className='flex-1 p-4'>
       <Text style={{ color: themeColors.primary }} className='text-xl font-extrabold text-center'>Clan ActiveScore</Text>
-      <View style={{ backgroundColor: themeColors.backgroundColor }} className='rounded-xl flex-row justify-center p-2 mb-2'>
+      <View className='rounded-xl flex-row justify-center p-2 mb-2 bg-white/50'>
         <View className='my-auto mx-3'>
           <FontAwesome6 name="fire" size={48} color="rgba(240, 93, 9, 0.8)" />
         </View>
@@ -34,7 +34,7 @@ const ClanDetailsScreen = () => {
 
       <Text style={{ color: themeColors.primary }} className='text-xl font-extrabold text-center'>Clan War History</Text>
 
-      <View style={{ backgroundColor: themeColors.backgroundColor }} className='rounded-xl p-2 mb-2'>
+      <View className='rounded-xl p-2 mb-2 bg-white/50'>
         <View className='flex-row justify-center'>
           <Text style={{ color: themeColors.tetiary }} className='font-bold text-[22px] mx-3'>Win</Text>
           <Progress.Bar className='my-2'
@@ -57,9 +57,9 @@ const ClanDetailsScreen = () => {
 
       
       <View className='rounded-xl p-2 mb-2 flex-row justify-around'>
-        <View className='w-3/5'>
+        <View className='w-3/5 bg-white/50'>
           <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>Required ActiveScore</Text>
-          <View style={{ backgroundColor: themeColors.backgroundColor }} className='flex-row'>
+          <View className='flex-row'>
             <View className='my-auto mx-3'>
               <FontAwesome6 name="fire" size={22} color="rgba(240, 93, 9, 0.8)" />
             </View>
@@ -77,9 +77,9 @@ const ClanDetailsScreen = () => {
             : null }
           </View>
         </View>
-        <View className='w-2/5'>
+        <View className='w-2/5 bg-white/50'>
           <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>Ranking</Text>
-          <View style={{ backgroundColor: themeColors.backgroundColor }} className='flex-row'>
+          <View className='flex-row'>
             <View className='my-auto mx-3'>
               <MaterialIcons name="leaderboard" size={22} color={themeColors.primary} />
             </View>
@@ -89,9 +89,9 @@ const ClanDetailsScreen = () => {
       </View>
 
       <View className='rounded-xl p-2 mb-2 flex-row'>
-        <View className='w-3/5'>
+        <View className='w-3/5 bg-white/50'>
           <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>Clan Health Points</Text>
-          <View style={{ backgroundColor: themeColors.backgroundColor }} className='flex-row'>
+          <View className='flex-row'>
             <View className='my-auto mx-3'>
               <FontAwesome6 name="shield-heart" size={22} color='red' />
             </View>

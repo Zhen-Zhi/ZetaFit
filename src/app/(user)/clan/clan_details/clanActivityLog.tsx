@@ -88,7 +88,7 @@ const ClanActivityLogScreen = () => {
         source={require('@asset/images/background_image.png')}
       >
 
-      <View style={{ backgroundColor: themeColors.backgroundColor }} className='flex-row justify-center pt-3 pb-2 px-4 border-b border-slate-300'>
+      <View style={{ backgroundColor: themeColors.backgroundColor }} className='flex-row justify-center pt-1 pb-2 px-4 border-b border-slate-300'>
         <AnimatedPressable 
           pressInValue={0.9} 
           className='z-10 absolute left-3 bottom-2'

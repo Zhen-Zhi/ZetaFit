@@ -2,11 +2,11 @@ import { ImageBackground, Image, KeyboardAvoidingView, Platform, StyleSheet, Tex
 import React, { useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
-import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome5, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import ClanLogoListModal from './clanLogoList';
 import AwesomeButton from "react-native-really-awesome-button";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 
 type CreateClanScreenProps = {
   onClose: () => void
@@ -30,22 +30,22 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height' }
       className='justify-end bg-black flex-1'
     >
+    
     <ImageBackground
       className='h-full'
       source={require('@asset/images/background_image.png')}
     >
-      <View className='flex-row justify-normal pt-3 pb-2 px-4 bg-white border-b border-slate-300'>
-        <Stack.Screen />
+      <View style={{ backgroundColor: themeColors.backgroundColor }} className={`pt-3 pb-2 px-4 border-b border-slate-300 ${Platform.OS == 'ios' ? 'h-20' : 'h-14'}`}>
         <AnimatedPressable 
           pressInValue={0.9} 
-          className='absolute left-2 top-2 z-10'
+          className='z-10 absolute left-3 bottom-2'
           onPress={onClose}
         >
           <View className='p-1'>
             <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
           </View>
         </AnimatedPressable>
-        <Text style={{ color: themeColors.primary }} className='text-center m-auto text-xl font-semibold'>Create New Clan</Text>
+        <Text style={{ color: themeColors.primary }} className='text-center mt-auto text-2xl font-extrabold'>Create Clan</Text>
       </View>
 
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} className=''>

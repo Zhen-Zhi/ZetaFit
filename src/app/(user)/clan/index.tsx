@@ -1,12 +1,11 @@
-import { ImageBackground, StyleSheet, Text, View, Image, TextInput, FlatList, TouchableWithoutFeedback, Keyboard, Modal } from 'react-native'
+import { ImageBackground, StyleSheet, Text, View, Image, TextInput, FlatList, TouchableWithoutFeedback, Keyboard, Modal, Platform } from 'react-native'
 import React, { useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
-import { FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import ClanList from '@/src/components/ClanList'
-
 import { clanListData } from '@/src/constants/dummyData'
 import CreateClanScreen from './createClan';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { themeColors } from '@/src/constants/Colors';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
@@ -21,13 +20,27 @@ const ClanScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
-    <ImageBackground
+    <SafeAreaView edges={['top']} className='flex-1'>
+      <ImageBackground
         className='flex-1'
         source={require('@asset/images/background_image.png')}
-    >
+      >
+      <Stack.Screen options={{ headerShown: false }} />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className='flex-1'>
-        <Stack.Screen options={{ 
+          <View style={{ backgroundColor: themeColors.backgroundColor }} className='flex-row justify-center pt-2 pb-1 px-4 border-b border-slate-300'>
+            <Text style={{ color: themeColors.primary }} className='text-center my-auto text-3xl font-extrabold'>Clan</Text>
+            <AnimatedPressable 
+              pressInValue={0.9}
+              className='z-10 absolute right-3 top-2.5'
+              onPress={() => setModalVisible(true)}
+            >
+              <View className='my-auto'>
+                <MaterialCommunityIcons name="shield-plus-outline" size={28} color={themeColors.primary} />
+              </View>
+            </AnimatedPressable>
+          </View>
+        {/* <Stack.Screen options={{ 
           title: 'Clan',
           headerTitleStyle: { color: themeColors.primary },
           headerRight: () => 
@@ -40,7 +53,7 @@ const ClanScreen = () => {
                 <MaterialCommunityIcons name="shield-plus-outline" size={28} color={themeColors.primary} />
               </View>
             </AnimatedPressable>
-        }}/>
+        }}/> */}
 
           {/* Top image - Clan */}
           <Image 
@@ -82,17 +95,14 @@ const ClanScreen = () => {
             transparent={true}
             onRequestClose={() =>setModalVisible(false)}
           >
-            <SafeAreaProvider>
-              <SafeAreaView edges={['top']} className='flex-1'>
-                <CreateClanScreen onClose={() => setModalVisible(false)} />
-              </SafeAreaView>
-            </SafeAreaProvider>
+            <CreateClanScreen onClose={() => setModalVisible(false)} />
           </Modal>
         </View>
 
         
       </TouchableWithoutFeedback>
-    </ImageBackground>
+      </ImageBackground>
+    </SafeAreaView>
   )
 }
 
