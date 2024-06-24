@@ -2,21 +2,25 @@ import { Entypo } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList, Pressable } from 'react-native';
 import AnimatedPressable from './AnimatedPressable';
-import ScrollPicker from './Scroll';
+import AnimatedModal from './AnimatedModal';
 
-const CustomPicker = ({ data, selectedValue, onValueChange, placeholder }) => {
+const CustomPicker = ({ data, selectedUnit, onValueChange, placeholder }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [localSelectedValue, setLocalSelectedValue] = useState(selectedValue);
+  const [modalSelectedValue, setModalSelectedValue] = useState(selectedUnit);
 
-  const handleValueChange = () => {
-    onValueChange(localSelectedValue);
-    setModalVisible(false);
+  const handleValueChange = (newUnit) => {
+    setModalSelectedValue(newUnit)
+    onValueChange(modalSelectedValue);
+    setTimeout(() => {
+      setModalVisible(false);
+    }, 150)
+    
   };
 
   return (
     <View className='flex-1'>
       <Pressable className='bg-slate-200 rounded-r-lg flex-1 flex-row justify-center' onPress={() => setModalVisible(true)}>
-        <Text className='font-bold text-lg text-center my-auto'>{localSelectedValue || placeholder}</Text>
+        <Text className='font-bold text-lg text-center my-auto'>{modalSelectedValue || placeholder}</Text>
         <View className='my-auto ml-3'>
           <Entypo name="triangle-down" size={24} color="black" />
         </View>
@@ -28,16 +32,39 @@ const CustomPicker = ({ data, selectedValue, onValueChange, placeholder }) => {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <Pressable className='bg-black/50 justify-center items-center flex-1' onPress={() => setModalVisible(false)}>
+        <AnimatedModal
+          onClose={() => setModalVisible(false)}
+        >
+          <Text className='font-bold text-lg mb-4'>Select distance unit</Text>
+          <FlatList
+            data={data}
+            keyExtractor={item => item.value}
+            renderItem={({ item }) => (
+              <AnimatedPressable
+                className={`border rounded-lg my-1 ${ item.label == modalSelectedValue ? 'border-4 border-teal-500' : 'border-slate-500' }`}
+                pressInValue={0.98}
+                style={styles.item}
+                onPress={() => handleValueChange(item.label)}
+              >
+                <Text className='font-bold text-lg text-center'>
+                  {item.label}
+                </Text>
+              </AnimatedPressable>
+            )}
+          />
+        </AnimatedModal>
+        {/* <Pressable className='bg-black/50 justify-center items-center flex-1' onPress={() => setModalVisible(false)}>
           <View style={styles.modalContent}>
+            <Text>Select distance unit</Text>
             <FlatList
               data={data}
               keyExtractor={item => item.value}
               renderItem={({ item }) => (
                 <AnimatedPressable
+                  className='border border-slate-500 rounded-lg my-1'
                   pressInValue={0.98}
                   style={styles.item}
-                  onPress={() => setLocalSelectedValue(item.label)}
+                  onPress={() => setModalSelectedValue(item.label)}
                 >
                   <Text className='font-bold text-lg text-center'>
                     {item.label}
@@ -46,7 +73,7 @@ const CustomPicker = ({ data, selectedValue, onValueChange, placeholder }) => {
               )}
             />
           </View>
-        </Pressable>
+        </Pressable> */}
       </Modal>
     </View>
   );

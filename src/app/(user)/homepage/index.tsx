@@ -6,7 +6,7 @@ import { FontAwesome, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import AnimatedPressable from '@/src/components/AnimatedPressable';
 import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
 import MoreOptionsModal from './optionListModal';
-import { useNavigation } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import { themeColors } from '@/src/constants/Colors';
 import AddActivityScreenModal from './addActivity';
 
@@ -152,6 +152,7 @@ const HomeScreen = () => {
           className='m-1 h-[40px] w-[240px] bg-slate-200 p-1 rounded-lg justify-center mt-2 flex-row'
           pressInValue={0.98}
           onPress={() => setAddActivityModalVisible(true)}
+          // onPress={() => router.push('/homepage/addActivity')}
         >
           <Text style={{ color: themeColors.backgroundColor }} className='text-center font-extrabold text-lg'>Add Activity</Text>
         </AnimatedPressable>
