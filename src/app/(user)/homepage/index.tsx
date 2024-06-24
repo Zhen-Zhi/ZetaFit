@@ -8,11 +8,13 @@ import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
 import MoreOptionsModal from './optionListModal';
 import { useNavigation } from 'expo-router';
 import { themeColors } from '@/src/constants/Colors';
+import AddActivityScreenModal from './addActivity';
 
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
 const HomeScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [addActivityModalVisible, setAddActivityModalVisible] = useState(false);
   const navigation = useNavigation();
 
   // define a event listerner to set modal visible false
@@ -26,11 +28,11 @@ const HomeScreen = () => {
   }, [navigation]);
 
   return (
+    <SafeAreaView edges={['top']} className='flex-1'>
     <ImageBackground
-      className='flex-1' 
+      className='flex-1 pt-2'
       source={require('@asset/images/background_image.png')}
-    >
-      <SafeAreaView edges={['top']} className='flex-1 pt-2'>
+    >  
       {/* Top Part, Avatar, Level Bar, Username, Virtual Currency */}
       <View className='flex flex-row justify-between'>
 
@@ -118,21 +120,6 @@ const HomeScreen = () => {
         </AnimatedPressable>
         
       </View>
-
-      {/* Function list options*/}
-      <Modal
-        animationType='fade'
-        visible={modalVisible}
-        presentationStyle='overFullScreen'
-        transparent={true}
-        onRequestClose={() =>setModalVisible(false)}
-      >
-        <SafeAreaProvider className='flex-1'>
-          <SafeAreaView className='flex-1' edges={['top']}>
-            <MoreOptionsModal onClose={() => setModalVisible(false)} />
-          </SafeAreaView>
-        </SafeAreaProvider>
-      </Modal>
       
       {/* middle image - main */}
       <View className='mx-auto mt-12 mb-6'>
@@ -164,6 +151,7 @@ const HomeScreen = () => {
           style={{ backgroundColor: themeColors.secondary }}
           className='m-1 h-[40px] w-[240px] bg-slate-200 p-1 rounded-lg justify-center mt-2 flex-row'
           pressInValue={0.98}
+          onPress={() => setAddActivityModalVisible(true)}
         >
           <Text style={{ color: themeColors.backgroundColor }} className='text-center font-extrabold text-lg'>Add Activity</Text>
         </AnimatedPressable>
@@ -181,8 +169,39 @@ const HomeScreen = () => {
           showsHorizontalScrollIndicator={false}
         />
       </View>
-      </SafeAreaView>
-    </ImageBackground>
+
+      {/* Function list options*/}
+      <Modal
+        animationType='fade'
+        visible={modalVisible}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setModalVisible(false)}
+      >
+        <SafeAreaProvider className='flex-1'>
+          <SafeAreaView className='flex-1' edges={['top']}>
+            <MoreOptionsModal onClose={() => setModalVisible(false)} />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </Modal>
+
+      {/* Add activity modal */}
+      <Modal
+        animationType='fade'
+        visible={addActivityModalVisible}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setAddActivityModalVisible(false)}
+      >
+        <SafeAreaProvider className='flex-1'>
+          <SafeAreaView edges={['top']} className='flex-1'>
+            <AddActivityScreenModal onClose={() => setAddActivityModalVisible(false)} />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </Modal>
+
+      </ImageBackground>
+    </SafeAreaView>
   )
 }
 
