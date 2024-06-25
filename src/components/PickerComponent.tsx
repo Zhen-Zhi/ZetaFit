@@ -4,11 +4,18 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList, Pressable } 
 import AnimatedPressable from './AnimatedPressable';
 import AnimatedModal from './AnimatedModal';
 
-const CustomPicker = ({ data, selectedUnit, onValueChange, placeholder }) => {
+type CustomPickerProps = {
+  data: any;
+  selectedUnit: string;
+  onValueChange: React.Dispatch<React.SetStateAction<string>>; 
+  placeholder: string
+}
+
+const CustomPicker = ({ data, selectedUnit, onValueChange, placeholder }: CustomPickerProps) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalSelectedValue, setModalSelectedValue] = useState(selectedUnit);
 
-  const handleValueChange = (newUnit) => {
+  const handleValueChange = (newUnit: string) => {
     setModalSelectedValue(newUnit)
     onValueChange(modalSelectedValue);
     setTimeout(() => {
@@ -53,27 +60,6 @@ const CustomPicker = ({ data, selectedUnit, onValueChange, placeholder }) => {
             )}
           />
         </AnimatedModal>
-        {/* <Pressable className='bg-black/50 justify-center items-center flex-1' onPress={() => setModalVisible(false)}>
-          <View style={styles.modalContent}>
-            <Text>Select distance unit</Text>
-            <FlatList
-              data={data}
-              keyExtractor={item => item.value}
-              renderItem={({ item }) => (
-                <AnimatedPressable
-                  className='border border-slate-500 rounded-lg my-1'
-                  pressInValue={0.98}
-                  style={styles.item}
-                  onPress={() => setModalSelectedValue(item.label)}
-                >
-                  <Text className='font-bold text-lg text-center'>
-                    {item.label}
-                  </Text>
-                </AnimatedPressable>
-              )}
-            />
-          </View>
-        </Pressable> */}
       </Modal>
     </View>
   );
