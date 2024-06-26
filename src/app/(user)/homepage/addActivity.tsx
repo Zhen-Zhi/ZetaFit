@@ -1,12 +1,12 @@
 import { ImageBackground, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View, Image, FlatList, Animated, TouchableOpacity, Pressable, Dimensions } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Picker } from "@react-native-picker/picker";
 import CustomPicker from '@/src/components/PickerComponent';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const AnimatedButton = Animated.createAnimatedComponent(Pressable);
 
 type AddActivityScreenModalProps = {
   onClose : () => void;
@@ -16,11 +16,12 @@ type ActivityTypeProps = {
   id: number;
   activity: string;
   image: any;
+  index ?: number;
 }
 
-type propsType = {
-  props: ActivityTypeProps;
-}
+const AnimatedButton = Animated.createAnimatedComponent(Pressable);
+const ITEM_WIDTH = 200;
+const SCREEN_WIDTH = Dimensions.get('window').width
 
 const items = [
   { label: 'Kilometers', value: 'km' },
@@ -71,95 +72,62 @@ const activityType: ActivityTypeProps[] = [
   // Add more dummy data as needed
 ];
 
-const ITEM_WIDTH = 200;
-
-// const ActivityTypeSelector = ({ props }: propsType) => {
-//   const {id, activity, image} = props;
-
-//   return (
-//     <Pressable style={{ width: ITEM_WIDTH }} className='my-8 bg-white/50 rounded-lg border-0 items-center'>
-//       <Image
-//         className='w-44 h-44'
-//         source={image}
-//       />
-//       <Text style={{ color: themeColors.primary }} className='text-lg text-center font-bold'>{activity}</Text>
-//     </Pressable>
-//   )
-// }
-
-const ActivityTypeSelector = ({ activity, image, index, scrollX }: { activity: string; image: any; index: number; scrollX: Animated.Value }) => {
-  // Interpolate opacity and scale based on scrollX value
-  const opacity = scrollX.interpolate({
-    inputRange: [index - 1, index, index + 1],
-    outputRange: [0.5, 1, 0.5],
-    extrapolate: 'clamp',
-  });
-
-  const scale = scrollX.interpolate({
-    inputRange: [index - 1, index, index + 1],
-    outputRange: [0.8, 1, 0.8],
-    extrapolate: 'clamp',
-  });
-
-  return (
-    <AnimatedButton style={{ width: ITEM_WIDTH, opacity, transform: [{ scale }] }} className='my-8 bg-white/50 rounded-lg border-0 items-center'>
-      <Image
-        className='w-44 h-44'
-        source={image}
-      />
-      <Text style={{ color: themeColors.primary }} className='text-lg text-center font-bold'>{activity}</Text>
-    </AnimatedButton>
-  )
-};
 
 const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
   const [selectedUnit, setSelectedUnit] = useState('Kilometers');
   const [selectedItem, setSelectedItem] = useState(activityType[0])
+  const flatListRef = useRef<FlatList<ActivityTypeProps>>(null);
 
-  console.log(selectedItem);
-  
+  console.log(selectedItem)
 
   const scrollX = useRef(new Animated.Value(0)).current;
-
+  
   const calculateCenterItem = (event: any) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const centeredIndex = Math.floor((contentOffsetX + ITEM_WIDTH / 2) / ITEM_WIDTH);
+    scrollX.setValue(contentOffsetX);
+    const centeredIndex = (contentOffsetX / ITEM_WIDTH);
     
-    activityType.forEach((item, index) => {
-      console.log(centeredIndex + ' this is space ' + index)
-      Animated.spring(scrollX, {
-        toValue: centeredIndex == index ? 1 : 0,
-        useNativeDriver: true,
-      }).start();
-    });
-
     setSelectedItem(activityType[centeredIndex]);
   };
 
-  // const flatListRef = useRef<FlatList<ActivityTypeProps>>(null);
-  // const [currentIndex, setCurrentIndex] = useState(0);
+  const ActivityTypeSelector = ({ activity, image, index }: { activity: string, image: any, index: number }) => {
+    const inputArray = [
+      (index - 1) * ITEM_WIDTH,  // Start fading in
+      index * ITEM_WIDTH,        // Fully visible
+      (index + 1) * ITEM_WIDTH,  // Start fading out
+    ]
 
-  // console.log(currentIndex)
-
-  // const scrollToNextItem = () => {
-  //   if (flatListRef.current) {
-  //     const nextIndex = currentIndex + 1;
-  //     if (nextIndex < activityType.length) {
-  //       flatListRef.current.scrollToIndex({ index: nextIndex });
-  //       setCurrentIndex(nextIndex);
-  //     }
-  //   }
-  // };
-
-  // const scrollToPreviousItem = () => {
-  //   if (flatListRef.current) {
-  //     const prevIndex = currentIndex - 1;
-  //     if (prevIndex >= 0) {
-  //       flatListRef.current.scrollToIndex({ index: prevIndex });
-  //       setCurrentIndex(prevIndex);
-  //     }
-  //   }
-  // };
+    const opacity = scrollX.interpolate({
+      inputRange: inputArray,
+      outputRange: [0.2, 1, 0.2],
+      extrapolate: 'clamp'
+    })
+    
+    const scale = scrollX.interpolate({
+      inputRange: inputArray,
+      outputRange: [0.8, 1.0, 0.8],
+      extrapolate: 'clamp'
+    })
+    
+    return (
+      <AnimatedButton 
+        style={[{ width: ITEM_WIDTH, opacity}, { transform: [{ scale }] }]} 
+        className='my-8 bg-white/50 rounded-lg border-0 items-center'
+        onPress={() => {
+          if (flatListRef.current) {
+            flatListRef.current.scrollToOffset({ offset: index * ITEM_WIDTH });
+            setSelectedItem(activityType[index])
+          }
+        }}
+      >
+        <Image
+          className='w-44 h-44'
+          source={image}
+        />
+        <Text style={{ color: themeColors.primary }} className='text-lg text-center font-bold'>{activity}</Text>
+      </AnimatedButton>
+    )
+  };
   
   return (
     <ImageBackground
@@ -194,21 +162,12 @@ const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
         <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
         <Text className='font-extrabold text-3xl mx-4 bg-white/50 mt-4'>Manual Entry</Text>
         <View className='flex-row'>
-          {/* <FlatList
-            data={activityType}
-            renderItem={({ item }) => <ActivityTypeSelector props={item} />}
-            keyExtractor={item => item.id.toString()}
-            contentContainerStyle= {{ gap: 10 }}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            // ref={flatListRef}
-          /> */}
           <Animated.FlatList
+            ref={flatListRef}
             horizontal
             data={activityType}
             renderItem={({ item, index }) => (
-              // <ActivityTypeSelector props={item} />
-              <ActivityTypeSelector {...item} index={index} scrollX={scrollX} />
+              <ActivityTypeSelector {...item} index={index} />
             )}
             keyExtractor={item => item.id.toString()}
             contentContainerStyle={styles.listContainer}
@@ -223,32 +182,6 @@ const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
             snapToInterval={200}
           />
         </View>
-
-        {/* <AnimatedPressable
-          style={ currentIndex == 0 ? { opacity: 0.5 } : { opacity: 1 } }
-          className='mx-1'
-          pressInValue={0.9}
-          onPress={scrollToPreviousItem}
-          disabled={ currentIndex == 0 }
-        >
-          <View className='flex-row'>
-            <Image className='h-4 w-2 my-auto' source={require('@asset/images/arrow_left.png')} />
-            <Text className='mx-2 font-medium'>Previous</Text>
-          </View>
-        </AnimatedPressable>
-
-        <AnimatedPressable
-          style={ currentIndex == activityType.length - 1 ? { opacity: 0.5 } : { opacity: 1 } }
-          className='mx-1'
-          pressInValue={0.9}
-          onPress={scrollToNextItem}
-          disabled={ currentIndex == activityType.length - 1 }
-        >
-          <View className='flex-row'>
-            <Text className='mx-2 font-medium'>Next</Text>
-            <Image className='h-4 w-2 my-auto' source={require('@asset/images/arrow_right.png')} />
-          </View>
-        </AnimatedPressable> */}
         
         <View className='px-4 pb-4 bg-white/30 gap-4'>
           <View>
@@ -324,7 +257,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   listContainer: {
-    paddingHorizontal: 100,
+    paddingHorizontal: (SCREEN_WIDTH - ITEM_WIDTH) / 2,
   },
   item: {
     paddingVertical: 12,
