@@ -1,6 +1,6 @@
 import { Entypo } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, StyleSheet, FlatList, Pressable, ImageBackground } from 'react-native';
 import AnimatedPressable from './AnimatedPressable';
 import AnimatedModal from './AnimatedModal';
 
@@ -42,13 +42,14 @@ const CustomPicker = ({ data, selectedUnit, onValueChange, placeholder }: Custom
         <AnimatedModal
           onClose={() => setModalVisible(false)}
         >
+          <ImageBackground className='p-4' source={require('@asset/images/background_image.png')}>
           <Text className='font-bold text-lg mb-4'>Select distance unit</Text>
           <FlatList
             data={data}
             keyExtractor={item => item.value}
             renderItem={({ item }) => (
               <AnimatedPressable
-                className={`border rounded-lg my-1 ${ item.label == modalSelectedValue ? 'border-4 border-teal-500' : 'border-slate-500' }`}
+                className={`border rounded-lg my-1 bg-white ${ item.label == modalSelectedValue ? 'border-4 border-teal-500' : 'border-slate-500' }`}
                 pressInValue={0.98}
                 style={styles.item}
                 onPress={() => handleValueChange(item.label)}
@@ -59,6 +60,7 @@ const CustomPicker = ({ data, selectedUnit, onValueChange, placeholder }: Custom
               </AnimatedPressable>
             )}
           />
+          </ImageBackground>
         </AnimatedModal>
       </Modal>
     </View>

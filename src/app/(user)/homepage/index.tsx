@@ -8,7 +8,7 @@ import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
 import MoreOptionsModal from './optionListModal';
 import { router, useNavigation } from 'expo-router';
 import { themeColors } from '@/src/constants/Colors';
-import AddActivityScreenModal from './addActivity';
+import AddActivityScreenModal from '@/src/components/AddActivity';
 
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 

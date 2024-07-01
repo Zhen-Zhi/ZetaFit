@@ -122,15 +122,17 @@ const ClanDetailsScreen = () => {
         onRequestClose={() =>setModalVisible(false)}
       >
         <AnimatedModal modalVisible={modalVisible} onClose={() => setModalVisible(false)}>
-          <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Leave Clan</Text>
-          <Text style={{ color: themeColors.primary }} className='font-bold text-lg'>Are you sure you want to leave clan?</Text>
-          <View className='flex-row justify-around mt-6'>
-            <AnimatedPressable style={{ backgroundColor: themeColors.secondary }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => setModalVisible(false)}>
-            <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Stay</Text>
-            </AnimatedPressable>
-            <AnimatedPressable style={{ backgroundColor: themeColors.danger }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => {setModalVisible(false); setHaveClan(false)}}>
-            <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Leave</Text>
-            </AnimatedPressable>
+          <View className='p-4'>
+            <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Leave Clan</Text>
+            <Text style={{ color: themeColors.primary }} className='font-bold text-lg'>Are you sure you want to leave clan?</Text>
+            <View className='flex-row justify-around mt-6'>
+              <AnimatedPressable style={{ backgroundColor: themeColors.secondary }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => setModalVisible(false)}>
+              <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Stay</Text>
+              </AnimatedPressable>
+              <AnimatedPressable style={{ backgroundColor: themeColors.danger }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => {setModalVisible(false); setHaveClan(false)}}>
+              <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Leave</Text>
+              </AnimatedPressable>
+            </View>
           </View>
         </AnimatedModal>
       </Modal>

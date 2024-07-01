@@ -13,6 +13,7 @@ type AnimatedPressableProps = {
   pressInValue: number;
   children?: ReactNode;
   disabled?: boolean;
+  delayLongPress?: number;
 }
 
 const AnimatedPressable = forwardRef<typeof Pressable, AnimatedPressableProps>((props, ref) => {
@@ -40,6 +41,7 @@ const AnimatedPressable = forwardRef<typeof Pressable, AnimatedPressableProps>((
       onPressOut={handlePressOut}
       onPress={props.onPress}
       onLongPress={props.onLongPress}
+      delayLongPress={props.delayLongPress ?? 500}
       style={[props.style, { transform: [{ scale: animatedValue}] }]}
       className={props.className}
       disabled={props.disabled}

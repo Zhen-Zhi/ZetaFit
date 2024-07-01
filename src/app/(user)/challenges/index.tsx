@@ -169,7 +169,7 @@ const ChallengesScreen = () => {
         >
           <ImageBackground
             source={require('@asset/images/background_image.png')}
-            className='flex'
+            className='p-4'
           >
             <ScrollView className='bg-white/30 px-2'>
               <View className='flex-row justify-center mb-3'>

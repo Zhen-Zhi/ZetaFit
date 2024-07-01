@@ -177,7 +177,7 @@ const ChallengesDetailsScreen = () => {
         onRequestClose={() =>setActionModalVisible(false)}
       >
         <AnimatedModal onClose={() => setModalVisible(false)}>
-          <View>
+          <View className='p-4'>
             <Text className='font-bold text-2xl'>Join Challenge?</Text>
             <Text className='font-medium my-3 text-lg'>Join Challenges this challenges?</Text>
             <AnimatedPressable

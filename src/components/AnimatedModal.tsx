@@ -45,7 +45,7 @@ const AnimatedModal = forwardRef<typeof View, AnimatedModalProps>((props, ref) =
         </View>
         <View
           style={{ backgroundColor: themeColors.backgroundColor }}
-          className={`w-[96%] p-4 mx-auto ${props.classNameAsProps}`}
+          className={`w-[96%] mx-auto ${props.classNameAsProps}`}
         >
           {props.children}
         </View>

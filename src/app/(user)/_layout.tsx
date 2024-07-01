@@ -4,8 +4,8 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { TabBarIcon } from '@components/navigation/TabBarIcon';
 import { themeColors } from '@/src/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { FontAwesome } from '@expo/vector-icons';
-import { StyleSheet, View, Keyboard } from 'react-native';
+import { FontAwesome, FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { StyleSheet, View, Keyboard, Dimensions } from 'react-native';
 
 const BottomTabs = withLayoutContext(createMaterialTopTabNavigator().Navigator)
 
@@ -38,33 +38,61 @@ export default function TabLayout() {
   return (
     <BottomTabs tabBarPosition='bottom' screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color }) => {
-        let iconName
+        let iconComponent
 
         if(route.name == 'homepage') {
-          iconName = 'home'
+          iconComponent = 
+            <FontAwesome 
+              name={'home'} 
+              size={26} 
+              color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'}
+            />
         }
         else if(route.name == 'clan') {
-          iconName = 'shield'
+          iconComponent = 
+            <FontAwesome 
+              name={'shield'} 
+              size={26} 
+              color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'}
+            />
         }
         else if(route.name == 'challenges') {
-          iconName = 'trophy'
+          iconComponent = 
+            <FontAwesome 
+              name={'trophy'} 
+              size={26} 
+              color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'}
+            />
+        }
+        else if(route.name == 'profile') {
+          iconComponent = 
+            <Ionicons
+              name="person" 
+              size={26} 
+              color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'} 
+            />
+        }
+        else if(route.name == 'marketplace') {
+          iconComponent = 
+            <Ionicons 
+              name="storefront"
+              size={26} 
+              color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'}
+            />
         }
 
         return (
-          <FontAwesome 
-            name={iconName as keyof typeof FontAwesome.glyphMap} 
-            size={26} 
-            color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'}
-          />
+          iconComponent
         )
       },
       tabBarPressColor: 'transparent',
       tabBarLabelStyle: {
+        fontSize: 12,
         fontWeight: 700
       },
       tabBarStyle: {
         height: 70,
-        padding: 6,
+        paddingTop: 6,
         borderTopWidth: 1,
         borderColor: 'rgba(189, 189, 189, 0.8)',
         display: isKeyboardVisible ? 'none' : 'flex',
@@ -74,14 +102,17 @@ export default function TabLayout() {
       },
       tabBarItemStyle: {
         height: 50,
+        width: Dimensions.get('window').width / 5
       },
       tabBarActiveTintColor: themeColors.secondary,
       tabBarInactiveTintColor: 'rgba(212, 212, 212, 0.8)',
       tabBarIndicatorStyle: { top: 0, backgroundColor: themeColors.secondary },
     })} >
-      <Stack.Screen name='challenges' options={{ title: 'Challenges' }} />
+      <Stack.Screen name='profile' options={{ title: 'Profile' }} />
+      <Stack.Screen name='challenges' options={{ title: 'Quest' }} />
       <Stack.Screen name='homepage' options={{ title: 'Home' }} />
       <Stack.Screen name='clan' options={{ title: 'Clan' }} />
+      <Stack.Screen name='marketplace' options={{ title: 'Store' }} />
     </BottomTabs>
   );
 }

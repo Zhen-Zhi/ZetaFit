@@ -6,6 +6,8 @@ import { themeColors } from '@/src/constants/Colors';
 import { FontAwesome } from '@expo/vector-icons';
 import ProfileScreen from './profile/profileModal';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import ActivityLogScreen from '../profile/activityLog';
+import AnimatedModal from '@/src/components/AnimatedModal';
 
 type MoreOptionsModalProps = {
   onClose: () => void;
@@ -25,6 +27,19 @@ const ListOptions: ListOptionsType[] = [
 const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
   const [modalVisible, setModalVisible] = useState(false);
 
+  const handleOptionPress = (optionName: string) => {
+    switch(optionName) {
+      case 'Profile':
+        setModalVisible(true)
+        break;
+      case 'Setting':
+        setModalVisible(true)
+        break
+      case 'Activities':
+        router.push('/profile/activityLog')
+    }
+  }
+
   return (
     <Pressable onPress={onClose} className='bg-black/40 flex-1'>
       <View className='flex w-3/5 rounded-2xl bg-white self-end top-[146px] mr-2 p-1'>
@@ -33,7 +48,7 @@ const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
             <AnimatedPressable
               style={{ backgroundColor: 'white' }}
               key={index}
-              onPress={() => {setModalVisible(true)}}
+              onPress={() => handleOptionPress(option.name)}
               pressInValue={0.95}
               className='border border-slate-400 h-10 rounded-xl m-1'
             >
