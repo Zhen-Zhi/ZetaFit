@@ -2,7 +2,7 @@ import { Dimensions, ImageBackground, StyleSheet, Text, View, Image, Platform } 
 import React from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
-import { FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
+import { FontAwesome, FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import * as Progress from 'react-native-progress';
 
@@ -11,6 +11,15 @@ type PetDetailsScreenProps = {
 }
 
 const PetDetailsScreen = ({ onClose }: PetDetailsScreenProps) => {
+  const star = [];
+  for (let i = 0; i < 4; i++) {
+    star.push(
+      <View key={i} className='mx-0.5'>
+        <FontAwesome6 name="diamond" size={20} color={themeColors.tetiary} />
+      </View>
+    );
+  }
+
   return (
     <ImageBackground
       source={require('@asset/images/background_image.png')}
@@ -34,6 +43,10 @@ const PetDetailsScreen = ({ onClose }: PetDetailsScreenProps) => {
           className='w-56 h-56 mx-auto'
           source={require('@asset/images/pets/turtle.png')} 
         />
+
+        <View className='mx-auto mt-2 flex-row'>
+          {star}
+        </View>
 
         <View className='flex-row mx-3 bg-white/50'>
           <View className='w-auto my-auto'>
