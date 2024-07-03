@@ -6,7 +6,7 @@ import { themeColors } from '@/src/constants/Colors';
 import { FontAwesome } from '@expo/vector-icons';
 import ProfileScreen from './profile/profileModal';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import ActivityLogScreen from '../profile/activityLog';
+import ActivityLogScreen from '../pets/activityLog';
 import AnimatedModal from '@/src/components/AnimatedModal';
 
 type MoreOptionsModalProps = {
@@ -36,7 +36,7 @@ const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
         setModalVisible(true)
         break
       case 'Activities':
-        router.push('/profile/activityLog')
+        router.push('/pets/activityLog')
     }
   }
 

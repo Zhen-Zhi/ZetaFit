@@ -7,6 +7,8 @@ import { Entypo, FontAwesome, FontAwesome6, Ionicons, MaterialCommunityIcons } f
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import PetDetailsScreen from './petDetails';
 import AnimatedModal from '@/src/components/AnimatedModal'
+import InventoryActionScreenModal from './modal/inventoryAction'
+import PetActionScreenModal from './modal/petAction'
 
 const petsData = [
   { id: 1, petsName: 'Turtle', level: '28', image: require('@asset/images/pets/turtle.png') },
@@ -26,10 +28,10 @@ const petsData = [
   { id: 15, petsName: 'Pig', level: '27', image: require('@asset/images/pets/dog.png') },
   { id: 16, petsName: 'Frog', level: '8', image: require('@asset/images/pets/golem.png') },
   { id: 17, petsName: 'Hedgehog', level: '11', image: require('@asset/images/pets/wolve.png') },
-  // { id: 18, petsName: 'Guinea Pig', level: '14', image: require('@asset/images/pets/unicorn.png') },
-  // { id: 19, petsName: 'Chinchilla', level: '19', image: require('@asset/images/pets/polar_bear.png') },
-  // { id: 20, petsName: 'Gerbil', level: '17', image: require('@asset/images/pets/turtle.png') },
-  // { id: 21, petsName: 'Pig', level: '27', image: require('@asset/images/pets/dog.png') },
+  { id: 18, petsName: 'Guinea Pig', level: '14', image: require('@asset/images/pets/unicorn.png') },
+  { id: 19, petsName: 'Chinchilla', level: '19', image: require('@asset/images/pets/polar_bear.png') },
+  { id: 20, petsName: 'Gerbil', level: '17', image: require('@asset/images/pets/turtle.png') },
+  { id: 21, petsName: 'Pig', level: '27', image: require('@asset/images/pets/dog.png') },
   // { id: 22, petsName: 'Frog', level: '8', image: require('@asset/images/pets/golem.png') },
   // { id: 23, petsName: 'Hedgehog', level: '11', image: require('@asset/images/pets/wolve.png') },
   // { id: 24, petsName: 'Guinea Pig', level: '14', image: require('@asset/images/pets/unicorn.png') },
@@ -48,11 +50,16 @@ const petsData = [
 const ProfileScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [petActionModalVisible, setPetActionModalVisible] = useState(false);
+  const [inventoryActionModalVisible, setInventoryActionModalVisible] = useState(false)
   const ITEMSIZE = Dimensions.get('window').width / 2 - 16;
-
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  const num = (ITEMSIZE + 8 + 20 + 28) * Math.floor(petsData.length / 2) - (ITEMSIZE + 8 + 20 + 28) * 1.2
+  //  itemsize, 8px margin, 20px line height (LV), 28px line height (pets name)
+  // offset 1+ row
+
   const opacity = scrollY.interpolate({
-    inputRange: [ITEMSIZE * Math.ceil(petsData.length / 2) - ITEMSIZE, ITEMSIZE * Math.ceil(petsData.length / 2)],
+    inputRange: [num - 50, num],
     outputRange: [0.5, 1],
     extrapolate: 'clamp'
   })
@@ -100,11 +107,11 @@ const ProfileScreen = () => {
         className='flex-1'
       >
         <View style={{ backgroundColor: themeColors.backgroundColor }} className='flex-row justify-center pt-2 pb-1 px-4 border-b border-slate-300'>
-          <Text style={{ color: themeColors.primary }} className='text-center my-auto text-3xl font-extrabold'>Profile</Text>
+          <Text style={{ color: themeColors.primary }} className='text-center my-auto text-3xl font-extrabold'>Pets</Text>
           <AnimatedPressable 
             pressInValue={0.9}
             className='z-10 absolute right-3 top-2.5'
-            onPress={() => router.push('/profile/activityLog')}
+            onPress={() => router.push('/pets/activityLog')}
           >
             <View className='my-auto'>
               <FontAwesome name='history' size={27} color={themeColors.primary} />
@@ -131,7 +138,7 @@ const ProfileScreen = () => {
               />
               <View className='flex-col mx-auto'>
                 <Text className='font-semibold text-xl text-center'>{item.petsName}</Text>
-                <Text className='font-medium text-center'>LV {item.level}</Text>
+                <Text className='font-medium text-sm text-center'>LV {item.level}</Text>
               </View>  
             </AnimatedPressable>
           }
@@ -175,38 +182,7 @@ const ProfileScreen = () => {
           onRequestClose={() =>setPetActionModalVisible(false)}
         >
           <AnimatedModal onClose={() => setPetActionModalVisible(false)}>
-            <ImageBackground
-              className='p-4'
-              source={require('@asset/images/background_image.png')}
-            >
-              <Image
-                className='w-44 h-44 mx-auto'
-                source={require('@asset/images/pets/turtle.png')}
-              />
-              <Text className='font-bold text-lg text-center mb-4'>Turtle</Text>
-
-              <AnimatedPressable
-                className='border border-slate-600 rounded-lg p-1 my-1 bg-white'
-                pressInValue={0.95}
-              >
-                <View>
-                  <Image className='w-5 h-6 absolute left-[25%] top-0.5' source={require('@asset/images/attack_icon.png')} />
-                  <Text style={{ color: themeColors.secondary }} className='font-bold text-lg text-center'>Go Battle</Text>
-                </View>
-              </AnimatedPressable>
-              <AnimatedPressable
-                className='border border-slate-600 rounded-lg p-1 my-1 bg-white'
-                pressInValue={0.95}
-              >
-                <Text style={{ color: themeColors.secondary }} className='font-bold text-lg text-center'>View Details</Text>
-              </AnimatedPressable>
-              <AnimatedPressable
-                className='border border-slate-600 rounded-lg p-1 my-1 bg-white'
-                pressInValue={0.95}
-              >
-                <Text style={{ color: themeColors.secondary }} className='font-bold text-lg text-center'>Upgrade</Text>
-              </AnimatedPressable>
-            </ImageBackground>
+            <PetActionScreenModal onClose={() => setPetActionModalVisible(false)} />
           </AnimatedModal>
         </Modal>
 
@@ -215,7 +191,7 @@ const ProfileScreen = () => {
           style={{ backgroundColor: themeColors.tetiary, opacity }}
           className='rounded-full p-3.5 absolute bottom-3 right-5 opacity-50'
           pressInValue={0.93}
-          onPress={() => router.replace('/profile/inventory')}
+          onPress={() => setInventoryActionModalVisible(true)}
         >
           <Image
             className='w-10 h-10'
@@ -224,6 +200,21 @@ const ProfileScreen = () => {
         </AnimatedPressable>
 
       </ImageBackground>
+
+      <Modal
+        animationType='fade'
+        visible={inventoryActionModalVisible}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setInventoryActionModalVisible(false)}
+      >
+        <AnimatedModal onClose={() => setInventoryActionModalVisible(false)}>
+          <InventoryActionScreenModal 
+            onClose={() => setInventoryActionModalVisible(false)} 
+            currentRoute='pets'
+          />
+        </AnimatedModal>
+      </Modal>
     </SafeAreaView>
   )
 }

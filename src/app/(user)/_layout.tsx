@@ -4,13 +4,12 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { TabBarIcon } from '@components/navigation/TabBarIcon';
 import { themeColors } from '@/src/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { FontAwesome, FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, View, Keyboard, Dimensions } from 'react-native';
 
 const BottomTabs = withLayoutContext(createMaterialTopTabNavigator().Navigator)
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   // keyboard detect is visible hook from expo go
@@ -47,6 +46,7 @@ export default function TabLayout() {
               size={26} 
               color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'}
             />
+            // <MaterialIcons name="pets" size={26} color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'} />
         }
         else if(route.name == 'clan') {
           iconComponent = 
@@ -64,10 +64,10 @@ export default function TabLayout() {
               color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'}
             />
         }
-        else if(route.name == 'profile') {
+        else if(route.name == 'pets') {
           iconComponent = 
-            <Ionicons
-              name="person" 
+            <MaterialIcons 
+              name="pets" 
               size={26} 
               color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'} 
             />
@@ -108,7 +108,7 @@ export default function TabLayout() {
       tabBarInactiveTintColor: 'rgba(212, 212, 212, 0.8)',
       tabBarIndicatorStyle: { top: 0, backgroundColor: themeColors.secondary },
     })} >
-      <Stack.Screen name='profile' options={{ title: 'Profile' }} />
+      <Stack.Screen name='pets' options={{ title: 'Pets' }} />
       <Stack.Screen name='challenges' options={{ title: 'Quest' }} />
       <Stack.Screen name='homepage' options={{ title: 'Home' }} />
       <Stack.Screen name='clan' options={{ title: 'Clan' }} />

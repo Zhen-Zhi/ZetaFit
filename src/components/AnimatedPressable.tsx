@@ -8,6 +8,7 @@ const AnimatedButton = Animated.createAnimatedComponent(Pressable);
 type AnimatedPressableProps = {
   onPress?: () => void | string | null | Promise<void>;
   onLongPress?: () => void | string | null | Promise<void>;
+  onPressOut?: () => void | string | null | Promise<void>;
   style?: StyleProps;
   className?: string;
   pressInValue: number;
@@ -28,6 +29,10 @@ const AnimatedPressable = forwardRef<typeof Pressable, AnimatedPressableProps>((
   };
 
   const handlePressOut = () => {
+    if (props.onPressOut) {
+      props.onPressOut();
+    }
+
     Animated.spring(animatedValue, {
       speed: 100,
       toValue: 1,
