@@ -50,8 +50,18 @@ const expReward = (
   </View>
 )
 
+const chestReward = (
+  <View className='h-[90%] justify-center'>
+    <Image
+      className='w-52 h-52 mx-auto'
+      source={require('@asset/images/chest.png')}
+      />
+    <Text className='font-extrabold text-3xl text-center mx-10 mt-4 rounded-lg'>Legendary Chest</Text>
+  </View>
+)
+
 const rewardsComponent = [
-  badgesReward, diamondReward, coinReward, expReward,
+  badgesReward, diamondReward, coinReward, expReward, chestReward
 ]
 
 const RewardsScreen = ({ onClose, modalVisible }: RewardsScreenProps) => {

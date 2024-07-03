@@ -72,7 +72,7 @@ export default function TabLayout() {
               color={focused ? themeColors.secondary : 'rgba(212, 212, 212, 0.8)'} 
             />
         }
-        else if(route.name == 'marketplace') {
+        else if(route.name == 'market') {
           iconComponent = 
             <Ionicons 
               name="storefront"
@@ -109,10 +109,10 @@ export default function TabLayout() {
       tabBarIndicatorStyle: { top: 0, backgroundColor: themeColors.secondary },
     })} >
       <Stack.Screen name='pets' options={{ title: 'Pets' }} />
-      <Stack.Screen name='challenges' options={{ title: 'Quest' }} />
+      <Stack.Screen name='challenges' options={{ title: 'Trials' }} />
       <Stack.Screen name='homepage' options={{ title: 'Home' }} />
       <Stack.Screen name='clan' options={{ title: 'Clan' }} />
-      <Stack.Screen name='marketplace' options={{ title: 'Store' }} />
+      <Stack.Screen name='market' options={{ title: 'Market' }} />
     </BottomTabs>
   );
 }
