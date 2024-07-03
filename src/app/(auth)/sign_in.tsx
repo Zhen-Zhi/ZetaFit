@@ -1,9 +1,28 @@
-import { StyleSheet, Text, View, Image, TextInput, KeyboardAvoidingView, Platform, ImageBackground, TouchableWithoutFeedback, Keyboard } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, Image, TextInput, KeyboardAvoidingView, Platform, ImageBackground, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native'
+import React, { useState } from 'react'
 import { Link, Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
+import { themeColors } from '@/src/constants/Colors'
+import { opacity } from 'react-native-reanimated/lib/typescript/reanimated2/Colors'
+import { supabase } from '@/src/lib/supabase'
 
 const SignInScreen = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [conFirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false)
+
+  async function signUpWithEmail() {
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    });
+
+    if (error) Alert.alert(error.message);
+    setLoading(false);
+  }
+  
   return (
     <ImageBackground
       className='flex-1'
@@ -18,41 +37,46 @@ const SignInScreen = () => {
         >
           {/* Top image logo */}
           <Image
-            className='w-72 h-56 rounded-xl mx-auto mt-16 mb-6'
+            className='w-72 h-56 rounded-xl mx-auto mt-8 mb-6'
             source={require('@asset/images/ZetaFit logo.png')} 
           />
 
           {/* Sign In field */}
-          <View className='bg-white/80 pt-2 pb-8 rounded-xl'>
+          <View className='bg-[#f8f8f8]/70 pt-2 pb-8 rounded-xl'>
             {/* email */}
             <View className='py-2'>
-              <Text className='font-bold text-xl mx-8 mt-2'>Email</Text>
+              <Text style={{ color: themeColors.primary }} className='font-bold text-xl mx-8 mt-2'>Email</Text>
               <TextInput 
+                style={{ color: themeColors.primary }}
                 className='border-b border-slate-400 rounded-lg mx-8 p-3' 
                 placeholder='johndoe@mail.com' 
+                onChangeText={setEmail}
               />
             </View>
             
             {/* password */}
             <View className='py-1'>
-              <Text className='font-bold text-xl mx-8'>Password</Text>
+              <Text style={{ color: themeColors.primary }} className='font-bold text-xl mx-8'>Password</Text>
               <TextInput 
                 secureTextEntry
                 className='border-b border-slate-400 rounded-lg mx-8 p-3' 
                 placeholder='johndoe@mail.com' 
+                style={{ color: themeColors.primary }}
+                onChangeText={setPassword}
               />
               <Link href={'#'} asChild>
-                <Text className='text-right mx-8 mt-0.5'>Forgot Password?</Text>
+                <Text style={{ color: themeColors.primary }} className='text-right mx-8 mt-0.5 font-medium'>Forgot Password?</Text>
               </Link>
             </View>
 
             {/* Sign in button */}
             <AnimatedPressable
-              className='rounded-full bg-sky-200 mx-auto p-2 w-56 mt-4 h-12'
+              style={{ backgroundColor: themeColors.primary }}
+              className='rounded-full mx-auto p-2 w-56 mt-14 h-12'
               pressInValue={0.95}
               onPress={() => router.replace('/(user)/homepage')}
             >
-              <Text className='font-semibold text-center my-auto text-lg'>Sign In</Text>
+              <Text className='font-semibold text-center text-white my-auto text-lg'>Sign In</Text>
             </AnimatedPressable>
 
             {/* create account button */}
@@ -61,7 +85,7 @@ const SignInScreen = () => {
               pressInValue={0.95}
               onPress={() => router.replace('/sign_up')}
             >
-              <Text className='mx-auto text-lg font-semibold text-blue-700'>Create Account</Text>
+              <Text style={{ color: themeColors.primary }} className='mx-auto text-lg font-semibold'>Create Account</Text>
             </AnimatedPressable>
           </View>
 

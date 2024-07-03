@@ -6,6 +6,7 @@
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
+// default
 export const Colors = {
   light: {
     text: '#11181C',
@@ -24,3 +25,22 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
 };
+
+// colors that is used
+export const themeColors = {
+  primary: '#053b50',
+  secondary: '#176b87',
+  tetiary: '#64ccc5',
+  backgroundColor: '#f5f5f5',
+  danger: '#dc2626',
+  disabled: '#bfbfbf'
+}
+
+export const difficultiesColors = {
+  beginner: '#34c834',
+  intermediate: '#FFCC66',
+  expert: '#FF6666',
+  beginner_darker: '#1f8c1f',
+  intermediate_darker: '#ed9b2d',
+  expert_darker: '#FF3333',
+}

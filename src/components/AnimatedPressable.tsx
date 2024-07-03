@@ -1,29 +1,38 @@
-import { StyleSheet, Text, View, Pressable, Animated, ViewStyle } from 'react-native'
-import React, { CSSProperties, PropsWithChildren, useRef } from 'react'
+import { StyleSheet, Pressable, Animated } from 'react-native'
+import React, { ReactNode, forwardRef, useRef } from 'react'
 import { StyleProps } from 'react-native-reanimated';
 
 // to create a animated component
 const AnimatedButton = Animated.createAnimatedComponent(Pressable);
 
 type AnimatedPressableProps = {
-  onPress?: () => void | null,
-  style?: StyleProps,
-  className?: string
-  pressInValue: number
+  onPress?: () => void | string | null | Promise<void>;
+  onLongPress?: () => void | string | null | Promise<void>;
+  onPressOut?: () => void | string | null | Promise<void>;
+  style?: StyleProps;
+  className?: string;
+  pressInValue: number;
+  children?: ReactNode;
+  disabled?: boolean;
+  delayLongPress?: number;
 }
 
-const AnimatedPressable = ({ children, onPress, style, className, pressInValue }: PropsWithChildren<AnimatedPressableProps>) => {
+const AnimatedPressable = forwardRef<typeof Pressable, AnimatedPressableProps>((props, ref) => {
   const animatedValue = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
     Animated.spring(animatedValue, {
       speed: 100,
-      toValue: pressInValue,
+      toValue: props.pressInValue,
       useNativeDriver: true,
     }).start();
   };
 
   const handlePressOut = () => {
+    if (props.onPressOut) {
+      props.onPressOut();
+    }
+
     Animated.spring(animatedValue, {
       speed: 100,
       toValue: 1,
@@ -35,15 +44,18 @@ const AnimatedPressable = ({ children, onPress, style, className, pressInValue }
     <AnimatedButton
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      onPress={onPress}
-      style={[style, { transform: [{ scale: animatedValue}] }]}
-      className={className}
+      onPress={props.onPress}
+      onLongPress={props.onLongPress}
+      delayLongPress={props.delayLongPress ?? 500}
+      style={[props.style, { transform: [{ scale: animatedValue}] }]}
+      className={props.className}
+      disabled={props.disabled}
     >
-      {children}
+      {props.children}
     </AnimatedButton>
   )
-}
+})
 
 export default AnimatedPressable
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});
