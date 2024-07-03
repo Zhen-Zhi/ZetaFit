@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View, Image, TextInput, KeyboardAvoidingView, Platform, ImageBackground, TouchableWithoutFeedback, Keyboard } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { Link, Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
 
 const SignInScreen = () => {
+  const [username, setUsername] = useState('');
+
   return (
     <ImageBackground
       className='flex-1'
@@ -32,6 +34,7 @@ const SignInScreen = () => {
                 className='border-b border-slate-400 rounded-lg mx-8 p-3' 
                 placeholder='John Doe'
                 style={{ color: themeColors.primary }} 
+                onChangeText={setUsername}
               />
               {/* validation ?? */}
               <Text className='mx-10 my-1 text-red-600'>This username is already taken!</Text>

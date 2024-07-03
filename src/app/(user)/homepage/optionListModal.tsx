@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { Redirect, router } from 'expo-router'
 import { themeColors } from '@/src/constants/Colors';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import ProfileScreen from './profile/profileModal';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import ActivityLogScreen from '../pets/activityLog';

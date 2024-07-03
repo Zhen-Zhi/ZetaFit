@@ -1,15 +1,28 @@
-import { StyleSheet, Text, View, Image, TextInput, KeyboardAvoidingView, Platform, ImageBackground, TouchableWithoutFeedback, Keyboard } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, Image, TextInput, KeyboardAvoidingView, Platform, ImageBackground, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native'
+import React, { useState } from 'react'
 import { Link, Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
 import { opacity } from 'react-native-reanimated/lib/typescript/reanimated2/Colors'
-
-const primary = themeColors.primary
-const secondary = themeColors.secondary
-const tetiary = themeColors.tetiary
+import { supabase } from '@/src/lib/supabase'
 
 const SignInScreen = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [conFirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false)
+
+  async function signUpWithEmail() {
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    });
+
+    if (error) Alert.alert(error.message);
+    setLoading(false);
+  }
+  
   return (
     <ImageBackground
       className='flex-1'
@@ -37,6 +50,7 @@ const SignInScreen = () => {
                 style={{ color: themeColors.primary }}
                 className='border-b border-slate-400 rounded-lg mx-8 p-3' 
                 placeholder='johndoe@mail.com' 
+                onChangeText={setEmail}
               />
             </View>
             
@@ -48,6 +62,7 @@ const SignInScreen = () => {
                 className='border-b border-slate-400 rounded-lg mx-8 p-3' 
                 placeholder='johndoe@mail.com' 
                 style={{ color: themeColors.primary }}
+                onChangeText={setPassword}
               />
               <Link href={'#'} asChild>
                 <Text style={{ color: themeColors.primary }} className='text-right mx-8 mt-0.5 font-medium'>Forgot Password?</Text>
