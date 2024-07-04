@@ -6,16 +6,27 @@ import { FontAwesome, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import AnimatedPressable from '@/src/components/AnimatedPressable';
 import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
 import MoreOptionsModal from './optionListModal';
-import { router, useNavigation } from 'expo-router';
+import { Redirect, router, useNavigation } from 'expo-router';
 import { themeColors } from '@/src/constants/Colors';
 import AddActivityScreenModal from '@/src/components/AddActivity';
+import EnterUsernameModal from '../../(auth)/username';
+import { useUserData } from '@/src/api/users';
+import { useAuth } from '@/src/providers/AuthProvider';
 
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
 const HomeScreen = () => {
+  const { session } = useAuth();
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
+  const { data: userData, error, isLoading } = useUserData(session?.user.id)
+
   const [modalVisible, setModalVisible] = useState(false);
   const [addActivityModalVisible, setAddActivityModalVisible] = useState(false);
   const navigation = useNavigation();
+  const [enterUsernameModalVisible, setEnterUsernameModalVisible] = useState(false);
 
   // define a event listerner to set modal visible false
   // come back from profile via back will not set to false without this
@@ -26,6 +37,44 @@ const HomeScreen = () => {
 
     return unsubscribe;
   }, [navigation]);
+
+  if (isLoading) {
+    return (
+      <ImageBackground
+        source={require('@asset/images/background_image.png')} 
+        className='flex-1'
+      >
+        <ActivityIndicator className='m-auto p-4 bg-white/50' size={100} color={themeColors.secondary} />
+      </ImageBackground>
+    )
+  }
+
+  const calculateLevel = (): number => {
+    if(!userData?.level) {
+      console.warn('Level undefine');
+      return 99999
+    }
+    let required_xp = 0
+    
+    if (userData.level >= 1 && userData.level < 10) {
+      required_xp = 80 + (userData.level * 20)
+    }
+    else if (userData.level >= 10 && userData.level < 29) {
+      required_xp = 260 + ((userData.level - 9) * 50)
+    }
+    else {
+      required_xp = 1230 + ((userData.level - 29) * 100)
+    }
+
+    return required_xp
+  }
+
+  // if username not set, pop up modal
+  setTimeout(() => {
+    if (userData?.username === null) {
+      setEnterUsernameModalVisible(true);
+    }
+  }, 1000)
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
@@ -56,7 +105,7 @@ const HomeScreen = () => {
           />
           <View className='flex-col mt-2'>
             <Progress.Bar className='justify-center left-[24px]'
-              progress={0.2}
+              progress={userData?.experience ?? 0 / calculateLevel()}
               width={130}
               height={24}
               color={themeColors.tetiary}
@@ -65,10 +114,10 @@ const HomeScreen = () => {
               borderColor={themeColors.primary}
               borderRadius={4}
             >
-              <Text className='absolute text-white font-extrabold self-center'>Level 1</Text>
+              <Text className='absolute text-white font-extrabold self-center'>Level {userData?.level}</Text>
             </Progress.Bar>
-            <Text style={{ color: themeColors.primary }} className='font-medium text-xs ml-1 mb-[-4px]'>100 / 200</Text>
-            <Text style={{ color: themeColors.primary }} className='text-lg font-bold ml-1'>Username</Text>
+            <Text style={{ color: themeColors.primary }} className='font-medium text-xs ml-1 mb-[-4px]'>{userData?.experience + " / " + calculateLevel()}</Text>
+            <Text style={{ color: themeColors.primary }} className='text-lg font-bold ml-1'>{userData?.username}</Text>
           </View>
         </AnimatedPressable>
 
@@ -79,14 +128,14 @@ const HomeScreen = () => {
               className='w-5 mx-4 my-auto aspect-square'
               source={require('@asset/images/coin_icon.png')} 
             />
-            <Text style={{ color: themeColors.primary }} className='text-right mx-2 my-auto'>9999</Text>
+            <Text style={{ color: themeColors.primary }} className='text-right mx-2 my-auto'>{userData?.coin}</Text>
           </View>
           <View style={styles.shadowAndriod} className='border border-slate-300 mt-1 h-7 rounded-xl mx-2 flex flex-row justify-between bg-white shadow shadow-slate-400'>
             <Image 
               className='w-5 mx-4 my-auto aspect-square'
               source={require('@asset/images/diamond_icon.png')} 
             />
-            <Text style={{ color: themeColors.primary }} className='text-right mx-2 my-auto'>9999</Text>
+            <Text style={{ color: themeColors.primary }} className='text-right mx-2 my-auto'>{userData?.diamond}</Text>
           </View>
         </View>
       </View>
@@ -104,7 +153,7 @@ const HomeScreen = () => {
             className='w-12 h-14 mx-2'
             source={require('@asset/images/clan_logo/clan_logo_3.png')} 
           />
-          <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>Clan Name</Text>
+          <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{userData?.clan_id ?? 'No Clan'}</Text>
         </AnimatedPressable>
         
         {/* More functions list */}
@@ -123,7 +172,7 @@ const HomeScreen = () => {
       
       {/* middle image - main */}
       <View className='mx-auto mt-12 mb-6'>
-        <AnimatedPressable pressInValue={0.95}>
+        <AnimatedPressable pressInValue={0.95} onPress={() => router.push('/pets')}>
           <Image
             className='w-56 h-56 mx-auto'
             source={require('@asset/images/pets/turtle.png')} 
@@ -135,7 +184,7 @@ const HomeScreen = () => {
               <FontAwesome6 name="fire" size={24} color="rgba(240, 93, 9, 0.8)" />
             </View>
             <View className='bg-slate-200 rounded-lg px-2 mx-2 flex-1'>
-              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>9999</Text>
+              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>{userData?.active_score}</Text>
             </View>
           </View>
           <View className='flex-row flex-1'>
@@ -143,7 +192,7 @@ const HomeScreen = () => {
               <FontAwesome6 name="bolt-lightning" size={24} color='orange' />
             </View>
             <View className='bg-slate-200 rounded-lg px-2 mx-2 flex-1'>
-              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>200</Text>
+              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>{userData?.energy}</Text>
             </View>
           </View>
         </View>
@@ -197,6 +246,22 @@ const HomeScreen = () => {
         <SafeAreaProvider className='flex-1'>
           <SafeAreaView edges={['top']} className='flex-1'>
             <AddActivityScreenModal onClose={() => setAddActivityModalVisible(false)} />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </Modal>
+
+      {/* username modal */}
+      <Modal
+        animationType='fade'
+        visible={enterUsernameModalVisible}
+        // visible={true}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setEnterUsernameModalVisible(false)}
+      >
+        <SafeAreaProvider className='flex-1'>
+          <SafeAreaView edges={['top']} className='flex-1'>
+            <EnterUsernameModal onClose={() => setEnterUsernameModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>

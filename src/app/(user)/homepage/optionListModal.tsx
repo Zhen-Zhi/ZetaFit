@@ -8,6 +8,7 @@ import ProfileScreen from './profile/profileModal';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import ActivityLogScreen from '../pets/activityLog';
 import AnimatedModal from '@/src/components/AnimatedModal';
+import { supabase } from '@/src/lib/supabase';
 
 type MoreOptionsModalProps = {
   onClose: () => void;
@@ -65,7 +66,7 @@ const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
           style={{ backgroundColor: themeColors.backgroundColor }}
           pressInValue={0.95} 
           className='border border-slate-400 h-10 rounded-xl mb-1 mt-4 mx-1'
-          onPress={() => router.replace('/(auth)/sign_in')}
+          onPress={() => supabase.auth.signOut()}
         >
           <View className='flex-row flex-1 justify-center'>
             <View className='absolute left-5 top-1.5'>

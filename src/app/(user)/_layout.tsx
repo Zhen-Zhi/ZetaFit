@@ -1,4 +1,4 @@
-import { Stack, Tabs, withLayoutContext } from 'expo-router';
+import { Redirect, Stack, Tabs, withLayoutContext } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { TabBarIcon } from '@components/navigation/TabBarIcon';
@@ -6,6 +6,7 @@ import { themeColors } from '@/src/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { FontAwesome, FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, View, Keyboard, Dimensions } from 'react-native';
+import { useAuth } from '@/src/providers/AuthProvider';
 
 const BottomTabs = withLayoutContext(createMaterialTopTabNavigator().Navigator)
 
@@ -33,6 +34,12 @@ export default function TabLayout() {
       keyboardDidHideListener.remove();
     };
   }, []);
+
+  const { session } = useAuth();
+
+  if (!session) {
+    return <Redirect href={'/(auth)/sign_in'} />;
+  }
 
   return (
     <BottomTabs tabBarPosition='bottom' screenOptions={({ route }) => ({

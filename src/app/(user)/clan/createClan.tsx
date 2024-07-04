@@ -1,4 +1,4 @@
-import { ImageBackground, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard, Pressable, Modal, Dimensions } from 'react-native'
+import { ImageBackground, Image, KeyboardAvoidingView, Platform, StyleSheet, Text, View, TextInput, TouchableWithoutFeedback, Keyboard, Pressable, Modal, Dimensions, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
@@ -7,23 +7,58 @@ import ClanLogoListModal from './clanLogoList';
 import AwesomeButton from "react-native-really-awesome-button";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
+import { useCreateNewClan } from '@/src/api/clan';
+import { create } from 'react-test-renderer';
+import { useAuth } from '@/src/providers/AuthProvider';
+import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
 
 type CreateClanScreenProps = {
   onClose: () => void
 }
 
 const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
+  const { user } = useAuth()
   const [modalVisible, setModalVisible] = useState(false)
   const [clanLogo, setClanLogo] = useState<{ id: number; image: any; }>({id: 1, image: require('@asset/images/clan_logo/clan_logo_1.png')})
-  const [amount, setAmount] = useState(0);
+  const [clanName, setClanName] = useState('');
+  const [clanDescription, setClanDescription] = useState('');
+  const [requiredActiveScore, setRequiredActiveScore] = useState(0);
+  const [isLoading, setIsLoading] = useState(false)
+
+  const { mutate: createClan } = useCreateNewClan()
 
   const increment = () => {
-    setAmount(prevAmount => prevAmount + 100);
+    setRequiredActiveScore(prevScore => prevScore + 100);
   };
 
   const decrement = () => {
-    setAmount(prevAmount => prevAmount > 0 ? prevAmount - 100 : 0);
+    setRequiredActiveScore(prevScore => prevScore > 0 ? prevScore - 100 : 0);
   };
+
+  const handleCreateClan = async () => {
+    setIsLoading(true)
+    console.log(user?.coin)
+    if (!user?.coin) {
+      return
+    }
+
+    if (Number(user?.coin) < 2000) {
+      console.log('Hi');
+      onClose();
+      return
+    }
+
+    createClan(
+      { clanName, requiredActiveScore, clanDescription },
+      {
+        onSuccess() {
+          console.log('Success')
+          onClose();
+        }
+      }
+    )
+    setIsLoading(false)
+  }
 
   return (
     <KeyboardAvoidingView
@@ -45,7 +80,9 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
             <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
           </View>
         </AnimatedPressable>
-        <Text style={{ color: themeColors.primary }} className='text-center mt-auto text-2xl font-extrabold'>Create Clan</Text>
+        { isLoading 
+        ? <ActivityIndicator size='large' color='white' />
+        : <Text style={{ color: themeColors.primary }} className='text-center mt-auto text-2xl font-extrabold'>Create Clan</Text>}
       </View>
 
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} className=''>
@@ -68,10 +105,12 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
           <View className='my-2 flex-col'>
             <Text style={{ color: themeColors.primary }} className='text-lg font-bold my-auto'>Clan Name</Text>
             <TextInput
+              value={clanName}
               className='border-b border-slate-400 rounded-lg p-3'
               placeholder='Enter Clan Name......'
               maxLength={20}
               style={{ color: themeColors.primary }}
+              onChangeText={setClanName}
             />
           </View>
           <View className='my-2'>
@@ -92,7 +131,7 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
              <Image className='h-6 w-4 my-auto' source={require('@asset/images/arrow_left.png')} />
             </AnimatedPressable>
             <TextInput
-              value={amount.toString()}
+              value={requiredActiveScore.toString()}
               className='p-3 w-1/4 text-center text-lg font-bold'
               style={{ color: themeColors.primary }}
             />
@@ -111,6 +150,7 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
             style={{ backgroundColor: themeColors.secondary }}
             className='w-3/5 mx-auto h-10 rounded-lg my-auto mt-2'
             pressInValue={0.95}
+            onPress={handleCreateClan}
           >
             <Text className='text-lg text-white font-bold text-center my-auto'>Create Clan</Text>
           </AnimatedPressable>
