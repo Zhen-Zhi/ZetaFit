@@ -7,7 +7,7 @@ import { Tables } from '../database.types'
 type AuthData = {
   session: Session | null;
   loading: boolean;
-  user: Tables<'users'> | null;
+  user: any;
 }
 
 const AuthContext = createContext<AuthData>({
@@ -34,10 +34,8 @@ export default function AuthProvider({ children }: PropsWithChildren) {
           .eq('id', session.user.id)
           .single();
 
-        setUser(data);
+        setUser(data || null);
       }
-
-      setLoading(false)
     }
 
     fetchSession()
@@ -45,6 +43,13 @@ export default function AuthProvider({ children }: PropsWithChildren) {
       setSession(session);
     });
   }, [])
+
+  useEffect(() => {
+    if (session) {  // This effect depends on `session` and `user`
+      // Only turn off loading when user is set, indicating all async operations are complete
+      setLoading(false);
+    }
+  }, [user, session]);
 
   return (
     <AuthContext.Provider value={{ session, loading, user }}>

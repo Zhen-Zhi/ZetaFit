@@ -16,7 +16,7 @@ import { useAuth } from '@/src/providers/AuthProvider';
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
 const HomeScreen = () => {
-  const { session } = useAuth();
+  const { session, user } = useAuth();
   if(!session) {
     return <Redirect href={'/sign_in'} />
   }
@@ -117,7 +117,7 @@ const HomeScreen = () => {
               <Text className='absolute text-white font-extrabold self-center'>Level {userData?.level}</Text>
             </Progress.Bar>
             <Text style={{ color: themeColors.primary }} className='font-medium text-xs ml-1 mb-[-4px]'>{userData?.experience + " / " + calculateLevel()}</Text>
-            <Text style={{ color: themeColors.primary }} className='text-lg font-bold ml-1'>{userData?.username}</Text>
+            <Text style={{ color: themeColors.primary }} className='text-lg font-bold ml-1'>{user?.username}</Text>
           </View>
         </AnimatedPressable>
 

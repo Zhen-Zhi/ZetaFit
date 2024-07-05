@@ -25,6 +25,7 @@ const SignInScreen = () => {
     });
 
     if (error) {
+      console.log('Error')
       setIsError(true)
       setErrorMessage(error.message)
       setPassword('')

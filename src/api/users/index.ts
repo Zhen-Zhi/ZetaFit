@@ -48,3 +48,30 @@ export const useUserData = (id: string) => {
     })
   )
 }
+
+export const useUpdateUserCoin = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (data: any) => {
+        const { data: username, error } = await supabase
+        .from('users')
+        .update({
+          coin: data.newUserCoin,
+        })
+        .eq('id', data.userId)
+      
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+          // throw new Error(`Update failed: ${error.message}`, { cause: { code: error.code } })
+        }
+
+        return username
+      },
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['users'] })
+      },
+    })
+  )
+}

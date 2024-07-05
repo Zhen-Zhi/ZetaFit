@@ -14,15 +14,39 @@ export const useCreateNewClan = () => {
             clan_description: data.clanDescription,
             required_active_score: data.requiredActiveScore,
             clan_health: 2000,
+            founder_id: data.userId,
           })
+          .select()
           .single()
 
         if (error) {
-          console.log(error.code + " :: " + error.message);
-          throw new Error(error.message)
+          throw new Error(error.code + ":" + error.message)
         }
 
         return newClan
+      },
+      async onSuccess() {
+        await queryClient.invalidateQueries({ queryKey: ['clans'] })
+      }
+    })
+  )
+}
+
+export const useDeleteClan = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (clan_id: number) => {
+        const { error } = await supabase
+          .from('clans')
+          .delete()
+          .eq('clan_id', clan_id);
+
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
       },
       async onSuccess() {
         await queryClient.invalidateQueries({ queryKey: ['clans'] })
