@@ -85,7 +85,6 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
         },
         onError(error) {
           setErrorCode(error.message.split(":")[0])
-          console.log("Create clan error" + error.message)
           setIsLoading(false)
         }
       }

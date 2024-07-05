@@ -3,11 +3,11 @@ import React, { useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import ClanList from '@/src/components/ClanList'
-import { clanListData } from '@/src/constants/dummyData'
 import CreateClanScreen from './createClan';
 import { Stack, router } from 'expo-router';
 import { themeColors } from '@/src/constants/Colors';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useClanList } from '@/src/api/clan';
 
 type Clan = {
   clanName: string;
@@ -18,6 +18,8 @@ type Clan = {
 
 const ClanScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
+  const { data: clanListData, error, isLoading } = useClanList();
+  // console.log("Count: " + count)
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
@@ -40,20 +42,6 @@ const ClanScreen = () => {
               </View>
             </AnimatedPressable>
           </View>
-        {/* <Stack.Screen options={{ 
-          title: 'Clan',
-          headerTitleStyle: { color: themeColors.primary },
-          headerRight: () => 
-            <AnimatedPressable 
-              pressInValue={0.9}
-              className='rounded'
-              onPress={() => setModalVisible(true)}
-            >
-              <View className=''>
-                <MaterialCommunityIcons name="shield-plus-outline" size={28} color={themeColors.primary} />
-              </View>
-            </AnimatedPressable>
-        }}/> */}
 
           {/* Top image - Clan */}
           <Image 
@@ -80,9 +68,9 @@ const ClanScreen = () => {
             {/* Clan list */}
             <FlatList
               className='mx-4 mt-2'
-              data={clanListData}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => <ClanList clan={item} />}
+              data={clanListData?.clan}
+              keyExtractor={(item) => item.clan_id.toString()}
+              renderItem={({ item }) => <ClanList clan={item} numberOfMembers={clanListData?.numberOfMember} />}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ gap: 3 }}
             />

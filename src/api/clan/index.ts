@@ -1,6 +1,25 @@
 import { useQueryClient, useMutation, useQuery, QueryClient } from "@tanstack/react-query"
 import { supabase } from "@/src/lib/supabase"
 
+export const useClanList = () => {
+  return (
+    useQuery({
+      queryKey: ['clans'],
+      queryFn: async () => {
+        const { data: clan, count: numberOfMember, error } = await supabase
+          .from('clans')
+          .select('*', { count: "exact", head: true })
+        
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return { clan, numberOfMember }
+      }
+    })
+  )
+}
+
 export const useCreateNewClan = () => {
   const queryClient = useQueryClient()
 

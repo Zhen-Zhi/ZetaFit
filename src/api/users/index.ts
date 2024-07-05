@@ -1,6 +1,28 @@
 import { useQueryClient, useMutation, useQuery, QueryClient } from "@tanstack/react-query"
 import { supabase } from "@/src/lib/supabase"
 
+// select user data
+export const useUserData = (id: string) => {
+  return (
+    useQuery({
+      queryKey: ['users'],
+      queryFn: async () => {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return data
+      }
+    })
+  )
+}
+
 // fill in or modify username
 export const useUpdateUsername = () => {
   const queryClient = useQueryClient()
@@ -17,7 +39,6 @@ export const useUpdateUsername = () => {
 
         if (error) {
           throw new Error(error.code + ":" + error.message)
-          // throw new Error(`Update failed: ${error.message}`, { cause: { code: error.code } })
         }
 
         return username
@@ -25,26 +46,6 @@ export const useUpdateUsername = () => {
       onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: ['users'] })
       },
-    })
-  )
-}
-
-export const useUserData = (id: string) => {
-  return (
-    useQuery({
-      queryKey: ['users'],
-      queryFn: async () => {
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', id)
-          .single();
-        
-        if(error) {
-          throw new Error(error.message)
-        }
-        return data
-      }
     })
   )
 }
@@ -64,7 +65,6 @@ export const useUpdateUserCoin = () => {
       
         if (error) {
           throw new Error(error.code + ":" + error.message)
-          // throw new Error(`Update failed: ${error.message}`, { cause: { code: error.code } })
         }
 
         return username

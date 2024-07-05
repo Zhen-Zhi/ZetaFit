@@ -48,6 +48,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     if (session) {  // This effect depends on `session` and `user`
       // Only turn off loading when user is set, indicating all async operations are complete
       setLoading(false);
+      console.log("Done loading")
     }
   }, [user, session]);
 

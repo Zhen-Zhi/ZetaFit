@@ -4,27 +4,21 @@ import AnimatedPressable from './AnimatedPressable'
 import { FontAwesome6 } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import { themeColors } from '../constants/Colors';
-
-type Clan = {
-  id: number;
-  clanName: string;
-  numberOfMember: number;
-  maxMember: number;
-  activeScore: number;
-}
+import { Tables } from '../database.types';
 
 type ClanListProps = {
-  clan: Clan; // Use Clan type
+  clan: Tables<'clans'>;
+  numberOfMembers: number | null | undefined;
 }
 
-const ClanList = ({ clan }: ClanListProps) => {
+const ClanList = ({ clan, numberOfMembers }: ClanListProps) => {
+
   return (
-    <Link href={`/clan/clan_details/${clan.id}`} asChild>
+    <Link href={`/clan/clan_details/${clan.clan_id}`} asChild>
     <AnimatedPressable 
       className='border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 bg-white'
       pressInValue={0.98}
-      // onPress={() => router.push(`/clan/${clan.id}`)}
-      onPress={() => console.log(`In ${clan.clanName}`)}
+      onPress={() => console.log(`In ${clan.clan_name}`)}
     >
       <View className='flex flex-row p-1'>
         <Image
@@ -32,14 +26,15 @@ const ClanList = ({ clan }: ClanListProps) => {
           source={require('@asset/images/clan_logo/clan_logo_8.png')}
         />
         <View className='flex-1 flex-col ml-3'>
-          <Text style={{ color: themeColors.primary }} numberOfLines={1} className='font-bold text-xl mb-1'>{clan.clanName}</Text>
+          <Text style={{ color: themeColors.primary }} numberOfLines={1} className='font-bold text-xl mb-1'>{clan.clan_name}</Text>
           <View className='flex-row justify-between w-9/12'>
             <View className='flex-row'>
               <View className='m-auto mr-1'>
                 <FontAwesome6 name="user-group" size={18} color="rgba(9, 65, 240, 0.8)" />
               </View>
               <View className='bg-slate-200 px-2 rounded-lg'>
-                <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>{clan.numberOfMember}/{clan.maxMember}</Text>
+                <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>3/{clan.max_member}</Text>
+                {/* <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>10/10</Text> */}
               </View>
             </View>
             <View className='flex-row'>
@@ -47,7 +42,7 @@ const ClanList = ({ clan }: ClanListProps) => {
                 <FontAwesome6 name="fire" size={24} color="rgba(240, 93, 9, 0.8)" />
               </View>
               <View className='bg-slate-200 px-2 rounded-lg'>
-                <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>{clan.activeScore}</Text>
+                <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>9999</Text>
               </View>
             </View>
           </View>
