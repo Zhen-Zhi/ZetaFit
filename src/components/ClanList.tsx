@@ -1,17 +1,32 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { StyleSheet, Text, View, Image, ActivityIndicator } from 'react-native'
 import React from 'react'
 import AnimatedPressable from './AnimatedPressable'
 import { FontAwesome6 } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import { themeColors } from '../constants/Colors';
 import { Tables } from '../database.types';
+import { useClanActiveScore, useClanMemberNumber } from '../api/clan';
 
 type ClanListProps = {
   clan: Tables<'clans'>;
-  numberOfMembers: number | null | undefined;
 }
 
-const ClanList = ({ clan, numberOfMembers }: ClanListProps) => {
+const ClanList = ({ clan }: ClanListProps) => {
+  const { 
+    data: clanMembersNumber,
+    error: membersNumberError, 
+    isLoading: membersNumberLoading
+  } = useClanMemberNumber(clan.clan_id);
+
+  const { 
+    data: clanActiveScore, 
+    error: clanActiveScoreError, 
+    isLoading: clanActiveScoreLoading 
+  } = useClanActiveScore(clan.clan_id);
+
+  if (membersNumberLoading && clanActiveScoreLoading) {
+    return <ActivityIndicator />
+  }
 
   return (
     <Link href={`/clan/clan_details/${clan.clan_id}`} asChild>
@@ -33,8 +48,8 @@ const ClanList = ({ clan, numberOfMembers }: ClanListProps) => {
                 <FontAwesome6 name="user-group" size={18} color="rgba(9, 65, 240, 0.8)" />
               </View>
               <View className='bg-slate-200 px-2 rounded-lg'>
-                <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>3/{clan.max_member}</Text>
-                {/* <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>10/10</Text> */}
+                {/* <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>{clanMembersData?.numberOfMember}/{clan.max_member}</Text> */}
+                <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>{clanMembersNumber?.count}/{clan.max_member}</Text>
               </View>
             </View>
             <View className='flex-row'>
@@ -42,7 +57,8 @@ const ClanList = ({ clan, numberOfMembers }: ClanListProps) => {
                 <FontAwesome6 name="fire" size={24} color="rgba(240, 93, 9, 0.8)" />
               </View>
               <View className='bg-slate-200 px-2 rounded-lg'>
-                <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>9999</Text>
+                {/* <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>9999</Text> */}
+                <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>{clanActiveScore}</Text>
               </View>
             </View>
           </View>

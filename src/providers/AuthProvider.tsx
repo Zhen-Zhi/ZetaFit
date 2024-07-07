@@ -25,7 +25,6 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     const fetchSession = async() => {
       const { data: {session} } = await supabase.auth.getSession()
       setSession(session)
-
       if (session) {
         // fetch profile
         const { data } = await supabase
@@ -33,7 +32,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
           .select('*')
           .eq('id', session.user.id)
           .single();
-
+  
         setUser(data || null);
       }
     }
@@ -50,7 +49,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
       setLoading(false);
       console.log("Done loading")
     }
-  }, [user, session]);
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{ session, loading, user }}>

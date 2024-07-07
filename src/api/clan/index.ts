@@ -1,20 +1,79 @@
 import { useQueryClient, useMutation, useQuery, QueryClient } from "@tanstack/react-query"
 import { supabase } from "@/src/lib/supabase"
 
-export const useClanList = () => {
+export const useClanList = (searchValue: string) => {
   return (
     useQuery({
-      queryKey: ['clans'],
+      queryKey: ['clans', searchValue],
+      enabled: false,
       queryFn: async () => {
-        const { data: clan, count: numberOfMember, error } = await supabase
-          .from('clans')
-          .select('*', { count: "exact", head: true })
+        console.log(searchValue)
+        if(searchValue.length > 2) {
+          const { data: clan, error } = await supabase
+            .from('clans')
+            .select('*')
+            .textSearch('clan_name', searchValue, {
+              type: 'websearch'
+            })
+
+          if (error) {
+            throw new Error(error.code + ":" + error.message)
+          }
+
+          return clan
+        }
+        else {
+          const { data: clan, error } = await supabase
+            .from('clans')
+            .select('*')
+
+          if (error) {
+            throw new Error(error.code + ":" + error.message)
+          }
+
+          return clan
+        }
+      }
+    })
+  )
+}
+
+export const useClanMemberNumber = (clan_id: number) => {
+  return (
+    useQuery({
+      queryKey: ['clan_member_number', clan_id],
+      queryFn: async () => {
+        const { data: clanMembersNumber, error } = await supabase
+          .from('clan_members')
+          .select('user_id.count()')
+          .eq('clan_id', clan_id)
+          .single()
         
         if (error) {
           throw new Error(error.code + ":" + error.message)
         }
 
-        return { clan, numberOfMember }
+        return clanMembersNumber
+      }
+    })
+  )
+}
+
+export const useClanActiveScore = (clan_id: number) => {
+  return (
+    useQuery({
+      queryKey: ['clan_active_score', clan_id],
+      queryFn: async () => {
+        const { data: clanActiveScore, error } = await supabase
+          .rpc('get_total_active_score', { clan_id: clan_id })
+          // need to use predefine function in database because
+          // supabase does not support group by
+
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return clanActiveScore
       }
     })
   )

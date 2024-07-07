@@ -12,16 +12,18 @@ import AddActivityScreenModal from '@/src/components/AddActivity';
 import EnterUsernameModal from '../../(auth)/username';
 import { useUserData } from '@/src/api/users';
 import { useAuth } from '@/src/providers/AuthProvider';
+import * as NavigationBar from 'expo-navigation-bar';
 
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
 const HomeScreen = () => {
-  const { session, user } = useAuth();
+  NavigationBar.setVisibilityAsync("hidden");
+  const { session, loading } = useAuth();
   if(!session) {
     return <Redirect href={'/sign_in'} />
   }
 
-  const { data: userData, error, isLoading } = useUserData(session?.user.id)
+  const { data: user, error, isLoading } = useUserData(session?.user.id)
 
   const [modalVisible, setModalVisible] = useState(false);
   const [addActivityModalVisible, setAddActivityModalVisible] = useState(false);
@@ -38,7 +40,7 @@ const HomeScreen = () => {
     return unsubscribe;
   }, [navigation]);
 
-  if (isLoading) {
+  if (loading && isLoading) {
     return (
       <ImageBackground
         source={require('@asset/images/background_image.png')} 
@@ -48,22 +50,22 @@ const HomeScreen = () => {
       </ImageBackground>
     )
   }
-
+  
   const calculateLevel = (): number => {
-    if(!userData?.level) {
-      console.warn('Level undefine');
-      return 99999
-    }
-    let required_xp = 0
-    
-    if (userData.level >= 1 && userData.level < 10) {
-      required_xp = 80 + (userData.level * 20)
-    }
-    else if (userData.level >= 10 && userData.level < 29) {
-      required_xp = 260 + ((userData.level - 9) * 50)
-    }
-    else {
-      required_xp = 1230 + ((userData.level - 29) * 100)
+    let required_xp = 99999   // if no level found
+    if(user?.level) {
+      
+      if (user.level >= 1 && user.level < 10) {
+        required_xp = 80 + (user.level * 20)
+      }
+      else if (user.level >= 10 && user.level < 29) {
+        required_xp = 260 + ((user.level - 9) * 50)
+      }
+      else {
+        required_xp = 1230 + ((user.level - 29) * 100)
+      }
+
+      return required_xp
     }
 
     return required_xp
@@ -71,7 +73,7 @@ const HomeScreen = () => {
 
   // if username not set, pop up modal
   setTimeout(() => {
-    if (userData?.username === null) {
+    if (user?.username === null) {
       setEnterUsernameModalVisible(true);
     }
   }, 1000)
@@ -105,7 +107,7 @@ const HomeScreen = () => {
           />
           <View className='flex-col mt-2'>
             <Progress.Bar className='justify-center left-[24px]'
-              progress={userData?.experience ?? 0 / calculateLevel()}
+              progress={user?.experience ?? 0 / calculateLevel()}
               width={130}
               height={24}
               color={themeColors.tetiary}
@@ -114,9 +116,9 @@ const HomeScreen = () => {
               borderColor={themeColors.primary}
               borderRadius={4}
             >
-              <Text className='absolute text-white font-extrabold self-center'>Level {userData?.level}</Text>
+              <Text className='absolute text-white font-extrabold self-center'>Level {user?.level}</Text>
             </Progress.Bar>
-            <Text style={{ color: themeColors.primary }} className='font-medium text-xs ml-1 mb-[-4px]'>{userData?.experience + " / " + calculateLevel()}</Text>
+            <Text style={{ color: themeColors.primary }} className='font-medium text-xs ml-1 mb-[-4px]'>{user?.experience + " / " + calculateLevel()}</Text>
             <Text style={{ color: themeColors.primary }} className='text-lg font-bold ml-1'>{user?.username}</Text>
           </View>
         </AnimatedPressable>
@@ -128,14 +130,14 @@ const HomeScreen = () => {
               className='w-5 mx-4 my-auto aspect-square'
               source={require('@asset/images/coin_icon.png')} 
             />
-            <Text style={{ color: themeColors.primary }} className='text-right mx-2 my-auto'>{userData?.coin}</Text>
+            <Text style={{ color: themeColors.primary }} className='text-right mx-2 my-auto'>{user?.coin}</Text>
           </View>
           <View style={styles.shadowAndriod} className='border border-slate-300 mt-1 h-7 rounded-xl mx-2 flex flex-row justify-between bg-white shadow shadow-slate-400'>
             <Image 
               className='w-5 mx-4 my-auto aspect-square'
               source={require('@asset/images/diamond_icon.png')} 
             />
-            <Text style={{ color: themeColors.primary }} className='text-right mx-2 my-auto'>{userData?.diamond}</Text>
+            <Text style={{ color: themeColors.primary }} className='text-right mx-2 my-auto'>{user?.diamond}</Text>
           </View>
         </View>
       </View>
@@ -153,7 +155,7 @@ const HomeScreen = () => {
             className='w-12 h-14 mx-2'
             source={require('@asset/images/clan_logo/clan_logo_3.png')} 
           />
-          <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{userData?.clan_id ?? 'No Clan'}</Text>
+          <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{user?.clan_id ?? 'No Clan'}</Text>
         </AnimatedPressable>
         
         {/* More functions list */}
@@ -184,7 +186,7 @@ const HomeScreen = () => {
               <FontAwesome6 name="fire" size={24} color="rgba(240, 93, 9, 0.8)" />
             </View>
             <View className='bg-slate-200 rounded-lg px-2 mx-2 flex-1'>
-              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>{userData?.active_score}</Text>
+              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>{user?.active_score}</Text>
             </View>
           </View>
           <View className='flex-row flex-1'>
@@ -192,7 +194,7 @@ const HomeScreen = () => {
               <FontAwesome6 name="bolt-lightning" size={24} color='orange' />
             </View>
             <View className='bg-slate-200 rounded-lg px-2 mx-2 flex-1'>
-              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>{userData?.energy}</Text>
+              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>{user?.energy}</Text>
             </View>
           </View>
         </View>

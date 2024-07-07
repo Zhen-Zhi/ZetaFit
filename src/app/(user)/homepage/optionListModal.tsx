@@ -66,7 +66,7 @@ const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
           style={{ backgroundColor: themeColors.backgroundColor }}
           pressInValue={0.95} 
           className='border border-slate-400 h-10 rounded-xl mb-1 mt-4 mx-1'
-          onPress={() => supabase.auth.signOut()}
+          onPress={async () => await supabase.auth.signOut()}
         >
           <View className='flex-row flex-1 justify-center'>
             <View className='absolute left-5 top-1.5'>
