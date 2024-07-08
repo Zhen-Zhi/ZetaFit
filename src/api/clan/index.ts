@@ -4,17 +4,15 @@ import { supabase } from "@/src/lib/supabase"
 export const useClanList = (searchValue: string) => {
   return (
     useQuery({
-      queryKey: ['clans', searchValue],
+      queryKey: ['clans'],
       enabled: false,
       queryFn: async () => {
-        console.log(searchValue)
         if(searchValue.length > 2) {
           const { data: clan, error } = await supabase
             .from('clans')
             .select('*')
-            .textSearch('clan_name', searchValue, {
-              type: 'websearch'
-            })
+            .ilike('clan_name', searchValue)
+            .limit(20)
 
           if (error) {
             throw new Error(error.code + ":" + error.message)
@@ -24,8 +22,7 @@ export const useClanList = (searchValue: string) => {
         }
         else {
           const { data: clan, error } = await supabase
-            .from('clans')
-            .select('*')
+          .rpc('get_random_clans')
 
           if (error) {
             throw new Error(error.code + ":" + error.message)
@@ -54,6 +51,47 @@ export const useClanMemberNumber = (clan_id: number) => {
         }
 
         return clanMembersNumber
+      }
+    })
+  )
+}
+
+export const useClanMembers = (clan_id: number) => {
+  return (
+    useQuery({
+      queryKey: ['clan_members', clan_id],
+      queryFn: async () => {
+        const { data: clanMembers, error } = await supabase
+          .from('clan_members')
+          .select('*, users(*)')
+          .eq('clan_id', clan_id)
+        
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return clanMembers
+      }
+    })
+  )
+}
+
+export const useClanDetails = (clan_id: number) => {
+  return (
+    useQuery({
+      queryKey: ['clan', clan_id],
+      queryFn: async () => {
+        const { data: clanDetail, error } = await supabase
+          .from('clans')
+          .select('*')
+          .eq('clan_id', clan_id)
+          .single()
+        
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return clanDetail
       }
     })
   )

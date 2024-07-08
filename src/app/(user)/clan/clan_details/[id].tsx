@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, Text, View, Image, FlatList, Modal, Pressable, Platform } from 'react-native'
+import { ImageBackground, StyleSheet, Text, View, Image, FlatList, Modal, Pressable, Platform, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { Stack, router, useLocalSearchParams } from 'expo-router'
 import { Entypo, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons'
@@ -11,9 +11,22 @@ import { themeColors } from '@/src/constants/Colors'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AnimatedModal from '@/src/components/AnimatedModal'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useClanDetails, useClanMembers } from '@/src/api/clan'
 
 const ClanDetailsScreen = () => {
   const { id } = useLocalSearchParams()
+  const clan_id = parseInt(typeof id == 'string' ? id : id?.[0] ?? '0')
+  const { 
+    data: clanDetails, 
+    isLoading: clanDetailsLoading, 
+    error: clanDetailsError } = useClanDetails(clan_id)
+
+  // const {
+  //   data: clanMembers,
+  //   isLoading: clanMemberLoading,
+  //   error: clanMemberError
+  // } = useClanMembers(id)
+
   const [haveClan, setHaveClan] = useState(false)
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -25,6 +38,14 @@ const ClanDetailsScreen = () => {
       setHaveClan(true)
       router.push('/clan/clan_details/clanActivityLog');
     }
+  }
+
+  if(!clanDetails) {
+    console.log("Clan details not found. debug in '/clan/clan_detials/[id].tsx'")
+  }
+
+  if(clanDetailsLoading) {
+    return <ActivityIndicator size='large' color={themeColors.secondary} />
   }
 
   return (
@@ -58,34 +79,15 @@ const ClanDetailsScreen = () => {
         </AnimatedPressable>
         <Text style={{ color: themeColors.primary }} className='text-center mt-auto text-[28px] font-extrabold'>CLAN</Text>
       </View>
-      
-      {/* <Stack.Screen 
-        options={{ title: 'Clan Name', 
-        headerRight: () => 
-          haveClan 
-          ? 
-            <AnimatedPressable 
-              pressInValue={0.9}
-              className='rounded'
-              onPress={() => {
-                router.push('clan/clan_war/clanWar')
-              }}
-            >
-              <View className='my-auto'>
-                <MaterialCommunityIcons name="sword-cross" size={28} color={themeColors.primary} />
-              </View>
-            </AnimatedPressable>
-          :
-            null
-      }} /> */}
+
       <View className='flex-row my-3'>
         <Image 
           className='w-32 h-40 mx-4'
           source={require('@asset/images/clan_logo/clan_logo_1.png')}
         />
         <View className='flex-1 pr-4'>
-          <Text style={{ color: themeColors.primary }} className='text-[24px] text-left font-[800]'>Samsung galaxy</Text>
-          <Text numberOfLines={4} style={{ color: themeColors.secondary }} className='font-semibold mt-1 text-justify'>The quick brown fox jumps over the lazy dog.The quick brown fox jumps</Text>
+          <Text style={{ color: themeColors.primary }} className='text-[24px] text-left font-[800]'>{clanDetails?.clan_name}</Text>
+          <Text numberOfLines={4} style={{ color: themeColors.secondary }} className='font-semibold mt-1 text-justify'>{clanDetails?.clan_description}</Text>
           <View className='flex-row mt-auto justify-between'>
             <AnimatedPressable 
               style={{ backgroundColor: haveClan ? themeColors.danger : themeColors.secondary }}
@@ -113,7 +115,7 @@ const ClanDetailsScreen = () => {
           </View>
         </View>
       </View>
-      <TabLayout haveClan={haveClan} />
+      <TabLayout haveClan={haveClan} clanId={clan_id} clanDetails={clanDetails}/>
       <Modal
         animationType='fade'
         visible={modalVisible}

@@ -29,11 +29,11 @@ const ClanList = ({ clan }: ClanListProps) => {
   }
 
   return (
-    <Link href={`/clan/clan_details/${clan.clan_id}`} asChild>
+    // <Link href={`/clan/clan_details/${clan.clan_id}`} asChild>
     <AnimatedPressable 
       className='border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 bg-white'
       pressInValue={0.98}
-      onPress={() => console.log(`In ${clan.clan_name}`)}
+      onPress={() => router.push(`/clan/clan_details/${clan.clan_id}`)}
     >
       <View className='flex flex-row p-1'>
         <Image
@@ -67,7 +67,7 @@ const ClanList = ({ clan }: ClanListProps) => {
       </View>
       
     </AnimatedPressable>
-    </Link>
+    // </Link>
   )
 }
 

@@ -4,14 +4,28 @@ import MemberScreen from './clanMemberList';
 import ClanDetailsScreen from './clanDetails';
 import { themeColors } from '@/src/constants/Colors';
 import ClanActivityLogScreen from './clanActivityLog';
+import { Tables } from '@/src/database.types';
+
+type MemberScreenRouteParamList = {
+  member: {
+      clanId: number;
+      clanDetails: Tables<'clans'> | undefined;
+  };
+  clanDetails: {
+    clanDetails: Tables<'clans'> | undefined;
+  }
+  clanActivityLog: undefined; // this is only the route
+};
 
 type TabLayoutProps = {
   haveClan: boolean;
+  clanId: number;
+  clanDetails: Tables<'clans'> | undefined;
 }
 
-const Tab = createMaterialTopTabNavigator();
+const Tab = createMaterialTopTabNavigator<MemberScreenRouteParamList>();
 
-const TabLayout = ({ haveClan }: TabLayoutProps) => {
+const TabLayout = ({ haveClan, clanId, clanDetails }: TabLayoutProps) => {
   const [currentTab, setCurrentTab] = useState(haveClan ? 'clanActivityLog' : 'member');
   
   useEffect(() => {
@@ -38,8 +52,8 @@ const TabLayout = ({ haveClan }: TabLayoutProps) => {
         },
       }}
     >
-      <Tab.Screen name="member" component={MemberScreen} options={{ tabBarLabel: 'Members' }} />
-      <Tab.Screen name="clanDetails" component={ClanDetailsScreen} options={{ tabBarLabel: 'Details' }} />
+      <Tab.Screen name="member" component={MemberScreen} initialParams={{ clanId: clanId, clanDetails: clanDetails }} options={{ tabBarLabel: 'Members' }} />
+      <Tab.Screen name="clanDetails" component={ClanDetailsScreen} initialParams={{ clanDetails: clanDetails }} options={{ tabBarLabel: 'Details' }} />
     </Tab.Navigator>
   );
 }

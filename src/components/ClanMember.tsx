@@ -7,12 +7,13 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { themeColors } from '../constants/Colors'
 import ProfileScreen from '../app/(user)/homepage/profile/profileModal'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { Tables } from '../database.types'
 
 type ClanMemberProps = {
-  id: number;
+  member: { users: Tables<'users'> | null } &Tables<'clan_members'> | null;
 }
 
-const ClanMember = ({ id }: ClanMemberProps) => {
+const ClanMember = ({ member }: ClanMemberProps) => {
   const [modalVisible, setModalVisible] = useState(false)
   const [profileModalVisible, setProfileModalVisible] = useState(false)
 
@@ -30,12 +31,12 @@ const ClanMember = ({ id }: ClanMemberProps) => {
           />
           <View className='flex-1 flex-row justify-between'>
             <View className='flex-col ml-4 my-auto'>
-              <Text className='text-lg font-bold'>Member Name</Text>
-              <Text className='font-semibold text-slate-600'>Founder</Text>
+              <Text className='text-lg font-bold'>{member?.users?.username}</Text>
+              <Text className='font-semibold text-slate-600'>{member?.role}</Text>
             </View>
             <View className='flex-row my-auto mr-2 bg-slate-200 rounded-lg p-2'>
               <FontAwesome6 name="fire" size={28} color="rgba(240, 93, 9, 0.8)" />
-              <Text className='text-center text-lg rounded font-semibold ml-2'>9999</Text>
+              <Text className='text-center text-lg rounded font-semibold ml-2'>{member?.users?.active_score}</Text>
             </View>
           </View>
         </View>
@@ -64,7 +65,7 @@ const ClanMember = ({ id }: ClanMemberProps) => {
             />
             <View className='flex-1 flex-row justify-between'>
               <View className='flex-col ml-4 my-auto'>
-                <Text className='text-lg font-bold'>Member Name + {id}</Text>
+                <Text className='text-lg font-bold'>Member Name</Text>
                 <Text className='font-semibold text-slate-600'>Founder</Text>
               </View>
             </View>

@@ -7,8 +7,22 @@ import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import AnimatedPressable from '@/src/components/AnimatedPressable';
 import EditRequireActiveScoreModal from './editRequireActiveScore';
 import AddClanHealthModal from './addClanHealth';
+import { RouteProp } from '@react-navigation/native';
+import { Tables } from '@/src/database.types';
 
-const ClanDetailsScreen = () => {
+type ClanDetailsScreenRouteProp = RouteProp<{
+  clanDetails: {
+    clanDetails: Tables<'clans'> | undefined;
+  };
+}, 'clanDetails'>;
+
+type ClanDetailsScreenProps = {
+  route: ClanDetailsScreenRouteProp;
+};
+
+const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
+  const { clanDetails } = route.params;
+
   const [editModalVisible, setEditModalVisible] = useState(false)
   const [healthModalVisible, setHealthModalVisible] = useState(false)
   const [haveClan, setHaveClan] = useState(true)

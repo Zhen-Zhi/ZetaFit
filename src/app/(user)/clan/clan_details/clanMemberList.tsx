@@ -4,14 +4,41 @@ import ClanMember from '@/src/components/ClanMember'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { FontAwesome6 } from '@expo/vector-icons'
 import { themeColors } from '@/src/constants/Colors'
+import { Tables } from '@/src/database.types'
+import { RouteProp } from '@react-navigation/native';
+import { useClanMemberNumber, useClanMembers } from '@/src/api/clan'
 
-const MemberScreen = () => {
+type MemberScreenRouteProp = RouteProp<{
+  member: {
+    clanId: number;
+    clanDetails: Tables<'clans'> | undefined;
+  };
+}, 'member'>;
+
+type MemberScreenProps = {
+  route: MemberScreenRouteProp;
+};
+
+const MemberScreen = ({ route }: MemberScreenProps) => {
+  const { clanDetails, clanId } = route.params;
+  const {
+    data: clanMembers,
+    isLoading: clanMembersLoading,
+    error: clanMembersError
+  } = useClanMembers(clanId)
+
+  const {
+    data: clanMembersNumber,
+    isLoading: clanMembersNumberLoading,
+    error: clanMembersNumberError,
+  } = useClanMemberNumber(clanId)
+
   const headerComponent = (
     <View className='bg-white flex-row'>
       <View className='mx-2 my-auto'>
         <FontAwesome6 name="user-group" size={18} color={themeColors.primary} />
       </View>
-      <Text className='text-lg font-semibold' style={{ color: themeColors.primary }}>Member 12/20</Text>
+      <Text className='text-lg font-semibold' style={{ color: themeColors.primary }}>Member {clanMembersNumber?.count}/{clanDetails?.max_member}</Text>
     </View>
   )
 
@@ -21,21 +48,11 @@ const MemberScreen = () => {
 
   return (
     <View className='px-2'>
-    {/* <View className='border flex-row justify-between mt-2 px-3 py-2 rounded-t-xl bg-white'>
-      <Text className='text-lg font-semibold my-auto'>Members</Text>
-      <AnimatedPressable 
-        className='bg-sky-500 my-2 p-2 rounded-lg px-4'
-        pressInValue={0.9}
-      >
-        <Text className='font-semibold text-white text-[16px]'>Join Clan</Text>
-      </AnimatedPressable>
-    </View> */}
-
       <FlatList
         className='mt-1 mb-2 mx-0.5'
-        data={[1,2,3,4,5,6,7,8,9,10]}
-        renderItem={({ item }) => <ClanMember id={1} />}
-        keyExtractor={(item) => item.toString()}
+        data={clanMembers}
+        renderItem={({ item }) => <ClanMember member={item} />}
+        keyExtractor={(item) => item.user_id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ gap: 3 }}
         ListHeaderComponent={headerComponent}

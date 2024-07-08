@@ -21,8 +21,8 @@ const ClanScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [searchValue, setSearchValue] = useState('')
 
-  const { data: clanListData, error, isLoading, refetch } = useClanList('"' + searchValue + '"');
-  useEffect(() => {refetch}, [])
+  const { data: clanListData, error, isLoading, refetch } = useClanList('%' + searchValue + '%');
+  useEffect(() => {refetch()}, [])
 
   if (isLoading) {
     return <ActivityIndicator />
