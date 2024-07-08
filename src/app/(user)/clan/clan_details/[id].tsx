@@ -1,6 +1,6 @@
 import { ImageBackground, StyleSheet, Text, View, Image, FlatList, Modal, Pressable, Platform, ActivityIndicator } from 'react-native'
-import React, { useState } from 'react'
-import { Stack, router, useLocalSearchParams } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { Redirect, Stack, router, useLocalSearchParams } from 'expo-router'
 import { Entypo, FontAwesome5, FontAwesome6, Ionicons } from '@expo/vector-icons'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import ClanMember from '@/src/components/ClanMember'
@@ -12,24 +12,42 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AnimatedModal from '@/src/components/AnimatedModal'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useClanDetails, useClanMembers } from '@/src/api/clan'
+import { useAuth } from '@/src/providers/AuthProvider'
 
 const ClanDetailsScreen = () => {
   const { id } = useLocalSearchParams()
   const clan_id = parseInt(typeof id == 'string' ? id : id?.[0] ?? '0')
-  const { 
-    data: clanDetails, 
-    isLoading: clanDetailsLoading, 
-    error: clanDetailsError } = useClanDetails(clan_id)
-
-  // const {
-  //   data: clanMembers,
-  //   isLoading: clanMemberLoading,
-  //   error: clanMemberError
-  // } = useClanMembers(id)
-
+  const { session } = useAuth();
   const [haveClan, setHaveClan] = useState(false)
   const [modalVisible, setModalVisible] = useState(false);
 
+  useEffect(() => {
+    if (clanMembers?.some(member => member.user_id === session?.user?.id)) {
+      setHaveClan(true);
+    }
+  },[])
+
+  const { 
+    data: clanDetails, 
+    isLoading: clanDetailsLoading, 
+    error: clanDetailsError 
+  } = useClanDetails(clan_id)
+
+  const {
+    data: clanMembers, 
+    isLoading: clanMembersLoading, 
+    error: clanMembersError 
+  } = useClanMembers(clan_id)
+
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
+  if(!clanMembers) {
+    console.log("Clan members not found")
+    return <ActivityIndicator size='large' color={themeColors.secondary} />
+  }
+  
   const handleCLanInOut = () => {
     if(haveClan) {
       setModalVisible(true)
@@ -42,6 +60,7 @@ const ClanDetailsScreen = () => {
 
   if(!clanDetails) {
     console.log("Clan details not found. debug in '/clan/clan_detials/[id].tsx'")
+    return <ActivityIndicator size='large' color={themeColors.secondary} />
   }
 
   if(clanDetailsLoading) {
@@ -81,10 +100,17 @@ const ClanDetailsScreen = () => {
       </View>
 
       <View className='flex-row my-3'>
-        <Image 
-          className='w-32 h-40 mx-4'
-          source={require('@asset/images/clan_logo/clan_logo_1.png')}
-        />
+        <View>
+          <Image 
+            className='w-[120px] h-36 mx-4'
+            source={require('@asset/images/clan_logo/clan_logo_1.png')}
+          />
+          <AnimatedPressable
+            pressInValue={0.95}
+          >
+            <Text style={{ color: themeColors.secondary }} className='text-lg font-bold text-center'>Edit Clan</Text>
+          </AnimatedPressable>
+        </View>
         <View className='flex-1 pr-4'>
           <Text style={{ color: themeColors.primary }} className='text-[24px] text-left font-[800]'>{clanDetails?.clan_name}</Text>
           <Text numberOfLines={4} style={{ color: themeColors.secondary }} className='font-semibold mt-1 text-justify'>{clanDetails?.clan_description}</Text>

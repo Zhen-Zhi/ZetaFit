@@ -6,21 +6,20 @@ import { FontAwesome5, MaterialCommunityIcons, MaterialIcons } from '@expo/vecto
 import ClanLogoListModal from './clanLogoList';
 import AwesomeButton from "react-native-really-awesome-button";
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack, router } from 'expo-router';
+import { Redirect, Stack, router } from 'expo-router';
 import { useCreateNewClan, useDeleteClan } from '@/src/api/clan';
 import { useAuth } from '@/src/providers/AuthProvider';
 import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
 import { Mutation } from '@tanstack/react-query';
 import { Tables } from '@/src/database.types';
-import { useUpdateUserCoin } from '@/src/api/users';
-import { create } from 'react-test-renderer';
+import { useUpdateUserCoin, useUserData } from '@/src/api/users';
 
 type CreateClanScreenProps = {
   onClose: () => void
 }
 
 const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
-  const { session, user } = useAuth()
+  const { session } = useAuth()
   const [modalVisible, setModalVisible] = useState(false)
   const [clanLogo, setClanLogo] = useState<{ id: number; image: any; }>({id: 1, image: require('@asset/images/clan_logo/clan_logo_1.png')})
   const [clanName, setClanName] = useState('');
@@ -29,10 +28,14 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [errorCode, setErrorCode] = useState<string | null>(null)
 
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
 
   const { mutate: updateCoin } = useUpdateUserCoin()
   const { mutate: createClan } = useCreateNewClan()
   const { mutate: deleteClan } = useDeleteClan()
+  const { data: user, isLoading: userDataLoading, error } = useUserData(session.user.id)
 
   const increment = () => {
     setRequiredActiveScore(prevScore => prevScore + 100);
@@ -52,7 +55,7 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
       return
     }
     
-    const userId = user?.id;
+    
     
 
     // duplicated coin balance checking
@@ -62,6 +65,8 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
       onClose();
       return
     }
+
+    const userId = user?.id;
     const newUserCoin = user?.coin - 2000;
 
     createClan(

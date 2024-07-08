@@ -69,7 +69,10 @@ const ClanScreen = () => {
               <AnimatedPressable 
                 pressInValue={0.9} 
                 className='border border-slate-400 rounded-lg justify-center p-3 bg-white shadow shadow-slate-400'
-                onPress={refetch}
+                onPress={() => {
+                  Keyboard.dismiss();
+                  refetch();
+                }}
               >
                 <FontAwesome6 class name="magnifying-glass" size={18} color={themeColors.primary} />
               </AnimatedPressable>
@@ -77,7 +80,7 @@ const ClanScreen = () => {
 
             {/* Clan list */}
             <FlatList
-              className='mx-4 mt-2'
+              className='mx-4 mt-2 mb-20'
               data={clanListData}
               keyExtractor={(item) => item.clan_id.toString()}
               renderItem={({ item }) => <ClanList clan={item} />}

@@ -8,12 +8,14 @@ import { themeColors } from '../constants/Colors'
 import ProfileScreen from '../app/(user)/homepage/profile/profileModal'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { Tables } from '../database.types'
+import { useAuth } from '../providers/AuthProvider'
 
 type ClanMemberProps = {
   member: { users: Tables<'users'> | null } &Tables<'clan_members'> | null;
 }
 
 const ClanMember = ({ member }: ClanMemberProps) => {
+  const { session } = useAuth()
   const [modalVisible, setModalVisible] = useState(false)
   const [profileModalVisible, setProfileModalVisible] = useState(false)
 
@@ -22,7 +24,10 @@ const ClanMember = ({ member }: ClanMemberProps) => {
       <AnimatedPressable
         onLongPress={() => setModalVisible(true)}
         pressInValue={0.97}
-        className='border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 bg-white'
+        className={
+          `border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 
+          ${ member?.user_id == session?.user.id ? 'bg-green-200' : 'bg-white' } `
+        }
       >
         <View className='flex-row'>
           <Image 
@@ -34,7 +39,10 @@ const ClanMember = ({ member }: ClanMemberProps) => {
               <Text className='text-lg font-bold'>{member?.users?.username}</Text>
               <Text className='font-semibold text-slate-600'>{member?.role}</Text>
             </View>
-            <View className='flex-row my-auto mr-2 bg-slate-200 rounded-lg p-2'>
+            <View className={
+              `flex-row my-auto mr-2 rounded-lg p-2
+              ${ member?.user_id == session?.user.id ? 'bg-white' : 'bg-slate-200' }`
+            }>
               <FontAwesome6 name="fire" size={28} color="rgba(240, 93, 9, 0.8)" />
               <Text className='text-center text-lg rounded font-semibold ml-2'>{member?.users?.active_score}</Text>
             </View>
@@ -56,7 +64,10 @@ const ClanMember = ({ member }: ClanMemberProps) => {
         >
         <AnimatedPressable 
           pressInValue={0.97}
-          className='border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 bg-white'
+          className={
+            `border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 
+            ${ member?.user_id == session?.user.id ? 'bg-green-200' : 'bg-white' } `
+          }
         >
           <View className='flex-row'>
             <Image 
@@ -65,8 +76,8 @@ const ClanMember = ({ member }: ClanMemberProps) => {
             />
             <View className='flex-1 flex-row justify-between'>
               <View className='flex-col ml-4 my-auto'>
-                <Text className='text-lg font-bold'>Member Name</Text>
-                <Text className='font-semibold text-slate-600'>Founder</Text>
+                <Text className='text-lg font-bold'>{member?.users?.username}</Text>
+                <Text className='font-semibold text-slate-600'>{member?.role}</Text>
               </View>
             </View>
           </View>

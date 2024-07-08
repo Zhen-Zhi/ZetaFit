@@ -165,7 +165,80 @@ export const useDeleteClan = () => {
 
       },
       async onSuccess() {
-        await queryClient.invalidateQueries({ queryKey: ['clans'] })
+        await queryClient.invalidateQueries({ queryKey: ['clana_active_score'] })
+      }
+    })
+  )
+}
+
+export const useUpdateRequiredActiveScore = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (data: any) => {
+        const { data: newScore, error } = await supabase
+        .from('clans')
+        .update({
+          required_active_score: data.requiredActiveScore,
+        })
+        .eq('clan_id', data.clanId)
+
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return newScore
+      },
+      onSuccess: async (_, { clan_id }) => {
+        await queryClient.invalidateQueries({ queryKey: ['clans', clan_id] })
+      },
+    })
+  )
+}
+
+export const useUpdateClanHealth = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (data: any) => {
+        const { data: newClanHealth, error } = await supabase
+        .from('clans')
+        .update({
+          clan_health: data.clanHealth,
+        })
+        .eq('clan_id', data.clanId)
+
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return newClanHealth
+      },
+      onSuccess: async (_, { clan_id }) => {
+        await queryClient.invalidateQueries({ queryKey: ['clans', clan_id] })
+      },
+    })
+  )
+}
+
+export const useClanRankings = () => {
+  return (
+    useQuery({
+      queryKey: ['clan_rankings'],
+      queryFn: async () => {
+        const { data: useClanRankings, error } = await supabase
+          .rpc('fetch_all_clan_rankings')
+          // need to use predefine function in database because
+          // supabase does not support rank()
+
+        if (error) {
+          console.log("error in rank::  " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return useClanRankings
       }
     })
   )

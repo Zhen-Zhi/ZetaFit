@@ -1,5 +1,5 @@
 import { Modal, Pressable, StyleSheet, Text, View, Image, TextInput } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons'
 import { themeColors } from '@/src/constants/Colors'
 import * as Progress from 'react-native-progress';
@@ -9,10 +9,11 @@ import EditRequireActiveScoreModal from './editRequireActiveScore';
 import AddClanHealthModal from './addClanHealth';
 import { RouteProp } from '@react-navigation/native';
 import { Tables } from '@/src/database.types';
+import { useClanActiveScore, useClanRankings } from '@/src/api/clan';
 
 type ClanDetailsScreenRouteProp = RouteProp<{
   clanDetails: {
-    clanDetails: Tables<'clans'> | undefined;
+    clanDetails: Tables<'clans'>;
   };
 }, 'clanDetails'>;
 
@@ -23,10 +24,24 @@ type ClanDetailsScreenProps = {
 const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
   const { clanDetails } = route.params;
 
+  const {
+    data: clanActiveScore,
+    isLoading: clanActiveScoreLoading,
+    error: clanActiveScoreError,
+  } = useClanActiveScore(clanDetails.clan_id)
+
+  const {
+    data: clanRankings,
+    isLoading: clanRankingsLoading,
+    error: clanRankingsError,
+  } = useClanRankings();
+
+  const rank = clanRankings?.find((clan) => clan.clan_id == clanDetails.clan_id)?.rank ?? '-';
+
   const [editModalVisible, setEditModalVisible] = useState(false)
   const [healthModalVisible, setHealthModalVisible] = useState(false)
   const [haveClan, setHaveClan] = useState(true)
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState(clanDetails.required_active_score);
 
   const increment = () => {
     setAmount(prevAmount => prevAmount + 100);
@@ -43,7 +58,7 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
         <View className='my-auto mx-3'>
           <FontAwesome6 name="fire" size={48} color="rgba(240, 93, 9, 0.8)" />
         </View>
-        <Text style={{ color: themeColors.primary }} className='text-[48px] font-bold text-center rounded-2xl'>9999</Text>
+        <Text style={{ color: themeColors.primary }} className='text-[48px] font-bold text-center rounded-2xl'>{clanActiveScore}</Text>
       </View>
 
       <Text style={{ color: themeColors.primary }} className='text-xl font-extrabold text-center'>Clan War History</Text>
@@ -77,11 +92,11 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
             <View className='my-auto mx-3'>
               <FontAwesome6 name="fire" size={22} color="rgba(240, 93, 9, 0.8)" />
             </View>
-            <Text style={{ color: themeColors.primary }} className='text-[22px] font-bold text-center rounded-2xl'>600</Text>
+            <Text style={{ color: themeColors.primary }} className='text-[22px] font-bold text-center rounded-2xl'>{clanDetails.required_active_score}</Text>
             {haveClan ? 
             <AnimatedPressable
               pressInValue={0.95}
-              className='ml-20'
+              className='absolute right-8 top-1.5'
               onPress={() => setEditModalVisible(true)}
             >   
               <View className='my-auto'>
@@ -97,7 +112,7 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
             <View className='my-auto mx-3'>
               <MaterialIcons name="leaderboard" size={22} color={themeColors.primary} />
             </View>
-          <Text style={{ color: themeColors.primary }} className='text-[22px] font-bold rounded-2xl'>2</Text>
+          <Text style={{ color: themeColors.primary }} className='text-[22px] font-bold rounded-2xl'>{rank}</Text>
           </View>
         </View>
       </View>
@@ -109,11 +124,11 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
             <View className='my-auto mx-3'>
               <FontAwesome6 name="shield-heart" size={22} color='red' />
             </View>
-            <Text style={{ color: themeColors.primary }} className='text-[22px] font-bold text-center rounded-2xl'>2000</Text>
+            <Text style={{ color: themeColors.primary }} className='text-[22px] font-bold text-center rounded-2xl'>{clanDetails.clan_health}</Text>
             {haveClan ? 
             <AnimatedPressable
               pressInValue={0.95}
-              className='ml-10'
+              className='absolute right-8 top-1.5'
               onPress={() => setHealthModalVisible(true)}
             >   
             <View className='my-auto'>
@@ -137,6 +152,7 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
           increment={increment}
           decrement={decrement}
           amount={amount}
+          clanId={clanDetails.clan_id}
         />
       </Modal>
 
@@ -147,7 +163,11 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
         transparent={true}
         onRequestClose={() =>setHealthModalVisible(false)}
       >
-        <AddClanHealthModal onClose={() => setHealthModalVisible(false)}/>
+        <AddClanHealthModal 
+          onClose={() => setHealthModalVisible(false)} 
+          clanHealth={clanDetails.clan_health} 
+          clanId={clanDetails.clan_id}
+        />
       </Modal>
     </View>
   )

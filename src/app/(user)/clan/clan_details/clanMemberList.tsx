@@ -11,7 +11,7 @@ import { useClanMemberNumber, useClanMembers } from '@/src/api/clan'
 type MemberScreenRouteProp = RouteProp<{
   member: {
     clanId: number;
-    clanDetails: Tables<'clans'> | undefined;
+    clanDetails: Tables<'clans'>;
   };
 }, 'member'>;
 

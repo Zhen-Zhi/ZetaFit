@@ -9,10 +9,10 @@ import { Tables } from '@/src/database.types';
 type MemberScreenRouteParamList = {
   member: {
       clanId: number;
-      clanDetails: Tables<'clans'> | undefined;
+      clanDetails: Tables<'clans'>;
   };
   clanDetails: {
-    clanDetails: Tables<'clans'> | undefined;
+    clanDetails: Tables<'clans'>;
   }
   clanActivityLog: undefined; // this is only the route
 };
@@ -20,7 +20,7 @@ type MemberScreenRouteParamList = {
 type TabLayoutProps = {
   haveClan: boolean;
   clanId: number;
-  clanDetails: Tables<'clans'> | undefined;
+  clanDetails: Tables<'clans'>;
 }
 
 const Tab = createMaterialTopTabNavigator<MemberScreenRouteParamList>();
