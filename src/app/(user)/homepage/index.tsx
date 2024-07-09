@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, ImageBackground, Modal, FlatList, ActivityIndicator, } from 'react-native'
+import { StyleSheet, Text, View, Image, ImageBackground, Modal, FlatList, ActivityIndicator, Platform } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import * as Progress from 'react-native-progress';
@@ -17,7 +17,7 @@ import * as NavigationBar from 'expo-navigation-bar';
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
 const HomeScreen = () => {
-  NavigationBar.setVisibilityAsync("hidden");
+  Platform.OS == 'android' && NavigationBar.setVisibilityAsync("hidden");
   const { session, loading } = useAuth();
   if(!session) {
     return <Redirect href={'/sign_in'} />
@@ -40,7 +40,7 @@ const HomeScreen = () => {
     return unsubscribe;
   }, [navigation]);
 
-  if (loading && isLoading) {
+  if (loading || isLoading || !user) {
     return (
       <ImageBackground
         source={require('@asset/images/background_image.png')} 

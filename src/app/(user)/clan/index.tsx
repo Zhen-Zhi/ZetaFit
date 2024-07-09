@@ -9,6 +9,7 @@ import { themeColors } from '@/src/constants/Colors';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useClanList } from '@/src/api/clan';
 import { fullHeight } from '@/src/constants/heigth';
+import ClanLoadingScreenComponent from '@/src/components/ClanLoadingScreen';
 
 type Clan = {
   clanName: string;
@@ -22,11 +23,10 @@ const ClanScreen = () => {
   const [searchValue, setSearchValue] = useState('')
 
   const { data: clanListData, error, isLoading, refetch } = useClanList('%' + searchValue + '%');
-  useEffect(() => {refetch()}, [])
 
-  if (isLoading) {
-    return <ActivityIndicator />
-  }
+  // if (isLoading) {
+  //   return <ClanLoadingScreenComponent />
+  // }
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
@@ -79,14 +79,25 @@ const ClanScreen = () => {
             </View>
 
             {/* Clan list */}
-            <FlatList
-              className='mx-4 mt-2 mb-20'
-              data={clanListData}
-              keyExtractor={(item) => item.clan_id.toString()}
-              renderItem={({ item }) => <ClanList clan={item} />}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ gap: 3 }}
-            />
+            {
+              isLoading
+              ?
+              <View className='bg-white/50 mx-4 mt-2 mb-20'>
+                <ActivityIndicator 
+                  size={80}
+                  color={themeColors.secondary}
+                />
+              </View>
+              :
+              <FlatList
+                className='mx-4 mt-2 mb-20'
+                data={clanListData}
+                keyExtractor={(item) => item.clan_id.toString()}
+                renderItem={({ item }) => <ClanList clan={item} />}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ gap: 3 }}
+              />
+            }
           </View>
 
           <Modal

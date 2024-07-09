@@ -25,11 +25,16 @@ const ClanList = ({ clan }: ClanListProps) => {
   } = useClanActiveScore(clan.clan_id);
 
   if (membersNumberLoading && clanActiveScoreLoading) {
-    return <ActivityIndicator />
+    return (
+      <View
+        className='border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 bg-white'
+      >
+        <ActivityIndicator className='my-4' size={30} color={themeColors.secondary} />
+      </View>
+    )
   }
 
   return (
-    // <Link href={`/clan/clan_details/${clan.clan_id}`} asChild>
     <AnimatedPressable 
       className='border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 bg-white'
       pressInValue={0.98}
@@ -67,7 +72,6 @@ const ClanList = ({ clan }: ClanListProps) => {
       </View>
       
     </AnimatedPressable>
-    // </Link>
   )
 }
 

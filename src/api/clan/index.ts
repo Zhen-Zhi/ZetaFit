@@ -4,8 +4,8 @@ import { supabase } from "@/src/lib/supabase"
 export const useClanList = (searchValue: string) => {
   return (
     useQuery({
+      refetchOnMount: false,
       queryKey: ['clans'],
-      enabled: false,
       queryFn: async () => {
         if(searchValue.length > 2) {
           const { data: clan, error } = await supabase
@@ -79,7 +79,7 @@ export const useClanMembers = (clan_id: number) => {
 export const useClanDetails = (clan_id: number) => {
   return (
     useQuery({
-      queryKey: ['clan', clan_id],
+      queryKey: ['clans', clan_id],
       queryFn: async () => {
         const { data: clanDetail, error } = await supabase
           .from('clans')
@@ -165,7 +165,7 @@ export const useDeleteClan = () => {
 
       },
       async onSuccess() {
-        await queryClient.invalidateQueries({ queryKey: ['clana_active_score'] })
+        await queryClient.invalidateQueries({ queryKey: ['clans'] })
       }
     })
   )
@@ -234,11 +234,63 @@ export const useClanRankings = () => {
           // supabase does not support rank()
 
         if (error) {
-          console.log("error in rank::  " + error.message)
           throw new Error(error.code + ":" + error.message)
         }
 
         return useClanRankings
+      }
+    })
+  )
+}
+
+export const useJoinClan = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (data: any) => {
+        const { data: joinClan, error } = await supabase
+        .from('clan_members')
+        .insert({
+          clan_id: data.clanId,
+          user_id: data.userId,
+        })
+        .select()
+        .single()
+
+        if (error) {
+          console.log("error in rank::  " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return joinClan
+      },
+      onSuccess: async (_, { clan_id }) => {
+        await queryClient.invalidateQueries({ queryKey: ['clan_members', clan_id] })
+      },
+    })
+  )
+}
+
+export const useLeaveClan = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (clan_member_id: number) => {
+        const { error } = await supabase
+          .from('clan_members')
+          .delete()
+          .eq('id', clan_member_id);
+
+        if (error) {
+          console.log("error in leave clan::  " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+      },
+      async onSuccess() {
+        await queryClient.invalidateQueries({ queryKey: ['clan_members'] })
       }
     })
   )
