@@ -50,7 +50,12 @@ const AddClanHealthModal = ({ onClose, clanHealth, clanId }: AddClanHeatlhModalP
 
 
     updateClanHealth(
-      { clanId , clanHealth },
+      { 
+        clanId: clanId, 
+        updatedFields: {
+          clan_health: clanHealth
+        }
+      }, 
       {
         onSuccess() {
           updateCoin(
@@ -65,7 +70,12 @@ const AddClanHealthModal = ({ onClose, clanHealth, clanId }: AddClanHeatlhModalP
                 console.log(error.message)
                 clanHealth -= 500
                 updateClanHealth(
-                  { clanId , clanHealth }, 
+                  { 
+                    clanId: clanId, 
+                    updatedFields: {
+                      clan_health: clanHealth
+                    }
+                  }, 
                   {
                     onSuccess() {
                       onClose();

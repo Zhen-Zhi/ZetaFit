@@ -47,23 +47,23 @@ const ClanList = ({ clan }: ClanListProps) => {
         />
         <View className='flex-1 flex-col ml-3'>
           <Text style={{ color: themeColors.primary }} numberOfLines={1} className='font-bold text-xl mb-1'>{clan.clan_name}</Text>
-          <View className='flex-row justify-between w-9/12'>
+          <View className='flex-row justify-around w-11/12'>
             <View className='flex-row'>
               <View className='m-auto mr-1'>
                 <FontAwesome6 name="user-group" size={18} color="rgba(9, 65, 240, 0.8)" />
               </View>
-              <View className='bg-slate-200 px-2 rounded-lg'>
-                {/* <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>{clanMembersData?.numberOfMember}/{clan.max_member}</Text> */}
-                <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>{clanMembersNumber?.count}/{clan.max_member}</Text>
+              <View className='bg-slate-200 px-2 rounded-lg w-[70]'>
+                {/* <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>99/99</Text> */}
+                <Text style={{ color: themeColors.primary }} className='text-center text-lg font-semibold'>{clanMembersNumber?.count ?? 0}/{clan.max_member}</Text>
               </View>
             </View>
             <View className='flex-row'>
               <View className='m-auto mr-1'>
                 <FontAwesome6 name="fire" size={24} color="rgba(240, 93, 9, 0.8)" />
               </View>
-              <View className='bg-slate-200 px-2 rounded-lg'>
+              <View className='bg-slate-200 px-2 rounded-lg w-7/12'>
                 {/* <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>9999</Text> */}
-                <Text style={{ color: themeColors.primary }} className='text-lg font-semibold'>{clanActiveScore}</Text>
+                <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>{clanActiveScore ?? 0}</Text>
               </View>
             </View>
           </View>

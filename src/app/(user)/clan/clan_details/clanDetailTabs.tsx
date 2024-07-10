@@ -13,6 +13,7 @@ type MemberScreenRouteParamList = {
   };
   clanDetails: {
     clanDetails: Tables<'clans'>;
+    haveClan: boolean;
   }
   clanActivityLog: undefined; // this is only the route
 };
@@ -53,7 +54,7 @@ const TabLayout = ({ haveClan, clanId, clanDetails }: TabLayoutProps) => {
       }}
     >
       <Tab.Screen name="member" component={MemberScreen} initialParams={{ clanId: clanId, clanDetails: clanDetails }} options={{ tabBarLabel: 'Members' }} />
-      <Tab.Screen name="clanDetails" component={ClanDetailsScreen} initialParams={{ clanDetails: clanDetails }} options={{ tabBarLabel: 'Details' }} />
+      <Tab.Screen name="clanDetails" component={ClanDetailsScreen} initialParams={{ clanDetails: clanDetails, haveClan: haveClan }} options={{ tabBarLabel: 'Details' }} />
     </Tab.Navigator>
   );
 }

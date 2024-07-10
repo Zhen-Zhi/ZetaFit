@@ -87,7 +87,10 @@ const ClanDetailsScreen = () => {
       }
 
       joinClan(
-        { userId, clanId },
+        {
+          clanId: clanId,
+          newMember: { clan_id: clanId, user_id: userId, }
+        },
         {
           onSuccess() {
             setHaveClan(true);
@@ -109,9 +112,15 @@ const ClanDetailsScreen = () => {
       return
     }
 
-    leaveClan(userDataInClan.id);
-    setModalVisible(false);
-    router.navigate('/clan')
+    leaveClan(
+      { clanId: userDataInClan.clan_id, clanMemberId: userDataInClan.id },
+      {
+        onSuccess() {
+          setModalVisible(false);
+          router.navigate('/clan')
+        }
+      }
+    ); 
   }
 
   return (

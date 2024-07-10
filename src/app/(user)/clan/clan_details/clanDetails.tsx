@@ -14,6 +14,7 @@ import { useClanActiveScore, useClanRankings } from '@/src/api/clan';
 type ClanDetailsScreenRouteProp = RouteProp<{
   clanDetails: {
     clanDetails: Tables<'clans'>;
+    haveClan: boolean;
   };
 }, 'clanDetails'>;
 
@@ -22,7 +23,7 @@ type ClanDetailsScreenProps = {
 };
 
 const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
-  const { clanDetails } = route.params;
+  const { clanDetails, haveClan: isHaveClan } = route.params;
 
   const {
     data: clanActiveScore,
@@ -40,7 +41,7 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
 
   const [editModalVisible, setEditModalVisible] = useState(false)
   const [healthModalVisible, setHealthModalVisible] = useState(false)
-  const [haveClan, setHaveClan] = useState(true)
+  const [haveClan, setHaveClan] = useState(isHaveClan)
   const [amount, setAmount] = useState(clanDetails.required_active_score);
 
   const increment = () => {
@@ -58,7 +59,7 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
         <View className='my-auto mx-3'>
           <FontAwesome6 name="fire" size={48} color="rgba(240, 93, 9, 0.8)" />
         </View>
-        <Text style={{ color: themeColors.primary }} className='text-[48px] font-bold text-center rounded-2xl'>{clanActiveScore}</Text>
+        <Text style={{ color: themeColors.primary }} className='text-[48px] font-bold text-center rounded-2xl'>{clanActiveScore ?? 0}</Text>
       </View>
 
       <Text style={{ color: themeColors.primary }} className='text-xl font-extrabold text-center'>Clan War History</Text>

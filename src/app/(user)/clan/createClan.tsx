@@ -70,7 +70,12 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
     const newUserCoin = user?.coin - 2000;
 
     createClan(
-      { clanName, requiredActiveScore, clanDescription, userId },
+      { 
+        founder_id: userId,
+        clan_name: clanName,
+        required_active_score: requiredActiveScore,
+        clan_description: clanDescription
+      },
       {
         onSuccess(createdClan) {
           updateCoin(

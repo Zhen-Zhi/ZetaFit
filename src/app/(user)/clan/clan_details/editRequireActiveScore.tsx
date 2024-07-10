@@ -21,7 +21,11 @@ const EditRequireActiveScoreModal = ({ onClose, increment, decrement, amount: re
   const handleUpdateRequiredActiveScore = async () => {
     setIsLoading(true)
     updateRequiredActiveScore(
-      { clanId , requiredActiveScore },
+      { clanId: clanId, 
+        updatedFields: { 
+          required_active_score: requiredActiveScore 
+        }
+      },
       {
         onSuccess() {
           console.log("Inside success")
