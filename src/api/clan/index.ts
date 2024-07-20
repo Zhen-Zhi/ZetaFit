@@ -37,15 +37,15 @@ export const useClanList = (searchValue: string) => {
   )
 }
 
-export const useClanMemberNumber = (clan_id: number) => {
+export const useClanMemberNumber = (clanId: number) => {
   return (
     useQuery({
-      queryKey: ['clan_member_number', clan_id],
+      queryKey: ['clan_member_number', clanId],
       queryFn: async () => {
         const { data: clanMembersNumber, error } = await supabase
           .from('clan_members')
           .select('user_id.count()')
-          .eq('clan_id', clan_id)
+          .eq('clan_id', clanId)
           .single()
         
         if (error) {
@@ -58,15 +58,15 @@ export const useClanMemberNumber = (clan_id: number) => {
   )
 }
 
-export const useClanMembers = (clan_id: number) => {
+export const useClanMembers = (clanId: number) => {
   return (
     useQuery({
-      queryKey: ['clan_members', clan_id],
+      queryKey: ['clan_members', clanId],
       queryFn: async () => {
         const { data: clanMembers, error } = await supabase
           .from('clan_members')
           .select('*, users(*)')
-          .eq('clan_id', clan_id)
+          .eq('clan_id', clanId)
         
         if (error) {
           throw new Error(error.code + ":" + error.message)
@@ -78,15 +78,15 @@ export const useClanMembers = (clan_id: number) => {
   )
 }
 
-export const useClanDetails = (clan_id: number) => {
+export const useClanDetails = (clanId: number) => {
   return (
     useQuery({
-      queryKey: ['clans', clan_id],
+      queryKey: ['clans', clanId],
       queryFn: async () => {
         const { data: clanDetail, error } = await supabase
           .from('clans')
           .select('*')
-          .eq('clan_id', clan_id)
+          .eq('clan_id', clanId)
           .single()
         
         if (error) {
@@ -99,13 +99,13 @@ export const useClanDetails = (clan_id: number) => {
   )
 }
 
-export const useClanActiveScore = (clan_id: number) => {
+export const useClanActiveScore = (clanId: number) => {
   return (
     useQuery({
-      queryKey: ['clan_active_score', clan_id],
+      queryKey: ['clan_active_score', clanId],
       queryFn: async () => {
         const { data: clanActiveScore, error } = await supabase
-          .rpc('get_total_active_score', { clan_id: clan_id })
+          .rpc('get_total_active_score', { clan_id: clanId })
           // need to use predefine function in database because
           // supabase does not support group by
 
@@ -127,11 +127,12 @@ export const useCreateNewClan = () => {
       mutationFn: async (newClanDetails: InsertTables<'clans'>) => {
         const { data: newClan, error } = await supabase
           .from('clans')
-          .insert({ ...newClanDetails, })
+          .insert({ ...newClanDetails })
           .select()
           .single()
 
         if (error) {
+          console.log(error.message)
           throw new Error(error.code + ":" + error.message)
         }
 
@@ -149,11 +150,11 @@ export const useDeleteClan = () => {
 
   return (
     useMutation({
-      mutationFn: async (clan_id: number) => {
+      mutationFn: async (clanId: number) => {
         const { error } = await supabase
           .from('clans')
           .delete()
-          .eq('clan_id', clan_id);
+          .eq('clan_id', clanId);
 
         if (error) {
           throw new Error(error.code + ":" + error.message)
@@ -256,11 +257,13 @@ export const useJoinClan = () => {
       mutationFn: async ({
         clanId,
         newMember,
+        userId
       } : {
         clanId: number,
-        newMember: InsertTables<'clan_members'>
+        newMember: InsertTables<'clan_members'>,
+        userId: string
       }) => {
-        const { data: joinClan, error } = await supabase
+        const { data: joinedMember, error } = await supabase
           .from('clan_members')
           .insert({...newMember})
           .select()
@@ -270,12 +273,16 @@ export const useJoinClan = () => {
           console.log("error in join::  " + error.message)
           throw new Error(error.code + ":" + error.message)
         }
+
+        return joinedMember
       },
-      onSuccess: async (_, { clanId }) => {
-        await queryClient.invalidateQueries({ queryKey: ['clan_members'] })
+      onSuccess: async (_, { clanId, userId }) => {
+        await queryClient.invalidateQueries({ queryKey: ['clan_members', clanId] })
         await queryClient.invalidateQueries({ queryKey: ['clan_member_number', clanId] })
-        await queryClient.invalidateQueries({ queryKey: ['clan_active_score'] })
+        await queryClient.invalidateQueries({ queryKey: ['clan_active_score', clanId] })
         await queryClient.invalidateQueries({ queryKey: ['clan_rankings'] })
+        await queryClient.invalidateQueries({ queryKey: ['user_clan_member_data'] })
+        await queryClient.invalidateQueries({ queryKey: ['users'] })
       },
     })
   )
@@ -289,11 +296,13 @@ export const useLeaveClan = () => {
       mutationFn: async ({
         clanId,
         clanMemberId,
+        userId
       } : {
         clanId: number,
         clanMemberId: number,
+        userId: string
       }) => {
-        const { data: deletedMember, error } = await supabase
+        const { data: leavedMember, error } = await supabase
           .from('clan_members')
           .delete()
           .eq('id', clanMemberId)
@@ -305,13 +314,127 @@ export const useLeaveClan = () => {
           throw new Error(error.code + ":" + error.message)
         }
 
-        return clanId
+        return leavedMember
+      },
+      onSuccess: async (_, { clanId, userId }) => {
+        await queryClient.invalidateQueries({ queryKey: ['clan_members', clanId] })
+        await queryClient.invalidateQueries({ queryKey: ['clan_member_number', clanId] })
+        await queryClient.invalidateQueries({ queryKey: ['clan_active_score', clanId] })
+        await queryClient.invalidateQueries({ queryKey: ['clan_rankings'] })
+        await queryClient.invalidateQueries({ queryKey: ['user_clan_member_data', userId] })
+        await queryClient.invalidateQueries({ queryKey: ['users'] })
+      },
+    })
+  )
+}
+
+export const useEditClanMemberRole = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async ({
+        clanId,
+        clanMemberId,
+        role
+      } : {
+        clanId: number
+        clanMemberId: number,
+        role: string
+      }) => {
+        const { data: newRole, error } = await supabase
+          .from('clan_members')
+          .update({
+            role: role
+          })
+          .eq('id', clanMemberId)
+
+        if (error) {
+          console.log("error in update role::  " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return newRole
       },
       onSuccess: async (_, { clanId }) => {
-        await queryClient.invalidateQueries({ queryKey: ['clan_members'] })
-        await queryClient.invalidateQueries({ queryKey: ['clan_member_number', clanId] })
-        await queryClient.invalidateQueries({ queryKey: ['clan_active_score'] })
-        await queryClient.invalidateQueries({ queryKey: ['clan_rankings'] })
+        await queryClient.invalidateQueries({ queryKey: ['clan_members', clanId] })
+      },
+    })
+  )
+}
+
+export const useInsertClanLog = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (clanLog: InsertTables<'clan_activity_log'>) => {
+        const { data: joinedMember, error } = await supabase
+          .from('clan_activity_log')
+          .insert({ ...clanLog, })
+          .select()
+          .single()
+
+        if (error) {
+          console.log("error in join::  " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return joinedMember
+      },
+      onSuccess: async (_, { clan_id }) => {
+        await queryClient.invalidateQueries({ queryKey: ['clan_activity_log', clan_id] })
+      },
+    })
+  )
+}
+
+export const useClanActivityLog = (clanId: number) => {
+  return (
+    useQuery({
+      queryKey: ['clan_activity_log', clanId],
+      queryFn: async () => {
+        const { data: clanActivityLog, error } = await supabase
+          .from('clan_activity_log')
+          .select('*, users(*)')
+          .eq('clan_id', clanId)
+
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return clanActivityLog
+      }
+    })
+  )
+}
+
+export const useUpdateBattleStatus = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async ({
+        clanId,
+        updateBattleStatus,
+      }: {
+        clanId: number,
+        updateBattleStatus: UpdateTables<'clans'>
+      }) => {
+        const { data: newRole, error } = await supabase
+          .from('clans')
+          .update(updateBattleStatus)
+          .eq('clan_id', clanId)
+
+        if (error) {
+          console.log("error in update role::  " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return newRole
+      },
+      onSuccess: async (_, { clanId }) => {
+        await queryClient.invalidateQueries({ queryKey: ['clans', clanId] })
       },
     })
   )

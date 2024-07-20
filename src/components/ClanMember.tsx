@@ -1,23 +1,196 @@
 import { StyleSheet, Text, View, Image, Modal, ImageBackground } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AnimatedPressable from './AnimatedPressable'
 import { FontAwesome6 } from '@expo/vector-icons'
 import AnimatedModal from './AnimatedModal'
-import { router, useLocalSearchParams } from 'expo-router'
+import { Redirect, router, useLocalSearchParams } from 'expo-router'
 import { themeColors } from '../constants/Colors'
 import ProfileScreen from '../app/(user)/homepage/profile/profileModal'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { Tables } from '../database.types'
 import { useAuth } from '../providers/AuthProvider'
+import { useEditClanMemberRole, useLeaveClan } from '../api/clan'
+import ClanLoadingScreenComponent from './ClanLoadingScreen'
 
 type ClanMemberProps = {
   member: { users: Tables<'users'> | null } &Tables<'clan_members'> | null;
+  role: string | null | undefined;
+  clanMemberViewerId: number | undefined;
 }
 
-const ClanMember = ({ member }: ClanMemberProps) => {
+const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
   const { session } = useAuth()
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
+  if(!member) {
+    console.log("Clan member not found. debug in '/components/ClanMember.tsx'")
+    return <ClanLoadingScreenComponent />
+  }
+
   const [modalVisible, setModalVisible] = useState(false)
   const [profileModalVisible, setProfileModalVisible] = useState(false)
+  const [highLevelMember, setHighLevelMember] = useState(0);
+  const [allowPromoteAndKick, setAllowPromoteAndKick] = useState(false);
+  const [allowDemote, setAllowDemote] = useState(false);
+  // 1 = member, 2 = Co-Leader, 3 = Leader, 0 = guest
+
+  const { mutate: editMemberRole } = useEditClanMemberRole()
+  const { mutate: kickMember } = useLeaveClan()
+
+  const checkRoleForPromote = () => {
+    if(member.user_id == session.user.id) {
+      return false
+    }
+    switch(member.role) {
+      case "Leader":
+        return false
+      case "Co-Leader": 
+        return highLevelMember > 2
+      default:
+        return highLevelMember > 1
+    }
+  }
+
+  const checkRoleForDemote = () => {
+    if(member.user_id == session.user.id && member.role != "Leader" && member.role != "Member") {
+      return true
+    }
+    switch(member.role) {
+      case "Leader":
+        return false
+      case "Co-Leader": 
+        return highLevelMember > 2
+      default:
+        return false
+    }
+  }
+
+  const handlePromote = () => {
+    console.log("In promote")
+    if(!clanMemberViewerId) {
+      console.log("You are not authorized!")
+      return
+    }
+
+    const clanId = member.clan_id;
+    const clanMemberId = member.id;
+
+    if(member.role == "Member") {       // promote
+      editMemberRole(    
+        { clanId, clanMemberId, role: "Co-Leader" }, 
+        {
+          onSuccess() {
+            console.log("Promote member success");
+            setModalVisible(false);
+          },
+          onError() {
+            console.log("Promote error")
+          }
+        }
+      )
+    }
+    else if(member.role == "Co-Leader") {       // promote co-leader to leader
+      const clanMemberLeaderId = clanMemberViewerId;
+      editMemberRole(
+        { clanId, clanMemberId, role: "Leader" }, 
+        {
+          onSuccess() {
+            console.log("Promote Co-Leader to leader success");
+            editMemberRole(
+              { clanId, clanMemberId: clanMemberLeaderId, role: "Co-Leader" },
+              {
+                onSuccess() {
+                  console.log("Demote leader to co leader success");
+                },
+                onError() {
+                  editMemberRole(
+                    { clanId, clanMemberId, role: "Co-Leader" },
+                    {
+                      onSuccess() {
+                        console.log("Demote back to co leader success");
+                      }
+                    }
+                  )
+                }
+              }
+            )
+          },
+          onError() {
+            console.log("Promote co leader error")
+          }
+        }
+      )
+    }
+  }
+
+  const handleDemote = () => {
+    if(!clanMemberViewerId) {
+      console.log("You are not authorized!")
+      return
+    }
+
+    const clanId = member.clan_id;
+    const clanMemberId = member.id;
+
+    if(member.role == "Co-Leader") {
+      editMemberRole(    
+        { clanId, clanMemberId, role: "Member" }, 
+        {
+          onSuccess() {
+            console.log("Demote member success");
+            setModalVisible(false);
+          },
+          onError() {
+            console.log("Demote error")
+          }
+        }
+      )
+    }
+  }
+
+  const handleKickMember = () => {
+    if(!clanMemberViewerId) {
+      console.log("You are not authorized!")
+      return
+    }
+
+    const clanId = member.clan_id;
+    const clanMemberId = member.id;
+    const kickedUserId = member.user_id;
+
+    kickMember(    
+      { clanId, clanMemberId, userId: kickedUserId }, 
+      {
+        onSuccess() {
+          console.log("Kick member success");
+          setModalVisible(false);
+        },
+        onError() {
+          console.log("Kick error")
+        }
+      }
+    )
+  }
+
+  useEffect(() => {
+    if(role == 'Leader') {
+      setHighLevelMember(3);
+    }
+    else if(role == 'Co-Leader') {
+      setHighLevelMember(2);
+    }
+    else if(role == 'Member') {
+      setHighLevelMember(1)
+    }
+    else {
+      setHighLevelMember(0);
+    }
+
+    setAllowPromoteAndKick(checkRoleForPromote);
+    setAllowDemote(checkRoleForDemote)
+  }, [handleDemote, handlePromote])
 
   return (
     <View>
@@ -76,8 +249,8 @@ const ClanMember = ({ member }: ClanMemberProps) => {
             />
             <View className='flex-1 flex-row justify-between'>
               <View className='flex-col ml-4 my-auto'>
-                <Text className='text-lg font-bold'>{member?.users?.username}</Text>
-                <Text className='font-semibold text-slate-600'>{member?.role}</Text>
+                <Text className='text-lg font-bold'>{member.users?.username}</Text>
+                <Text className='font-semibold text-slate-600'>{member.role}</Text>
               </View>
             </View>
           </View>
@@ -95,21 +268,28 @@ const ClanMember = ({ member }: ClanMemberProps) => {
               <AnimatedPressable
                 className='p-1 rounded-lg border border-slate-500 my-1 flex-1 mr-1 bg-white'
                 pressInValue={0.95}
-                >
-                <Text style={{ color: themeColors.secondary }} className='text-lg text-center font-bold text-white'>Promote</Text>
+                disabled={!allowPromoteAndKick}
+                onPress={handlePromote}
+              >
+                <Text style={{ color: allowPromoteAndKick ? themeColors.secondary : themeColors.disabled }} className='text-lg text-center font-bold text-white'>Promote</Text>
               </AnimatedPressable>
+
               <AnimatedPressable
                 className='p-1 rounded-lg border border-slate-500 my-1 flex-1 ml-1 bg-white'
                 pressInValue={0.95}
-                >
-                <Text style={{ color: themeColors.danger }} className='text-lg text-center font-bold text-white'>Demote</Text>
+                disabled={!allowDemote}
+                onPress={handleDemote}
+              >
+                <Text style={{ color: allowDemote ? themeColors.danger : themeColors.disabled }} className='text-lg text-center font-bold text-white'>Demote</Text>
               </AnimatedPressable>
             </View>
 
             <AnimatedPressable
-              style={{ backgroundColor: themeColors.danger }}
+              style={{ backgroundColor: allowPromoteAndKick ? themeColors.danger : themeColors.disabled }}
               className='p-1.5 rounded-lg mt-2'
               pressInValue={0.95}
+              disabled={!allowPromoteAndKick}
+              onPress={handleKickMember}
             >
               <Text className='text-lg text-center font-bold text-white'>Kick</Text>
             </AnimatedPressable>

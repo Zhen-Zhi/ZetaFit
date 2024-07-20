@@ -3,7 +3,6 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import MemberScreen from './clanMemberList';
 import ClanDetailsScreen from './clanDetails';
 import { themeColors } from '@/src/constants/Colors';
-import ClanActivityLogScreen from './clanActivityLog';
 import { Tables } from '@/src/database.types';
 
 type MemberScreenRouteParamList = {
@@ -13,26 +12,25 @@ type MemberScreenRouteParamList = {
   };
   clanDetails: {
     clanDetails: Tables<'clans'>;
-    haveClan: boolean;
   }
   clanActivityLog: undefined; // this is only the route
 };
 
 type TabLayoutProps = {
-  haveClan: boolean;
+  isClanMember: boolean;
   clanId: number;
   clanDetails: Tables<'clans'>;
 }
 
 const Tab = createMaterialTopTabNavigator<MemberScreenRouteParamList>();
 
-const TabLayout = ({ haveClan, clanId, clanDetails }: TabLayoutProps) => {
-  const [currentTab, setCurrentTab] = useState(haveClan ? 'clanActivityLog' : 'member');
+const TabLayout = ({ isClanMember, clanId, clanDetails }: TabLayoutProps) => {
+  const [currentTab, setCurrentTab] = useState(isClanMember ? 'clanActivityLog' : 'member');
   
   useEffect(() => {
     // Update the current tab based on the haveClan prop
-    setCurrentTab(haveClan ? 'clanActivityLog' : 'member');
-  }, [haveClan]);
+    setCurrentTab(isClanMember ? 'clanActivityLog' : 'member');
+  }, [isClanMember]);
   
   return (
     <Tab.Navigator
@@ -54,7 +52,7 @@ const TabLayout = ({ haveClan, clanId, clanDetails }: TabLayoutProps) => {
       }}
     >
       <Tab.Screen name="member" component={MemberScreen} initialParams={{ clanId: clanId, clanDetails: clanDetails }} options={{ tabBarLabel: 'Members' }} />
-      <Tab.Screen name="clanDetails" component={ClanDetailsScreen} initialParams={{ clanDetails: clanDetails, haveClan: haveClan }} options={{ tabBarLabel: 'Details' }} />
+      <Tab.Screen name="clanDetails" component={ClanDetailsScreen} initialParams={{ clanDetails: clanDetails }} options={{ tabBarLabel: 'Details' }} />
     </Tab.Navigator>
   );
 }

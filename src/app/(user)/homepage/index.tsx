@@ -10,7 +10,7 @@ import { Redirect, router, useNavigation } from 'expo-router';
 import { themeColors } from '@/src/constants/Colors';
 import AddActivityScreenModal from '@/src/components/AddActivity';
 import EnterUsernameModal from '../../(auth)/username';
-import { useUserData } from '@/src/api/users';
+import { useUserClanMemberData, useUserClanName, useUserData } from '@/src/api/users';
 import { useAuth } from '@/src/providers/AuthProvider';
 import * as NavigationBar from 'expo-navigation-bar';
 
@@ -24,6 +24,12 @@ const HomeScreen = () => {
   }
 
   const { data: user, error, isLoading } = useUserData(session?.user.id)
+
+  const {
+    data: clanData,
+    error: clanError,
+    isLoading: clanIsLoading
+  } = useUserClanName(user?.clan_id, session.user.id)
 
   const [modalVisible, setModalVisible] = useState(false);
   const [addActivityModalVisible, setAddActivityModalVisible] = useState(false);
@@ -155,7 +161,7 @@ const HomeScreen = () => {
             className='w-12 h-14 mx-2'
             source={require('@asset/images/clan_logo/clan_logo_3.png')} 
           />
-          <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{user?.clan_id ?? 'No Clan'}</Text>
+          <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{clanData?.clan_name ?? 'No Clan'}</Text>
         </AnimatedPressable>
         
         {/* More functions list */}

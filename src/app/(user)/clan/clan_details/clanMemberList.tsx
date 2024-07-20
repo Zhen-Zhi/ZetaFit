@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import ClanMember from '@/src/components/ClanMember'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { FontAwesome6 } from '@expo/vector-icons'
@@ -7,6 +7,10 @@ import { themeColors } from '@/src/constants/Colors'
 import { Tables } from '@/src/database.types'
 import { RouteProp } from '@react-navigation/native';
 import { useClanMemberNumber, useClanMembers } from '@/src/api/clan'
+import { Redirect } from 'expo-router'
+import { useAuth } from '@/src/providers/AuthProvider'
+import ClanLoadingScreenComponent from '@/src/components/ClanLoadingScreen'
+import { useUserClanMemberData } from '@/src/api/users'
 
 type MemberScreenRouteProp = RouteProp<{
   member: {
@@ -21,6 +25,12 @@ type MemberScreenProps = {
 
 const MemberScreen = ({ route }: MemberScreenProps) => {
   const { clanDetails, clanId } = route.params;
+  const { session } = useAuth();
+
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
   const {
     data: clanMembers,
     isLoading: clanMembersLoading,
@@ -32,6 +42,24 @@ const MemberScreen = ({ route }: MemberScreenProps) => {
     isLoading: clanMembersNumberLoading,
     error: clanMembersNumberError,
   } = useClanMemberNumber(clanId)
+
+  const {
+    data: userClanMemberData,
+    isLoading: userClanMemberDataLoading,
+    error: userClanMemberDataError,
+  } = useUserClanMemberData(clanId, session?.user.id)
+
+  const [isMember, setIsMember] = useState(false)
+  useEffect(() => {
+    if (clanMembers?.some(member => member.user_id === session.user.id)) {
+      setIsMember(true);
+    }
+  },[clanMembers])
+
+  if(!clanMembers) {
+    console.log("Clan members not found. debug in '/clan/clan_detials/clanMemberList.tsx'")
+    return <ClanLoadingScreenComponent />
+  }
 
   const headerComponent = (
     <View className='bg-white flex-row'>
@@ -51,7 +79,7 @@ const MemberScreen = ({ route }: MemberScreenProps) => {
       <FlatList
         className='mt-1 mb-2 mx-0.5'
         data={clanMembers}
-        renderItem={({ item }) => <ClanMember member={item} />}
+        renderItem={({ item }) => <ClanMember member={item} role={userClanMemberData?.role} clanMemberViewerId={userClanMemberData?.id} />}
         keyExtractor={(item) => item.user_id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ gap: 3 }}
