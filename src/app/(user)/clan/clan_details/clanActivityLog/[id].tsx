@@ -181,9 +181,10 @@ const ClanActivityLogScreen = () => {
           className='bg-white border border-slate-500 px-2 mx-1 rounded-lg'
           pressInValue={0.95}
           onPress={handleSendMessage}
+          disabled={message == ''}
         >
           <View className='m-auto'>
-            <Ionicons name="chatbox-ellipses" size={24} color={themeColors.secondary} />
+            <Ionicons name="chatbox-ellipses" size={24} color={message == '' ? themeColors.disabled : themeColors.secondary} />
           </View>
         </AnimatedPressable>
       </View>

@@ -35,7 +35,6 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
   const { mutate: updateCoin } = useUpdateUserCoin()
   const { mutate: createClan } = useCreateNewClan()
   const { mutate: deleteClan } = useDeleteClan()
-  const { mutate: updateUserClanId } = useUpdateUserClanId()
   const { data: user, isLoading: userDataLoading, error } = useUserData(session.user.id)
 
   const increment = () => {
@@ -50,7 +49,6 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
     setIsLoading(true)
     setErrorCode(null)
     
-    console.log("User coin : " + user?.coin)
     if (!user?.coin) {
       console.error("User coin not found!!  Please debug in '@/src/app/(user)/clan/createClan.tsx'")
       return

@@ -23,7 +23,7 @@ export const useUserData = (id: string) => {
   )
 }
 
-export const useUserClanMemberData = (clanMemberId: number, userId: string) => {
+export const useUserClanMemberData = (clanId: number, userId: string) => {
   return (
     useQuery({
       queryKey: ['user_clan_member_data', userId],
@@ -31,8 +31,8 @@ export const useUserClanMemberData = (clanMemberId: number, userId: string) => {
         const { data: clanMembers, error } = await supabase
           .from('clan_members')
           .select('*, users(*)')
-          // .eq('user_id', userId)
-          .eq('id', clanMemberId)
+          .eq('user_id', userId)
+          .eq('clan_id', clanId)
           .single()
         
         if (error) {
@@ -45,19 +45,19 @@ export const useUserClanMemberData = (clanMemberId: number, userId: string) => {
   )
 }
 
-export const useUserClanName= (clanMemberId: number | null | undefined, userId: string) => {
+export const useUserClanName= (clanId: number | null | undefined, userId: string) => {
   return (
     useQuery({
       queryKey: ['user_clan', userId],
       queryFn: async () => {
-        if (clanMemberId == null || clanMemberId == undefined) {
+        if (clanId == null || clanId == undefined) {
           return null
         }
 
         const { data: clanMembers, error } = await supabase
-          .from('clan_members')
-          .select('clan_id, clans(clan_name)')
-          .eq('id', clanMemberId)
+          .from('clans')
+          .select('*')
+          .eq('clan_id', clanId)
           .single()
         
         if (error) {
@@ -66,7 +66,7 @@ export const useUserClanName= (clanMemberId: number | null | undefined, userId: 
 
         return clanMembers
       },
-      enabled: !!clanMemberId,
+      enabled: !!clanId,
     })
   )
 }
@@ -139,7 +139,7 @@ export const useUpdateUserClanId = () => {
         const { data: updatedUserData, error } = await supabase
           .from('users')
           .update({
-            clan_member_id: clanId
+            clan_id: clanId
           })
           .eq('id', userId)
           .single()

@@ -29,7 +29,7 @@ const HomeScreen = () => {
     data: clanData,
     error: clanError,
     isLoading: clanIsLoading
-  } = useUserClanName(user?.clan_member_id, session.user.id)
+  } = useUserClanName(user?.clan_id, session.user.id)
 
   const [modalVisible, setModalVisible] = useState(false);
   const [addActivityModalVisible, setAddActivityModalVisible] = useState(false);
@@ -46,7 +46,7 @@ const HomeScreen = () => {
     return unsubscribe;
   }, [navigation]);
 
-  if (loading || isLoading || !user) {
+  if (loading || isLoading || clanIsLoading || !user) {
     return (
       <ImageBackground
         source={require('@asset/images/background_image.png')} 
@@ -161,7 +161,7 @@ const HomeScreen = () => {
             className='w-12 h-14 mx-2'
             source={require('@asset/images/clan_logo/clan_logo_3.png')} 
           />
-          <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{clanData?.clans?.clan_name ?? 'No Clan'}</Text>
+          <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{clanData?.clan_name ?? 'No Clan'}</Text>
         </AnimatedPressable>
         
         {/* More functions list */}

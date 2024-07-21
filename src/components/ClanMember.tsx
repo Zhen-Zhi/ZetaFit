@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, Modal, ImageBackground } from 'react-native'
+import { StyleSheet, Text, View, Image, Modal, ImageBackground, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import AnimatedPressable from './AnimatedPressable'
 import { FontAwesome6 } from '@expo/vector-icons'
@@ -33,42 +33,15 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
   const [modalVisible, setModalVisible] = useState(false)
   const [profileModalVisible, setProfileModalVisible] = useState(false)
   const [highLevelMember, setHighLevelMember] = useState(0);
+  // 1 = member, 2 = Co-Leader, 3 = Leader, 0 = guest
   const [allowPromoteAndKick, setAllowPromoteAndKick] = useState(false);
   const [allowDemote, setAllowDemote] = useState(false);
-  // 1 = member, 2 = Co-Leader, 3 = Leader, 0 = guest
+  const [kickLoading, setKickLoading] = useState(false);
 
   const { mutate: editMemberRole } = useEditClanMemberRole()
   const { mutate: kickMember } = useLeaveClan()
   const { mutate: insertClanLog } = useInsertClanLog()
   const { mutate: updateUserClanId } = useUpdateUserClanId()
-
-  const checkRoleForPromote = () => {
-    if(member.user_id == session.user.id) {
-      return false
-    }
-    switch(member.role) {
-      case "Leader":
-        return false
-      case "Co-Leader": 
-        return highLevelMember > 2
-      default:
-        return highLevelMember > 1
-    }
-  }
-
-  const checkRoleForDemote = () => {
-    if(member.user_id == session.user.id && member.role != "Leader" && member.role != "Member") {
-      return true
-    }
-    switch(member.role) {
-      case "Leader":
-        return false
-      case "Co-Leader": 
-        return highLevelMember > 2
-      default:
-        return false
-    }
-  }
 
   const handlePromote = () => {
     console.log("In promote")
@@ -153,44 +126,6 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
     }
   }
 
-  const handleKickMember = () => {
-    if(!clanMemberViewerId) {
-      console.log("You are not authorized!")
-      return
-    }
-
-    const clanId = member.clan_id;
-    const clanMemberId = member.id;
-    const kickedUserId = member.user_id;
-
-    kickMember(    
-      { clanId, clanMemberId, userId: kickedUserId }, 
-      {
-        onSuccess() {
-          updateUserClanId(
-            { clanId, userId: kickedUserId }, 
-            {
-              onSuccess() {
-                insertClanLog(
-                  { 
-                    clan_id: clanId, 
-                    user_id: null, 
-                    message: `${member.users?.username} had been kicked` 
-                  }
-                )
-              }
-            }
-          )
-          console.log("Kick member success");
-          setModalVisible(false);
-        },
-        onError() {
-          console.log("Kick error")
-        }
-      }
-    )
-  }
-
   useEffect(() => {
     if(role == 'Leader') {
       setHighLevelMember(3);
@@ -208,6 +143,158 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
     setAllowPromoteAndKick(checkRoleForPromote);
     setAllowDemote(checkRoleForDemote)
   }, [handleDemote, handlePromote])
+
+  const checkRoleForPromote = () => {
+    if(member.user_id == session.user.id) {
+      return false
+    }
+    switch(member.role) {
+      case "Leader":
+        return false
+      case "Co-Leader": 
+        return highLevelMember > 2
+      default:
+        return highLevelMember > 1
+    }
+  }
+
+  const checkRoleForDemote = () => {
+    if(member.user_id == session.user.id && member.role != "Leader" && member.role != "Member") {
+      return true
+    }
+    switch(member.role) {
+      case "Leader":
+        return false
+      case "Co-Leader": 
+        return highLevelMember > 2
+      default:
+        return false
+    }
+  }
+
+  const handleKickMember = () => {
+    setModalVisible(false);
+    setKickLoading(true);
+  
+    if (!clanMemberViewerId) {
+      console.log("You are not authorized!");
+      setKickLoading(false);
+      return;
+    }
+  
+    const clanId = member.clan_id;
+    const clanMemberId = member.id;
+    const kickedUserId = member.user_id;
+  
+    console.log("Starting kick process");
+  
+    // Step 1: Insert the clan log message
+    insertClanLog(
+      {
+        clan_id: clanId,
+        user_id: null,
+        message: `${member.users?.username} has been kicked`
+      },
+      {
+        onSuccess() {
+          console.log("Inserted clan log successfully");
+  
+          // Step 2: Update the user's clan ID
+          updateUserClanId(
+            { userId: kickedUserId, clanId: null },
+            {
+              onSuccess() {
+                console.log("Updated user clan ID successfully");
+  
+                // Step 3: Kick the member
+                kickMember(
+                  { clanId, clanMemberId, userId: kickedUserId },
+                  {
+                    onSuccess() {
+                      console.log("Kicked member successfully");
+                      setKickLoading(false);
+                    },
+                    onError(error) {
+                      console.log("Error kicking member:", error);
+                      setKickLoading(false);
+                    }
+                  }
+                );
+              },
+              onError(error) {
+                console.log("Error updating user clan ID:", error);
+                setKickLoading(false);
+              }
+            }
+          );
+        },
+        onError(error) {
+          console.log("Error inserting clan log:", error);
+          setKickLoading(false);
+        }
+      }
+    );
+  };
+
+  // const handleKickMember = () => {
+  //   setModalVisible(false);
+  //   setKickLoading(true);
+  
+  //   if (!clanMemberViewerId) {
+  //     console.log("You are not authorized!");
+  //     setKickLoading(false);
+  //     return;
+  //   }
+  
+  //   const clanId = member.clan_id;
+  //   const clanMemberId = member.id;
+  //   const kickedUserId = member.user_id;
+  //   console.log("Kick Member: " + clanId + "  :  " +  clanMemberId + "  :  " + kickedUserId)
+  
+  //   console.log("Starting kick process");
+  
+  //   kickMember(
+  //     { clanId, clanMemberId, userId: kickedUserId },
+  //     {
+  //       onSuccess() {
+  //         console.log("Kicked member successfully");
+  //         updateUserClanId(
+  //           { userId: kickedUserId, clanId: null },
+  //           {
+  //             onSuccess() {
+  //               console.log("Updated user clan ID successfully");
+  //               insertClanLog(
+  //                 {
+  //                   clan_id: clanId,
+  //                   user_id: null,
+  //                   message: `${member.users?.username} has been kicked`
+  //                 },
+  //                 {
+  //                   onSuccess() {
+  //                     console.log("Inserted clan log successfully");
+  //                     // setKickLoading(false);
+  //                   },
+  //                   onError(error) {
+  //                     console.log("Error inserting clan log:", error);
+  //                     // setKickLoading(false);
+  //                   }
+  //                 }
+  //               );
+  //             },
+  //             onError(error) {
+  //               console.log("Error updating user clan ID:", error);
+  //               // setKickLoading(false);
+  //             }
+  //           }
+  //         );
+  //       },
+  //       onError(error) {
+  //         console.log("Error kicking member:", error);
+  //         // setKickLoading(false);
+  //       }
+  //     }
+  //   )
+  // };
 
   return (
     <View>
@@ -313,6 +400,23 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
           </View>
         </ImageBackground>
       </AnimatedModal>
+      </Modal>
+
+      <Modal
+        animationType='fade'
+        visible={kickLoading}
+        presentationStyle='overFullScreen'
+        transparent={true}
+      >
+        <AnimatedModal modalVisible={kickLoading} onClose={() => {}}>
+          <View className='p-4'>
+            <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Kick Member</Text>
+            <ActivityIndicator className='mt-8' size={64} color={themeColors.tetiary} />
+            <View className='flex-row justify-around mt-6'>
+              <Text style={{ color: themeColors.secondary }} className='font-bold text-lg'>Kicking Member ......</Text>
+            </View>
+          </View>
+        </AnimatedModal>
       </Modal>
 
       <Modal

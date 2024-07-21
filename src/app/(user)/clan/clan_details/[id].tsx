@@ -39,8 +39,6 @@ const ClanDetailsScreen = () => {
     error: clanMembersError 
   } = useClanMembers(clanId)
 
-  console.log(clanMembersError)
-
   const {
     data: userData,
     isLoading: userDataLoading,
@@ -263,7 +261,7 @@ const ClanDetailsScreen = () => {
         {/* <Link href={'/clan'} asChild> */}
           <AnimatedPressable 
             pressInValue={0.9} 
-            className='z-10 absolute left-3 bottom-2'
+            className={`z-10 absolute left-3 bottom-2 ${userData.clan_id == clanId && 'hidden'}`}
             onPress={() => router.navigate('/clan')}
           >
             <View className='p-1'>
@@ -303,11 +301,11 @@ const ClanDetailsScreen = () => {
           <Text numberOfLines={4} style={{ color: themeColors.secondary }} className='font-semibold mt-1 text-justify'>{clanDetails.clan_description}</Text>
           <View className='flex-row mt-auto justify-between'>
             <AnimatedPressable 
-              style={{ backgroundColor: isClanMember ? themeColors.danger : userData.clan_member_id != null ? themeColors.disabled : themeColors.secondary }}
+              style={{ backgroundColor: isClanMember ? themeColors.danger : userData.clan_id != null ? themeColors.disabled : themeColors.secondary }}
               className='w-[75%] rounded-xl p-2'
               pressInValue={0.95}
               onPress={() => handleCLanInOut()}
-              disabled={userData.clan_member_id != null && !isClanMember}
+              disabled={userData.clan_id != null && !isClanMember}
               >
               { isClanMember
                 ? 
@@ -361,7 +359,7 @@ const ClanDetailsScreen = () => {
         presentationStyle='overFullScreen'
         transparent={true}
       >
-        <AnimatedModal modalVisible={modalVisible} onClose={() => {}}>
+        <AnimatedModal modalVisible={leaveClanLoading} onClose={() => {}}>
           <View className='p-4'>
             <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Leave Clan</Text>
             <ActivityIndicator className='mt-8' size={64} color={themeColors.tetiary} />
@@ -379,7 +377,7 @@ const ClanDetailsScreen = () => {
         transparent={true}
         onRequestClose={() =>setInsufficientActiveScoreModalVisible(false)}
       >
-        <AnimatedModal modalVisible={modalVisible} onClose={() => setInsufficientActiveScoreModalVisible(false)}>
+        <AnimatedModal modalVisible={insufficientActiveScoreModalVisible} onClose={() => setInsufficientActiveScoreModalVisible(false)}>
           <View className='p-4'>
             <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Insufficient Active Score</Text>
             <Text style={{ color: themeColors.primary }} className='font-bold text-lg mt-2'>Your active score is below the clan required active score.</Text>
