@@ -443,3 +443,25 @@ export const useUpdateBattleStatus = () => {
     })
   )
 }
+
+export const useClanWar = (clanId: number) => {
+  return (
+    useQuery({
+      queryKey: ['clan_war', clanId],
+      queryFn: async () => {
+        const { data: clanActivityLog, error } = await supabase
+          .from('clan_war')
+          .select('*')
+          .or(`clan_1.eq.${clanId},clan_2.eq.${clanId}`)
+          // .eq('status', true)
+          .single()
+
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return clanActivityLog
+      }
+    })
+  )
+}
