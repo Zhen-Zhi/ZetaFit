@@ -1,5 +1,5 @@
 import { ImageBackground, StyleSheet, Text, View, Image, Platform, Modal, ActivityIndicator } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Redirect, Stack, router, useLocalSearchParams } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useClanDetails, useUpdateBattleStatus } from '@/src/api/clan'
 import { useAuth } from '@/src/providers/AuthProvider'
 import { useUserClanMemberData } from '@/src/api/users'
+import { useClanBattleStatusSubscription } from '@/src/api/clan/subscription'
 
 const ClanWarScreen = () => {
   const { session } = useAuth();
@@ -34,6 +35,8 @@ const ClanWarScreen = () => {
     isLoading: userClanMemberDataLoading,
     error: userClanMemberDataError,
   } = useUserClanMemberData(clanId, session?.user.id)
+
+  useClanBattleStatusSubscription(clanId);
 
   const { mutate: updateBattleStatus } = useUpdateBattleStatus()
 

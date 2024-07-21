@@ -272,7 +272,7 @@ const ClanDetailsScreen = () => {
         <AnimatedPressable 
           pressInValue={0.9} 
           className={`z-10 absolute right-3 bottom-3 ${ !isClanMember && 'h-0' }`}
-          onPress={() => router.push(`clan/clan_war/clanWar?clan_id=${clanId}&battle_status=${clanDetails.battle_status}`)}
+          onPress={() => router.push(`clan/clan_war/clanPreWar?clan_id=${clanId}&battle_status=${clanDetails.battle_status}`)}
         >
           <View className='my-auto'>
             <MaterialCommunityIcons name="sword-cross" size={28} color={themeColors.primary} />

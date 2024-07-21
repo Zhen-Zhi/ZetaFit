@@ -64,3 +64,28 @@ export const useClanMembersSubscription = (clanId: number) => {
     };
   }, [clanId, queryClient]);
 };
+
+export const useClanBattleStatusSubscription = (clanId: number) => {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const clanBattleStatus = supabase.channel('custom-filter-channel')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'clans',
+          filter: `clan_id=eq.${clanId}`,
+        },
+        (payload) => {
+          queryClient.invalidateQueries({queryKey: ['clans', clanId]});
+        }
+      )
+      .subscribe();
+
+      return () => {
+        clanBattleStatus.unsubscribe()
+      }
+    }, [])
+}
