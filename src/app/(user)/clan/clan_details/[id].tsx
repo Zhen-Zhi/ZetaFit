@@ -8,7 +8,7 @@ import { themeColors } from '@/src/constants/Colors'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AnimatedModal from '@/src/components/AnimatedModal'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useClanDetails, useClanMembers, useEditClanMemberRole, useInsertClanLog, useJoinClan, useLeaveClan } from '@/src/api/clan'
+import { useClanDetails, useClanMembers, useDeleteClan, useEditClanMemberRole, useInsertClanLog, useJoinClan, useLeaveClan } from '@/src/api/clan'
 import { useAuth } from '@/src/providers/AuthProvider'
 import ClanLoadingScreenComponent from '@/src/components/ClanLoadingScreen'
 import { useUpdateUserClanId, useUserData } from '@/src/api/users'
@@ -20,8 +20,8 @@ const ClanDetailsScreen = () => {
   const [isClanMember, setIsClanMember] = useState(false)
   const [modalVisible, setModalVisible] = useState(false);
   const [insufficientActiveScoreModalVisible, setInsufficientActiveScoreModalVisible] = useState(false);
-  const [leaderLeaveClanErrorModalVisible, setLeaderLeaveClanErrorModalVisible] = useState(false)
   const [highLevelMember, setHighLevelMember] = useState(false);
+  const [leaveClanLoading, setLeaveClanLoading] = useState(false)
 
   if(!session) {
     return <Redirect href={'/sign_in'} />
@@ -39,6 +39,8 @@ const ClanDetailsScreen = () => {
     error: clanMembersError 
   } = useClanMembers(clanId)
 
+  console.log(clanMembersError)
+
   const {
     data: userData,
     isLoading: userDataLoading,
@@ -50,6 +52,7 @@ const ClanDetailsScreen = () => {
   const { mutate: updateUserClanId } = useUpdateUserClanId()
   const { mutate: insertClanLog } = useInsertClanLog()
   const { mutate: editMemberRole } = useEditClanMemberRole()
+  const { mutate: deleteClan } = useDeleteClan()
 
   useEffect(() => {
     if (clanMembers?.some(member => member.user_id === session.user.id)) {
@@ -129,6 +132,8 @@ const ClanDetailsScreen = () => {
   }
 
   const handleLeaveClan = () => {
+    setModalVisible(false)
+    setLeaveClanLoading(true)
     const userDataInClan = clanMembers.find((member) => member.user_id == session.user.id)
 
     if(!userDataInClan) {
@@ -144,40 +149,103 @@ const ClanDetailsScreen = () => {
       },
       {
         onSuccess() {
+
           updateUserClanId(
             { userId: userDataInClan.user_id, clanId: null }, 
             {
               onSuccess() {
                 if(userDataInClan.role == "Leader") {
                   const coLeader = clanMembers.find((member) => member.role == "Co-Leader")
-                  
+
                   if(!coLeader) {
-                    
+                    const randomMember = clanMembers.find((member) => member.role == "Member")
+                    if(!randomMember) {
+                      deleteClan(
+                        userDataInClan.clan_id, 
+                        {
+                          onSuccess() {
+                            setLeaveClanLoading(false);
+                            setIsClanMember(false);
+                            router.navigate('/clan')
+                            return
+                          },
+                          onError() {
+                            console.log("Unable to delete clan")
+                          }
+                        }
+                      )
+                      return
+                    }
+
+                    editMemberRole(
+                      { clanId: clanId, clanMemberId: randomMember?.id, role: "Leader" }, 
+                      {
+                        onSuccess() {
+                          insertClanLog(
+                            { 
+                              clan_id: clanId, 
+                              user_id: null, 
+                              message: `${userDataInClan.users?.username} had left the clan` 
+                            }, 
+                            {
+                              onSuccess() {
+                                console.log("Msg insert successful")
+                                setLeaveClanLoading(false);
+                                setIsClanMember(false);
+                                router.navigate('/clan')
+                              }
+                            }
+                          )
+                        }
+                      }
+                    )
+                    return
                   }
 
                   editMemberRole(
-                    { coLeader }, 
+                    { clanId: clanId, clanMemberId: coLeader?.id, role: "Leader" }, 
                     {
-
+                      onSuccess() {
+                        insertClanLog(
+                          { 
+                            clan_id: clanId, 
+                            user_id: null, 
+                            message: `${userDataInClan.users?.username} had left the clan` 
+                          }, 
+                          {
+                            onSuccess() {
+                              setLeaveClanLoading(false);
+                              setIsClanMember(false);
+                              router.navigate('/clan')
+                            }
+                          }
+                        )
+                      }
                     }
                   )
                 }
-                setModalVisible(false);
                 setIsClanMember(false);
                 router.navigate('/clan')
+                insertClanLog(
+                  { 
+                    clan_id: clanId, 
+                    user_id: null, 
+                    message: `${userDataInClan.users?.username} had left the clan` 
+                  }, 
+                  {
+                    onSuccess() {
+                      setLeaveClanLoading(false);
+                      setIsClanMember(false);
+                      router.navigate('/clan')
+                    }
+                  }
+                )
               }
             }
           )
-          insertClanLog(
-            { 
-              clan_id: clanId, 
-              user_id: null, 
-              message: `${userDataInClan.users?.username} had left the clan` 
-            }, 
-          )
         }
       }
-    ); 
+    )
   }
     
 
@@ -235,11 +303,11 @@ const ClanDetailsScreen = () => {
           <Text numberOfLines={4} style={{ color: themeColors.secondary }} className='font-semibold mt-1 text-justify'>{clanDetails.clan_description}</Text>
           <View className='flex-row mt-auto justify-between'>
             <AnimatedPressable 
-              style={{ backgroundColor: isClanMember ? themeColors.danger : userData.clan_id != null ? themeColors.disabled : themeColors.secondary }}
+              style={{ backgroundColor: isClanMember ? themeColors.danger : userData.clan_member_id != null ? themeColors.disabled : themeColors.secondary }}
               className='w-[75%] rounded-xl p-2'
               pressInValue={0.95}
               onPress={() => handleCLanInOut()}
-              disabled={userData.clan_id != null && !isClanMember}
+              disabled={userData.clan_member_id != null && !isClanMember}
               >
               { isClanMember
                 ? 
@@ -272,16 +340,33 @@ const ClanDetailsScreen = () => {
         onRequestClose={() =>setModalVisible(false)}
       >
         <AnimatedModal modalVisible={modalVisible} onClose={() => setModalVisible(false)}>
+            <View className='p-4'>
+              <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Leave Clan</Text>
+              <Text style={{ color: themeColors.primary }} className='font-bold text-lg'>Are you sure you want to leave clan?</Text>
+              <View className='flex-row justify-around mt-6'>
+                <AnimatedPressable style={{ backgroundColor: themeColors.secondary }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => setModalVisible(false)}>
+                <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Stay</Text>
+                </AnimatedPressable>
+                <AnimatedPressable style={{ backgroundColor: themeColors.danger }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => handleLeaveClan()}>
+                <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Leave</Text>
+                </AnimatedPressable>
+              </View>
+            </View>
+        </AnimatedModal>
+      </Modal>
+
+      <Modal
+        animationType='fade'
+        visible={leaveClanLoading}
+        presentationStyle='overFullScreen'
+        transparent={true}
+      >
+        <AnimatedModal modalVisible={modalVisible} onClose={() => {}}>
           <View className='p-4'>
             <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Leave Clan</Text>
-            <Text style={{ color: themeColors.primary }} className='font-bold text-lg'>Are you sure you want to leave clan?</Text>
+            <ActivityIndicator className='mt-8' size={64} color={themeColors.tetiary} />
             <View className='flex-row justify-around mt-6'>
-              <AnimatedPressable style={{ backgroundColor: themeColors.secondary }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => setModalVisible(false)}>
-              <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Stay</Text>
-              </AnimatedPressable>
-              <AnimatedPressable style={{ backgroundColor: themeColors.danger }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => handleLeaveClan()}>
-              <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Leave</Text>
-              </AnimatedPressable>
+              <Text style={{ color: themeColors.secondary }} className='font-bold text-lg'>Leaving Clan ......</Text>
             </View>
           </View>
         </AnimatedModal>

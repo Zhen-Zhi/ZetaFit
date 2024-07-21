@@ -2,7 +2,7 @@ import { ImageBackground, Image, KeyboardAvoidingView, Platform, StyleSheet, Tex
 import React, { useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
-import { FontAwesome5, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome5, MaterialCommunityIcons, MaterialIcons, Zocial } from '@expo/vector-icons';
 import ClanLogoListModal from './clanLogoList';
 import AwesomeButton from "react-native-really-awesome-button";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,7 +12,7 @@ import { useAuth } from '@/src/providers/AuthProvider';
 import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
 import { Mutation } from '@tanstack/react-query';
 import { Tables } from '@/src/database.types';
-import { useUpdateUserCoin, useUserData } from '@/src/api/users';
+import { useUpdateUserClanId, useUpdateUserCoin, useUserData } from '@/src/api/users';
 
 type CreateClanScreenProps = {
   onClose: () => void
@@ -35,6 +35,7 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
   const { mutate: updateCoin } = useUpdateUserCoin()
   const { mutate: createClan } = useCreateNewClan()
   const { mutate: deleteClan } = useDeleteClan()
+  const { mutate: updateUserClanId } = useUpdateUserClanId()
   const { data: user, isLoading: userDataLoading, error } = useUserData(session.user.id)
 
   const increment = () => {
@@ -54,9 +55,6 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
       console.error("User coin not found!!  Please debug in '@/src/app/(user)/clan/createClan.tsx'")
       return
     }
-    
-    
-    
 
     // duplicated coin balance checking
     // in case disable is broken

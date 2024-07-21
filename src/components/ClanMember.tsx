@@ -9,8 +9,9 @@ import ProfileScreen from '../app/(user)/homepage/profile/profileModal'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { Tables } from '../database.types'
 import { useAuth } from '../providers/AuthProvider'
-import { useEditClanMemberRole, useLeaveClan } from '../api/clan'
+import { useEditClanMemberRole, useInsertClanLog, useLeaveClan } from '../api/clan'
 import ClanLoadingScreenComponent from './ClanLoadingScreen'
+import { useUpdateUserClanId } from '../api/users'
 
 type ClanMemberProps = {
   member: { users: Tables<'users'> | null } &Tables<'clan_members'> | null;
@@ -38,6 +39,8 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
 
   const { mutate: editMemberRole } = useEditClanMemberRole()
   const { mutate: kickMember } = useLeaveClan()
+  const { mutate: insertClanLog } = useInsertClanLog()
+  const { mutate: updateUserClanId } = useUpdateUserClanId()
 
   const checkRoleForPromote = () => {
     if(member.user_id == session.user.id) {
@@ -164,6 +167,20 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
       { clanId, clanMemberId, userId: kickedUserId }, 
       {
         onSuccess() {
+          updateUserClanId(
+            { clanId, userId: kickedUserId }, 
+            {
+              onSuccess() {
+                insertClanLog(
+                  { 
+                    clan_id: clanId, 
+                    user_id: null, 
+                    message: `${member.users?.username} had been kicked` 
+                  }
+                )
+              }
+            }
+          )
           console.log("Kick member success");
           setModalVisible(false);
         },

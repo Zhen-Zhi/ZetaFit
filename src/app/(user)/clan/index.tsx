@@ -4,12 +4,14 @@ import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import ClanList from '@/src/components/ClanList'
 import CreateClanScreen from './createClan';
-import { Stack, router } from 'expo-router';
+import { Redirect, Stack, router } from 'expo-router';
 import { themeColors } from '@/src/constants/Colors';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useClanList } from '@/src/api/clan';
 import { fullHeight } from '@/src/constants/heigth';
 import ClanLoadingScreenComponent from '@/src/components/ClanLoadingScreen';
+import { useUserClanMemberData, useUserData } from '@/src/api/users';
+import { useAuth } from '@/src/providers/AuthProvider';
 
 type Clan = {
   clanName: string;
@@ -19,14 +21,31 @@ type Clan = {
 };
 
 const ClanScreen = () => {
+  const { session } = useAuth()
   const [modalVisible, setModalVisible] = useState(false);
   const [searchValue, setSearchValue] = useState('')
 
   const { data: clanListData, error, isLoading, refetch } = useClanList('%' + searchValue + '%');
 
-  // if (isLoading) {
-  //   return <ClanLoadingScreenComponent />
-  // }
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
+  const {
+    data: userData,
+    error: userDataError,
+    isLoading: userDataIsLoading,
+  } = useUserData(session.user.id)
+
+  if(userData?.clan_member_id != null) {
+    const {
+      data: userClanData,
+      error: userClanDataError,
+      isLoading: userClanDataIsLoading
+    } = useUserClanMemberData(userData.clan_member_id, userData.id)
+
+    return <Redirect href={`/clan/clan_details/${userClanData?.clan_id}`} />
+  }
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
