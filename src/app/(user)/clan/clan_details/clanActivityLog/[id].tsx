@@ -102,7 +102,7 @@ const ClanActivityLogScreen = () => {
               </View>
             </View>
           </View>
-          { clanDetails?.on_battle == true 
+          { clanDetails?.battle_status == "On Battle" 
             ? 
             <View className='flex-col'>
               <Image
@@ -112,7 +112,7 @@ const ClanActivityLogScreen = () => {
               <Text className='font-extrabold text-emerald-600'>On Battle</Text>
             </View>
             :
-            clanDetails?.on_battle == false 
+            clanDetails?.battle_status == "Off Battle" 
               ?
               <View>
                 <Image

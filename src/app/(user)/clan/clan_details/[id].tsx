@@ -8,7 +8,7 @@ import { themeColors } from '@/src/constants/Colors'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AnimatedModal from '@/src/components/AnimatedModal'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useClanDetails, useClanMembers, useInsertClanLog, useJoinClan, useLeaveClan } from '@/src/api/clan'
+import { useClanDetails, useClanMembers, useEditClanMemberRole, useInsertClanLog, useJoinClan, useLeaveClan } from '@/src/api/clan'
 import { useAuth } from '@/src/providers/AuthProvider'
 import ClanLoadingScreenComponent from '@/src/components/ClanLoadingScreen'
 import { useUpdateUserClanId, useUserData } from '@/src/api/users'
@@ -19,7 +19,8 @@ const ClanDetailsScreen = () => {
   const { session } = useAuth();
   const [isClanMember, setIsClanMember] = useState(false)
   const [modalVisible, setModalVisible] = useState(false);
-  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [insufficientActiveScoreModalVisible, setInsufficientActiveScoreModalVisible] = useState(false);
+  const [leaderLeaveClanErrorModalVisible, setLeaderLeaveClanErrorModalVisible] = useState(false)
   const [highLevelMember, setHighLevelMember] = useState(false);
 
   if(!session) {
@@ -48,6 +49,7 @@ const ClanDetailsScreen = () => {
   const { mutate: leaveClan } = useLeaveClan()
   const { mutate: updateUserClanId } = useUpdateUserClanId()
   const { mutate: insertClanLog } = useInsertClanLog()
+  const { mutate: editMemberRole } = useEditClanMemberRole()
 
   useEffect(() => {
     if (clanMembers?.some(member => member.user_id === session.user.id)) {
@@ -86,7 +88,7 @@ const ClanDetailsScreen = () => {
     }
     else {
       if(userData?.active_score < clanDetails.required_active_score) {
-        setErrorModalVisible(true)
+        setInsufficientActiveScoreModalVisible(true)
         return
       }
 
@@ -146,6 +148,20 @@ const ClanDetailsScreen = () => {
             { userId: userDataInClan.user_id, clanId: null }, 
             {
               onSuccess() {
+                if(userDataInClan.role == "Leader") {
+                  const coLeader = clanMembers.find((member) => member.role == "Co-Leader")
+                  
+                  if(!coLeader) {
+                    
+                  }
+
+                  editMemberRole(
+                    { coLeader }, 
+                    {
+
+                    }
+                  )
+                }
                 setModalVisible(false);
                 setIsClanMember(false);
                 router.navigate('/clan')
@@ -273,23 +289,24 @@ const ClanDetailsScreen = () => {
 
       <Modal
         animationType='fade'
-        visible={errorModalVisible}
+        visible={insufficientActiveScoreModalVisible}
         presentationStyle='overFullScreen'
         transparent={true}
-        onRequestClose={() =>setModalVisible(false)}
+        onRequestClose={() =>setInsufficientActiveScoreModalVisible(false)}
       >
-        <AnimatedModal modalVisible={modalVisible} onClose={() => setModalVisible(false)}>
+        <AnimatedModal modalVisible={modalVisible} onClose={() => setInsufficientActiveScoreModalVisible(false)}>
           <View className='p-4'>
             <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Insufficient Active Score</Text>
             <Text style={{ color: themeColors.primary }} className='font-bold text-lg mt-2'>Your active score is below the clan required active score.</Text>
             <View className='flex-row justify-around mt-6'>
-              <AnimatedPressable style={{ backgroundColor: themeColors.secondary }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => setErrorModalVisible(false)}>
+              <AnimatedPressable style={{ backgroundColor: themeColors.secondary }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => setInsufficientActiveScoreModalVisible(false)}>
               <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>OK</Text>
               </AnimatedPressable>
             </View>
           </View>
         </AnimatedModal>
       </Modal>
+
     </View>
     </ImageBackground>
     </SafeAreaView>

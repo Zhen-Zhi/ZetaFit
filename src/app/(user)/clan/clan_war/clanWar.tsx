@@ -10,8 +10,16 @@ import ClanWarActionScreenModal from './clanWarActions'
 import ClanWarResultScreen from './clanWarResult'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useClanDetails, useUpdateBattleStatus } from '@/src/api/clan'
+import { useAuth } from '@/src/providers/AuthProvider'
+import { useUserClanMemberData } from '@/src/api/users'
 
 const ClanWarScreen = () => {
+  const { session } = useAuth();
+
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
   const { clan_id, battle_status } = useLocalSearchParams()
   const clanId = parseInt(typeof clan_id == 'string' ? clan_id : clan_id?.[0] ?? '0')
   
@@ -20,6 +28,12 @@ const ClanWarScreen = () => {
   const [actionModalVisible, setActionModalVisible] = useState(false);
   const [actionType, setActionType] = useState('attack');
   const [warEnded, setWarEnded] = useState(true);
+
+  const {
+    data: userClanMemberData,
+    isLoading: userClanMemberDataLoading,
+    error: userClanMemberDataError,
+  } = useUserClanMemberData(clanId, session?.user.id)
 
   const { mutate: updateBattleStatus } = useUpdateBattleStatus()
 
@@ -58,10 +72,11 @@ const ClanWarScreen = () => {
           />
           <Text className='text-xl font-bold text-center mt-2 text-slate-500'>No Active Clan War</Text>
           <AnimatedPressable
-            style={{ backgroundColor: themeColors.secondary }}
+            style={{ backgroundColor: userClanMemberData?.role == "Member" ? themeColors.disabled : themeColors.secondary }}
             pressInValue={0.98}
             className='p-2 mx-auto rounded-lg mt-6 flex-row'
             onPress={searchingClanWar}
+            disabled={userClanMemberData?.role == "Member"}
           >
             <View className='my-auto ml-3'>
               <FontAwesome6 name="magnifying-glass" size={24} color="white" />
