@@ -11,6 +11,7 @@ import { Redirect } from 'expo-router'
 import { useAuth } from '@/src/providers/AuthProvider'
 import ClanLoadingScreenComponent from '@/src/components/ClanLoadingScreen'
 import { useUserClanMemberData } from '@/src/api/users'
+import { useClanMembersSubscription } from '@/src/api/clan/subscription'
 
 type MemberScreenRouteProp = RouteProp<{
   member: {
@@ -49,12 +50,7 @@ const MemberScreen = ({ route }: MemberScreenProps) => {
     error: userClanMemberDataError,
   } = useUserClanMemberData(clanId, session?.user.id)
 
-  const [isMember, setIsMember] = useState(false)
-  useEffect(() => {
-    if (clanMembers?.some(member => member.user_id === session.user.id)) {
-      setIsMember(true);
-    }
-  },[clanMembers])
+  useClanMembersSubscription(clanId);
 
   if(!clanMembers) {
     console.log("Clan members not found. debug in '/clan/clan_detials/clanMemberList.tsx'")

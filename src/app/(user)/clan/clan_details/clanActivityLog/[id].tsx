@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Image, ScrollView, TextInput, KeyboardAvoidingView, ImageBackground, TouchableWithoutFeedback, Keyboard } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, Text, View, Image, ScrollView, TextInput, KeyboardAvoidingView, ImageBackground, TouchableWithoutFeedback, Keyboard, NativeSyntheticEvent, NativeScrollEvent } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import { themeColors } from '@/src/constants/Colors'
 import { Redirect, Stack, router, useLocalSearchParams } from 'expo-router';
 import AnimatedPressable from '@/src/components/AnimatedPressable';
@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useClanActiveScore, useClanActivityLog, useClanDetails, useInsertClanLog } from '@/src/api/clan';
 import { useUserData } from '@/src/api/users';
 import { useAuth } from '@/src/providers/AuthProvider';
+import { useClanActivityLogSubscription } from '@/src/api/clan/subscription';
 
 const ClanActivityLogScreen = () => {
   const { session } = useAuth();
@@ -19,7 +20,18 @@ const ClanActivityLogScreen = () => {
   const { id } = useLocalSearchParams()
   const clanId = parseInt(typeof id == 'string' ? id : id?.[0] ?? '0')
   const [message, setMessage] = useState('')
-  const [onBattle, setOnBattle] = useState(false)
+  const [isNearBottom, setIsNearBottom] = useState(true);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const paddingToBottom = 60;
+    setIsNearBottom(
+      layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom
+    );
+  };
+
+  useClanActivityLogSubscription(clanId); // real time chat
 
   const {
     data: activityLog,
@@ -58,6 +70,12 @@ const ClanActivityLogScreen = () => {
       }, 
     )
   }
+
+  useEffect(() => {
+    if (isNearBottom && scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [activityLog]);
   
   return (
     <KeyboardAvoidingView className='flex-1 justify-end'>
@@ -135,7 +153,12 @@ const ClanActivityLogScreen = () => {
       </AnimatedPressable>
 
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <ScrollView className='p-1'>
+      <ScrollView 
+        ref={scrollViewRef} 
+        className='p-1'
+        onScroll={handleScroll}
+        scrollEventThrottle={32}
+      >
         {activityLog?.map(( activity, index ) => {
           if (activity.user_id == null) {
             return (
