@@ -56,8 +56,8 @@ export const useUserClanName= (clanId: number | null | undefined, userId: string
 
         const { data: clanMembers, error } = await supabase
           .from('clans')
-          .select('clan_name')
-          .eq('clan_id', clanId)
+          .select('*')
+          .eq('id', clanId)
           .single()
         
         if (error) {
