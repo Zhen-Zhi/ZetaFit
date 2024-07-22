@@ -447,7 +447,7 @@ export const useUpdateBattleStatus = () => {
 export const useClanWar = (clanId: number) => {
   return (
     useQuery({
-      queryKey: ['clan_war'],
+      queryKey: ['clan_war', clanId],
       queryFn: async () => {
         const { data: clanActivityLog, error } = await supabase
           .from('clan_war')
@@ -490,8 +490,9 @@ export const useUpdateClanWar = () => {
 
         return newRole
       },
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: ['clan_war'] })
+      onSuccess: async (_, { clan_1, clan_2 }) => {
+        await queryClient.invalidateQueries({ queryKey: ['clan_war', clan_1] })
+        await queryClient.invalidateQueries({ queryKey: ['clan_war', clan_2] })
       },
     })
   )

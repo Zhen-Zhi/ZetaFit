@@ -9,11 +9,12 @@ import ClanWarBattleLogScreen from './clanWarBattleLog'
 import ClanWarActionScreenModal from './clanWarActions'
 import ClanWarResultScreen from './clanWarResult'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useClanActiveScore, useClanDetails, useClanWar, useUpdateBattleStatus } from '@/src/api/clan'
+import { useClanActiveScore, useClanDetails, useClanWar, useUpdateBattleStatus, useUpdateClanWar } from '@/src/api/clan'
 import { useAuth } from '@/src/providers/AuthProvider'
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import dayjs from 'dayjs';
+import { useClanWarSubscription } from '@/src/api/clan/subscription'
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -69,6 +70,10 @@ const ClanWarScreen = () => {
     isLoading: opponentClanDetailsIsLoading,
   } = useClanDetails(opponentClanId)
 
+  useClanWarSubscription(clanId)
+
+  const { mutate: updateClanWar } = useUpdateClanWar() // maybe used for attack and defense
+
   const updateCountdown = () => {
     if(!clanWar) {
       return
@@ -88,7 +93,7 @@ const ClanWarScreen = () => {
 
     const countdown = dayjs.duration(difference);
 
-    if (countdown.days() >= 3) {
+    if (countdown.days() >= 1) {
       setCountdown(`${countdown.days()} day${countdown.days() > 1 ? "s" : ''} ${countdown.hours()} hours`);
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -100,8 +105,9 @@ const ClanWarScreen = () => {
     }
   }
 
-
   useEffect(() => {
+    setWarEnded(!clanWar?.status);
+
     if(clanWar?.clan_2 == clanId) {
       setIsSecondClan(true)
     }

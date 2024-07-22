@@ -84,8 +84,46 @@ export const useClanBattleStatusSubscription = (clanId: number) => {
       )
       .subscribe();
 
-      return () => {
-        clanBattleStatus.unsubscribe()
-      }
-    }, [])
+    return () => {
+      clanBattleStatus.unsubscribe()
+    }
+  }, [])
+}
+
+export const useClanWarSubscription = (clanId: number) => {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const clanWar1 = supabase.channel('custom-filter-channel')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'clan_war',
+          filter: `clan_1=eq.${clanId}`,
+        },
+        (payload) => {
+          queryClient.invalidateQueries({queryKey: ['clan_war', clanId]});
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'clan_war',
+          filter: `clan_2=eq.${clanId}`,
+        },
+        (payload) => {
+          queryClient.invalidateQueries({queryKey: ['clan_war', clanId]});
+        }
+      )
+      .subscribe();
+
+    return () => {
+      clanWar1.unsubscribe()
+      // clanWar2.unsubscribe()
+    }
+  }, [])
 }
