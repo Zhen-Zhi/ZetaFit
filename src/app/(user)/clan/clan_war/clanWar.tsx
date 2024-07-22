@@ -106,8 +106,6 @@ const ClanWarScreen = () => {
   }
 
   useEffect(() => {
-    setWarEnded(!clanWar?.status);
-
     if(clanWar?.clan_2 == clanId) {
       setIsSecondClan(true)
     }
