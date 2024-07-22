@@ -1,5 +1,5 @@
 import { ImageBackground, StyleSheet, Text, View, Image, Platform, Modal, ActivityIndicator } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { Redirect, Stack, router, useLocalSearchParams } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
@@ -11,8 +11,12 @@ import ClanWarResultScreen from './clanWarResult'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useClanActiveScore, useClanDetails, useClanWar, useUpdateBattleStatus } from '@/src/api/clan'
 import { useAuth } from '@/src/providers/AuthProvider'
-import { useUserClanMemberData } from '@/src/api/users'
-import { useClanBattleStatusSubscription } from '@/src/api/clan/subscription'
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import dayjs from 'dayjs';
+
+dayjs.extend(relativeTime);
+dayjs.extend(duration);
 
 const ClanWarScreen = () => {
   const { session } = useAuth();
@@ -28,7 +32,10 @@ const ClanWarScreen = () => {
   const [actionModalVisible, setActionModalVisible] = useState(false);
   const [actionType, setActionType] = useState('attack');
   const [warEnded, setWarEnded] = useState(false);
+  const [clanWarResult, setClanWarResult] = useState('')
   const [isSecondClan, setIsSecondClan] = useState(false)
+  const [countdown, setCountdown] = useState('');
+  const timerRef: MutableRefObject<NodeJS.Timeout | null> = useRef(null);
 
   const {
     data: clanWar,
@@ -62,18 +69,69 @@ const ClanWarScreen = () => {
     isLoading: opponentClanDetailsIsLoading,
   } = useClanDetails(opponentClanId)
 
+  const updateCountdown = () => {
+    if(!clanWar) {
+      return
+    }
+
+    const now = dayjs();
+    const difference = dayjs(clanWar.end_time).diff(now);
+
+    if (difference <= 0) {
+      setCountdown('00:00:00');
+      if(timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
+
+    const countdown = dayjs.duration(difference);
+
+    if (countdown.days() >= 3) {
+      setCountdown(`${countdown.days()} day${countdown.days() > 1 ? "s" : ''} ${countdown.hours()} hours`);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    } else {
+      const formattedCountdown = countdown.format('HH:mm:ss');
+      setCountdown(formattedCountdown);
+    }
+  }
+
+
   useEffect(() => {
     if(clanWar?.clan_2 == clanId) {
       setIsSecondClan(true)
     }
-  }, [])
 
-  if(clanWarIsLoading) {
+    if(clanWar?.end_time) {
+      timerRef.current = setInterval(updateCountdown, 1000)
+    }
+
+    return () => {
+      if(timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  }, [clanWar])
+
+  if(clanWarIsLoading || clanDetailsIsLoading || opponentClanDetailsIsLoading ) {
     return <ActivityIndicator />
   }
   
-  if(!clanWar || !clanDetails || !opponentClanDetails) {
-    console.log("Data not found. Debug in '/clan/clan_details/clan_war/clanWar' ")
+  if(!clanWar) {
+    console.log("CLanwar not found. Debug in '/clan/clan_details/clan_war/clanWar' ")
+    return <Redirect href={`/clan/clan_details/${clanId}`} />
+  }
+  if(!clanDetails) {
+    console.log("Clan details not found. Debug in '/clan/clan_details/clan_war/clanWar' ")
+    return <Redirect href={`/clan/clan_details/${clanId}`} />
+  }
+  if(!opponentClanDetails) {
+    console.log("opponent not found. Debug in '/clan/clan_details/clan_war/clanWar' ")
     return <Redirect href={`/clan/clan_details/${clanId}`} />
   }
 
@@ -96,7 +154,7 @@ const ClanWarScreen = () => {
         </View>
 
         <View style={{ borderColor: themeColors.primary }} className='mx-auto mt-0.5 bg-slate-200 px-10 rounded border'>
-          <Text style={{ color: themeColors.primary }}>Time Remaning: 12:00:00</Text>
+          <Text style={{ color: themeColors.primary }}>Time Remaning: {countdown}</Text>
         </View>
 
         <View className='flex-1'>
@@ -214,7 +272,7 @@ const ClanWarScreen = () => {
         transparent={true}
         onRequestClose={() =>setWarEnded(false)}
       >
-        <ClanWarResultScreen modalVisible={warEnded} onClose={() => setWarEnded(false)} />
+        <ClanWarResultScreen modalVisible={warEnded} clanWarResultParam={clanWarResult} onClose={() => setWarEnded(false)} />
       </Modal>
 
     </View>

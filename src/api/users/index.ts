@@ -1,5 +1,6 @@
 import { useQueryClient, useMutation, useQuery, QueryClient } from "@tanstack/react-query"
 import { supabase } from "@/src/lib/supabase"
+import { UpdateTables } from "@/src/types";
 
 // select user data
 export const useUserData = (id: string) => {
@@ -146,6 +147,37 @@ export const useUpdateUserClanId = () => {
 
         if (error) {
           console.log("error in update user clanId::  " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return updatedUserData
+      },
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['users'] })
+      },
+    })
+  )
+}
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (updateFields: UpdateTables<'users'>) => {
+        if(updateFields.id == '' || updateFields.id == null) {
+          console.log("User id not provided. Error in useUpdateUser")
+          return
+        }
+
+        const { data: updatedUserData, error } = await supabase
+          .from('users')
+          .update({...updateFields})
+          .eq('id', updateFields.id)
+          .single()
+
+        if (error) {
+          console.log("error in update user:  " + error.message)
           throw new Error(error.code + ":" + error.message)
         }
 

@@ -10,11 +10,12 @@ const AnimatedView = Animated.createAnimatedComponent(View);
 
 type ClanWarResultScreenProps = {
   modalVisible : boolean;
+  clanWarResultParam: string;
   onClose : () => void;
 }
 
-const ClanWarResultScreen = ({ modalVisible, onClose }: ClanWarResultScreenProps) => {
-  const [clanWarResult, setClanWarResult] = useState('defeat');
+const ClanWarResultScreen = ({ modalVisible, clanWarResultParam, onClose }: ClanWarResultScreenProps) => {
+  const [clanWarResult, setClanWarResult] = useState(clanWarResultParam);
   const [rewardsModalVisible, setRewardsModalVisible] = useState(false)
   const [claimed , setClaimed] = useState(false);
   const scaleAnimation = useRef(new Animated.Value(2)).current;

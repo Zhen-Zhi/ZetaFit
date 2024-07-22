@@ -447,21 +447,52 @@ export const useUpdateBattleStatus = () => {
 export const useClanWar = (clanId: number) => {
   return (
     useQuery({
-      queryKey: ['clan_war', clanId],
+      queryKey: ['clan_war'],
       queryFn: async () => {
         const { data: clanActivityLog, error } = await supabase
           .from('clan_war')
           .select('*')
           .or(`clan_1.eq.${clanId},clan_2.eq.${clanId}`)
-          // .eq('status', true)
+          .eq('status', true)
           .single()
 
         if (error) {
+          console.log(error)
           throw new Error(error.code + ":" + error.message)
         }
 
         return clanActivityLog
       }
+    })
+  )
+}
+
+export const useUpdateClanWar = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (updatedClanWar: UpdateTables<'clan_war'>) => {
+        if(updatedClanWar.id == null) {
+          console.log("Clan war id not provided.")
+          return
+        }
+
+        const { data: newRole, error } = await supabase
+          .from('clans')
+          .update(updatedClanWar)
+          .eq('id', updatedClanWar.id)
+
+        if (error) {
+          console.log("error in update role::  " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return newRole
+      },
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: ['clan_war'] })
+      },
     })
   )
 }

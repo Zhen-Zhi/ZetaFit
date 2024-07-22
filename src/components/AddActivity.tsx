@@ -1,11 +1,16 @@
-import { ImageBackground, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View, Image, FlatList, Animated, TouchableOpacity, Pressable, Dimensions } from 'react-native'
+import { ImageBackground, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View, Image, FlatList, Animated, TouchableOpacity, Pressable, Dimensions, ActivityIndicator, Modal } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { Feather, FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { Picker } from "@react-native-picker/picker";
 import CustomPicker from '@/src/components/PickerComponent';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useActivityTypes, useInsertActivity } from '../api/activity';
+import { Tables } from '../database.types';
+import { useAuth } from '../providers/AuthProvider';
+import { Redirect } from 'expo-router';
+import AnimatedModal from './AnimatedModal';
 
 
 type AddActivityScreenModalProps = {
@@ -28,69 +33,93 @@ const items = [
   { label: 'Meters', value: 'm' },
 ];
 
-const activityType: ActivityTypeProps[] = [
-  {
-    id: 1,
-    activity: 'Swimming',
-    image: require('@asset/images/swimming.png'),
-  },
-  {
-    id: 2,
-    activity: 'Running',
-    image: require('@asset/images/running.png'),
-  },
-  {
-    id: 3,
-    activity: 'Cycling',
-    image: require('@asset/images/running.png'), // Using the same image for cycling
-  },
-  {
-    id: 4,
-    activity: 'Hiking',
-    image: require('@asset/images/swimming.png'), // Using the same image for hiking
-  },
-  {
-    id: 5,
-    activity: 'Swimming',
-    image: require('@asset/images/swimming.png'),
-  },
-  {
-    id: 6,
-    activity: 'Running',
-    image: require('@asset/images/running.png'),
-  },
-  {
-    id: 7,
-    activity: 'Cycling',
-    image: require('@asset/images/running.png'), // Using the same image for cycling
-  },
-  {
-    id: 8,
-    activity: 'Hiking',
-    image: require('@asset/images/swimming.png'), // Using the same image for hiking
-  },
-  // Add more dummy data as needed
-];
+// const activityTypes: ActivityTypeProps[] = [
+//   {
+//     id: 1,
+//     activity: 'Swimming',
+//     image: require('@asset/images/swimming.png'),
+//   },
+//   {
+//     id: 2,
+//     activity: 'Running',
+//     image: require('@asset/images/running.png'),
+//   },
+//   {
+//     id: 3,
+//     activity: 'Cycling',
+//     image: require('@asset/images/running.png'), // Using the same image for cycling
+//   },
+//   {
+//     id: 4,
+//     activity: 'Hiking',
+//     image: require('@asset/images/swimming.png'), // Using the same image for hiking
+//   },
+//   {
+//     id: 5,
+//     activity: 'Swimming',
+//     image: require('@asset/images/swimming.png'),
+//   },
+//   {
+//     id: 6,
+//     activity: 'Running',
+//     image: require('@asset/images/running.png'),
+//   },
+//   {
+//     id: 7,
+//     activity: 'Cycling',
+//     image: require('@asset/images/running.png'), // Using the same image for cycling
+//   },
+//   {
+//     id: 8,
+//     activity: 'Hiking',
+//     image: require('@asset/images/swimming.png'), // Using the same image for hiking
+//   },
+//   // // Add more dummy data as needed
+// ];
 
 
 const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
+  const { session } = useAuth();
+
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
+  const {
+    data: activityTypes,
+    error: activityTypesError,
+    isLoading: activityTypesIsLoading,
+  } = useActivityTypes()
+
+  const { mutate: insertActivity } = useInsertActivity()
+  
+  const [title, setTitle] = useState('')
+  const [distance, setDistance] = useState('')
+  const [duration, setDuration] = useState('')
+  const [description, setDescription] = useState('')
   const [selectedUnit, setSelectedUnit] = useState('Kilometers');
-  const [selectedItem, setSelectedItem] = useState(activityType[0])
-  const flatListRef = useRef<FlatList<ActivityTypeProps>>(null);
+  const [selectedItem, setSelectedItem] = useState(activityTypes?.[0])
+  const [missingRequired, setMissingRequired] = useState(false);
+  const [insertActivityLoading, setInsertActivityLoading] = useState(false)
+  const [insertComplete, setInsertComplete] = useState(false);
 
-  console.log(selectedItem)
-
+  const flatListRef = useRef<FlatList<Tables<'activity_type'>>>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+
+  if(!activityTypes) {
+    console.log("Activity type not found!")
+    return <ActivityIndicator />
+  }
   
   const calculateCenterItem = (event: any) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
     scrollX.setValue(contentOffsetX);
     const centeredIndex = (contentOffsetX / ITEM_WIDTH);
     
-    setSelectedItem(activityType[centeredIndex]);
+    setSelectedItem(activityTypes[centeredIndex]);
   };
 
-  const ActivityTypeSelector = ({ activity, image, index }: { activity: string, image: any, index: number }) => {
+  const ActivityTypeSelector = ({ index, activity, activity_image }: { index: number, activity: string, activity_image: string | null }) => {
     const inputArray = [
       (index - 1) * ITEM_WIDTH,  // Start fading in
       index * ITEM_WIDTH,        // Fully visible
@@ -116,19 +145,62 @@ const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
         onPress={() => {
           if (flatListRef.current) {
             flatListRef.current.scrollToOffset({ offset: index * ITEM_WIDTH });
-            setSelectedItem(activityType[index])
+            scrollX.setValue(index * ITEM_WIDTH);
+            setSelectedItem(activityTypes[index])
           }
         }}
       >
         <Image
           className='w-44 h-44'
-          source={image}
+          source={require("@asset/images/swimming.png")}
         />
         <Text style={{ color: themeColors.primary }} className='text-lg text-center font-bold'>{activity}</Text>
       </AnimatedButton>
     )
   };
   
+  const handleAddActivity = () => {
+    setInsertComplete(false)
+    setInsertActivityLoading(true)
+    if(title == '' || distance == '' || duration == '') {
+      setMissingRequired(true)
+      setInsertActivityLoading(false)
+      return
+    }
+
+    let distanceInMeter = 0;
+
+    if(selectedUnit == "Kilometers") {
+      distanceInMeter = parseFloat(distance) * 1000
+    }
+    else {
+      distanceInMeter = parseFloat(distance)
+    }
+
+    insertActivity(
+      {
+        activity_type_id: selectedItem?.id,
+        activity_title: title,
+        distance: distanceInMeter,
+        duration: duration,
+        activity_description: description, 
+        user_id: session.user.id,
+      }, 
+      {
+        onSuccess() {
+          setTitle('')
+          setDistance('')
+          setDuration('')
+          setDescription('')
+          setInsertComplete(true)
+          setTimeout(() => {
+            setInsertActivityLoading(false)
+          }, 1000)
+        }
+      }
+    )
+  }
+
   return (
     <ImageBackground
       className='flex-1'
@@ -165,7 +237,7 @@ const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
           <Animated.FlatList
             ref={flatListRef}
             horizontal
-            data={activityType}
+            data={activityTypes}
             renderItem={({ item, index }) => (
               <ActivityTypeSelector {...item} index={index} />
             )}
@@ -185,21 +257,32 @@ const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
         
         <View className='px-4 pb-4 bg-white/30 gap-4'>
           <View>
-            <Text className='font-medium text-lg'>Title</Text>
+            <Text className='font-medium text-lg'>Title *</Text>
             <TextInput
-              placeholderTextColor={'black'}
+              // placeholderTextColor={'black'}
               placeholder='Enter activity name'
               className='border p-2 rounded-lg border-slate-500 mt-1 bg-white'
+              maxLength={30}
+              onChangeText={setTitle}
+              value={title}
             />
+            { 
+              missingRequired && title == ''
+                &&
+              <Text className='text-red-500 mx-1 font-medium'>Title is required</Text>
+            }
           </View>
           
           <View className=''>
-            <Text className='font-medium text-lg'>Distance</Text>
+            <Text className='font-medium text-lg'>Distance *</Text>
             <View className='flex-row bg-white'>
               <TextInput
-                className='flex-1 border p-2 rounded-l-lg'
+                keyboardType="numeric"
+                className='flex-1 border border-slate-500 p-2 rounded-l-lg'
+                onChangeText={setDistance}
+                value={distance}
               />
-              <View className='flex-1 border-y border-r rounded-r-lg'>
+              <View className='flex-1 border-y border-r rounded-r-lg border-slate-500'>
                 <CustomPicker
                   data={items}
                   selectedUnit={selectedUnit}
@@ -208,14 +291,26 @@ const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
                 />
               </View>
             </View>
+            { 
+              missingRequired && distance == ''
+                &&
+              <Text className='text-red-500 mx-1 font-medium'>Distance is required</Text>
+            }
           </View>
 
           <View>
-            <Text className='font-bold text-lg'>Duration</Text>
+            <Text className='font-bold text-lg'>Duration *</Text>
             <TextInput
               placeholder='Enter activity name'
               className='border p-2 rounded-lg border-slate-500 mt-1 bg-white'
+              onChangeText={setDuration}
+              value={duration}
             />
+            { 
+              missingRequired && duration == '' 
+                &&
+              <Text className='text-red-500 mx-1 font-medium'>Duration is required</Text>
+            }
           </View>
           
           <View>
@@ -225,13 +320,24 @@ const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
               numberOfLines={5}
               placeholder='Enter activity name'
               className='border p-2 rounded-lg border-slate-500 mt-1 bg-white h-28'
+              onChangeText={setDescription}
+              value={description}
             />
           </View>
         </View>
           <AnimatedPressable
-            style={{ backgroundColor: themeColors.secondary }}
+            style={{ backgroundColor: (
+              title == '' || distance == '' || duration == ''
+            ) 
+              ? themeColors.disabled 
+              : themeColors.secondary 
+            }}
             className='p-2 rounded-lg mx-auto mt-4 mb-16'
             pressInValue={0.98}
+            disabled={(
+              title == '' || distance == '' || duration == ''
+            )}
+            onPress={handleAddActivity}
           >
             <Text className='font-bold text-lg text-white text-center mx-16'>Add Record</Text>
           </AnimatedPressable>
@@ -240,6 +346,32 @@ const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
       </KeyboardAvoidingView>
       </View>
       </TouchableWithoutFeedback>
+
+      <Modal
+        animationType='fade'
+        visible={insertActivityLoading}
+        presentationStyle='overFullScreen'
+        transparent={true}
+      >
+        <AnimatedModal modalVisible={insertActivityLoading} onClose={() => {}}>
+          <View className='p-4'>
+            <Text style={{ color: themeColors.secondary }} className='font-extrabold text-2xl'>Adding Activity</Text>
+            {
+              insertComplete
+                ?
+              <View className='mx-auto mt-6'>
+                <Feather name="check-circle" size={108} color={themeColors.tetiary} />
+                <Text className='text-center font-bold text-lg' style={{ color: themeColors.secondary }} >Done</Text>
+              </View>
+                :
+              <ActivityIndicator className='mt-8' size={72} color={themeColors.tetiary} />
+            }
+            <View className='flex-row justify-around mt-6'>
+              <Text style={{ color: themeColors.secondary }} className='font-bold text-lg'>Well Done! Keep It Up.</Text>
+            </View>
+          </View>
+        </AnimatedModal>
+      </Modal>
     </ImageBackground>
   )
 }
