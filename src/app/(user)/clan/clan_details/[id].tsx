@@ -245,6 +245,14 @@ const ClanDetailsScreen = () => {
       }
     )
   }
+
+  const handleGoClanWar = () => {
+    if(clanDetails.battle_status == "On Battle") {
+      router.push(`clan/clan_war/clanWar?clan_id=${clanId}`)
+    } else {
+      router.push(`clan/clan_war/clanPreWar?clan_id=${clanId}&battle_status=${clanDetails.battle_status}`)
+    }
+  }
     
 
   return (
@@ -272,7 +280,7 @@ const ClanDetailsScreen = () => {
         <AnimatedPressable 
           pressInValue={0.9} 
           className={`z-10 absolute right-3 bottom-3 ${ !isClanMember && 'h-0' }`}
-          onPress={() => router.push(`clan/clan_war/clanPreWar?clan_id=${clanId}&battle_status=${clanDetails.battle_status}`)}
+          onPress={handleGoClanWar}
         >
           <View className='my-auto'>
             <MaterialCommunityIcons name="sword-cross" size={28} color={themeColors.primary} />

@@ -36,29 +36,46 @@ const ClanWarScreen = () => {
     isLoading: clanWarIsLoading,
   } = useClanWar(clanId);
 
-  // if(!clanWar) {
-  //   console.log("Clan War not found!")
-  //   return <Redirect href={`/clan/clan_details/${clanId}`} />
-  // }
-
-  console.log(clanWarError)
-  console.log("Clan war id:  " + clanWar?.clan_1 + clanWar?.clan_2)
-
-  if(clanWar?.clan_2 == clanId) {
-    setIsSecondClan(true)
-  }
+  const opponentClanId = isSecondClan ? clanWar?.clan_1 ?? 0 : clanWar?.clan_2 ?? 0
 
   const {
     data: clanActiveScore,
     error: clanActiveScoreError,
     isLoading: clanActiveScoreIsLoading,
   } = useClanActiveScore(clanId)
-
+  
   const {
-    data: oponentClanActiveScore,
+    data: opponentClanActiveScore,
     error: opponentClanActiveScoreError,
     isLoading: opponentClanActiveScoreIsLoading,
-  } = useClanActiveScore(isSecondClan ? clanWar?.clan_1 : clanWar?.clan_2)
+  } = useClanActiveScore(opponentClanId)
+
+  const {
+    data: clanDetails,
+    error: clanDetailsError,
+    isLoading: clanDetailsIsLoading,
+  } = useClanDetails(clanId)
+  
+  const {
+    data: opponentClanDetails,
+    error: opponentClanDetailsError,
+    isLoading: opponentClanDetailsIsLoading,
+  } = useClanDetails(opponentClanId)
+
+  useEffect(() => {
+    if(clanWar?.clan_2 == clanId) {
+      setIsSecondClan(true)
+    }
+  }, [])
+
+  if(clanWarIsLoading) {
+    return <ActivityIndicator />
+  }
+  
+  if(!clanWar || !clanDetails || !opponentClanDetails) {
+    console.log("Data not found. Debug in '/clan/clan_details/clan_war/clanWar' ")
+    return <Redirect href={`/clan/clan_details/${clanId}`} />
+  }
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
@@ -82,7 +99,6 @@ const ClanWarScreen = () => {
           <Text style={{ color: themeColors.primary }}>Time Remaning: 12:00:00</Text>
         </View>
 
-        {/* absolute image */}
         <View className='flex-1'>
           <View className='flex-row'>
             <View className='ml-4'>
@@ -91,16 +107,16 @@ const ClanWarScreen = () => {
                 <View className='my-auto mx-1'>
                   <FontAwesome6 name="fire" size={22} color="rgba(240, 93, 9, 0.8)" />
                 </View>
-                <Text style={{ color: themeColors.primary }} className='text-xl font-extrabold text-center bg-slate-200 px-2 rounded'>999990</Text>
+                <Text style={{ color: themeColors.primary }} className='text-xl font-extrabold text-center bg-slate-200 px-2 rounded'>{clanActiveScore}</Text>
               </View>
             </View>
             <View className='mx-6 my-10'>
-              <Text className='text-xl font-bold mb-2'>Samsung Galaxy</Text>
+              <Text className='text-xl font-bold mb-2'>{clanDetails?.clan_name}</Text>
               <Text className='font-semibold text-md'>Clan Health</Text>
               <View className='mt-1 flex-row'>
                 <FontAwesome6 name="shield-heart" size={22} color='red' />
               <Progress.Bar className='my-1 ml-2'
-                progress={0.9}
+                progress={(isSecondClan ? clanWar.clan_2_health : clanWar.clan_1_health) / clanDetails.clan_health}
                 height={14}
                 width={115}
                 color={themeColors.tetiary}
@@ -110,7 +126,7 @@ const ClanWarScreen = () => {
                 borderColor={themeColors.primary}
               />
               </View>
-              <Text>900/1000</Text>
+              <Text>{isSecondClan ? clanWar.clan_2_health : clanWar.clan_1_health}/{clanDetails?.clan_health}</Text>
               <AnimatedPressable 
                 style={{ backgroundColor: themeColors.secondary }}
                 className='rounded mt-auto p-2'
@@ -126,12 +142,12 @@ const ClanWarScreen = () => {
           </View>
           <View className='flex-row'>
             <View className='mx-6 my-10'>
-              <Text style={{ color: themeColors.danger }} className='text-xl font-bold mb-2'>Samsung Galaxy</Text>
+              <Text style={{ color: themeColors.danger }} className='text-xl font-bold mb-2'>{opponentClanDetails.clan_name}</Text>
               <Text className='font-semibold text-md'>Clan Health</Text>
               <View className='mt-1 flex-row'>
                 <FontAwesome6 name="shield-heart" size={22} color='red' />
                 <Progress.Bar className='my-1 ml-2'
-                  progress={0.9}
+                  progress={(isSecondClan ? clanWar.clan_1_health : clanWar.clan_2_health) / opponentClanDetails.clan_health}
                   height={14}
                   width={115}
                   color={themeColors.tetiary}
@@ -141,7 +157,7 @@ const ClanWarScreen = () => {
                   borderColor={themeColors.primary}
                 />
               </View>
-              <Text>900/1000</Text>
+              <Text>{isSecondClan ? clanWar.clan_1_health : clanWar.clan_2_health}/{clanDetails?.clan_health}</Text>
               <View className='flex-row mt-auto'>
                 <AnimatedPressable 
                   style={{ backgroundColor: themeColors.danger }}
@@ -167,7 +183,7 @@ const ClanWarScreen = () => {
                 <View className='my-auto mx-1'>
                   <FontAwesome6 name="fire" size={22} color="rgba(240, 93, 9, 0.8)" />
                 </View>
-                <Text style={{ color: themeColors.primary }} className='text-xl font-extrabold text-center bg-slate-200 px-2 rounded'>999990</Text>
+                <Text style={{ color: themeColors.primary }} className='text-xl font-extrabold text-center bg-slate-200 px-2 rounded'>{opponentClanActiveScore}</Text>
               </View>
             </View>
           </View>

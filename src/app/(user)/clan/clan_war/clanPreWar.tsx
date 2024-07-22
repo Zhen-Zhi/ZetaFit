@@ -18,10 +18,6 @@ const ClanPreWarScreen = () => {
   }
 
   const { clan_id, battle_status } = useLocalSearchParams()
-  if(battle_status == "On Battle") {
-    router.replace(`/clan/clan_war/clanWar?clan_id=${clan_id}`)
-  }
-
   const clanId = parseInt(typeof clan_id == 'string' ? clan_id : clan_id?.[0] ?? '0')
   const [clanWar, setClanWar] = useState(battle_status)
 
