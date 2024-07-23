@@ -183,8 +183,9 @@ export const useUpdateUser = () => {
 
         return updatedUserData
       },
-      onSuccess: async () => {
+      onSuccess: async (_, { clan_id }) => {
         await queryClient.invalidateQueries({ queryKey: ['users'] })
+        await queryClient.invalidateQueries({ queryKey: ['clan_members', clan_id] })
       },
     })
   )

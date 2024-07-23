@@ -77,18 +77,15 @@ export const useDeleteActivity = () => {
   return (
     useMutation({
       mutationFn: async ({
-          activityId, userId, activity
+          activityId, userId
         } : {
           activityId: number,
           userId: string,
-          activity: UpdateTables<'user_activities'>
         }) => {
         const { data: deletedActivity, error } = await supabase
           .from('user_activities')
           .delete()
           .eq('id', activityId)
-          .select('*')
-          .single()
 
         if (error) {
           console.log(error.message)
@@ -98,7 +95,7 @@ export const useDeleteActivity = () => {
         return deletedActivity
       },
       async onSuccess(_, { userId }) {
-        await queryClient.invalidateQueries({ queryKey: ['user_activities', userId] })
+        await queryClient.invalidateQueries({ queryKey: ['user_activities'] })
       }
     })
   )

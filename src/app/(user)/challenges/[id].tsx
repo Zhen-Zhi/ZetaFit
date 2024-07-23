@@ -24,7 +24,7 @@ const ChallengesDetailsScreen = () => {
   const [actionModalVisible, setActionModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [rewardsModalVisible, setRewardsModalVisible] = useState(false)
-  const datass = { progress: false, claimed: false }
+  const datass = { progress: true, claimed: false }
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
@@ -92,6 +92,7 @@ const ChallengesDetailsScreen = () => {
           <View className='mt-6'>
             <Text className='font-bold text-2xl'>Leaderboard</Text>
             <LeaderboardMemberScreen />
+            <LeaderboardMemberScreen />
           </View>
         </View>
         <View className='h-20' />
@@ -106,24 +107,28 @@ const ChallengesDetailsScreen = () => {
           ? 
           datass.progress 
             ? 
-            <View className='mx-3 p-2 mb-2'>
-              <View className='flex-row justify-between'>
-                <Text className='font-bold text-lg mb-1'>Your Progress</Text>
-                <View className='flex-row'>
-                  <Image className='w-6 h-8 mb-1 mr-1.5' source={require('@asset/images/attack_icon.png')}/>
-                  <Text className='font-bold text-lg mr-3 mb-1'>880/1000</Text>
+            <AnimatedPressable
+              pressInValue={0.95}
+            >
+              <View className='mx-3 p-2 mb-2'>
+                <View className='flex-row justify-between'>
+                  <Text className='font-bold text-lg mb-1'>Your Progress</Text>
+                  <View className='flex-row'>
+                    <Image className='w-6 h-8 mb-1 mr-1.5' source={require('@asset/images/attack_icon.png')}/>
+                    <Text className='font-bold text-lg mr-3 mb-1'>880/1000</Text>
+                  </View>
                 </View>
+                <Progress.Bar
+                  width={350}
+                  height={10}
+                  progress={0.6}
+                  borderWidth={0}
+                  color={themeColors.tetiary}
+                  borderRadius={10}
+                  unfilledColor='red'
+                />
               </View>
-              <Progress.Bar
-                width={350}
-                height={10}
-                progress={0.6}
-                borderWidth={0}
-                color={themeColors.tetiary}
-                borderRadius={10}
-                unfilledColor='red'
-              />
-            </View>
+            </AnimatedPressable>
             :
             <AnimatedPressable 
               style={{ backgroundColor: datass.claimed ? themeColors.disabled : themeColors.secondary }}

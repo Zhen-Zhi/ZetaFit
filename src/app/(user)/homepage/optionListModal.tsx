@@ -9,8 +9,10 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import ActivityLogScreen from '../pets/activityLog';
 import AnimatedModal from '@/src/components/AnimatedModal';
 import { supabase } from '@/src/lib/supabase';
+import { Tables } from '@/src/database.types';
 
 type MoreOptionsModalProps = {
+  userData: Tables<'users'>;
   onClose: () => void;
 };
 
@@ -25,7 +27,7 @@ const ListOptions: ListOptionsType[] = [
   {name: 'Activities', iconName: 'history'}
 ]
 
-const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
+const MoreOptionsModal = ({ userData, onClose }: MoreOptionsModalProps) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleOptionPress = (optionName: string) => {
@@ -86,7 +88,7 @@ const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
       >
         <SafeAreaProvider>
           <SafeAreaView edges={['top']} className='flex-1'>
-            <ProfileScreen onClose={() => setModalVisible(false)} />
+            <ProfileScreen userData={userData} onClose={() => setModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, Modal, ImageBackground } from 'react-native'
+import { StyleSheet, Text, View, Image, Modal, ImageBackground, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import AnimatedPressable from './AnimatedPressable'
 import { FontAwesome6 } from '@expo/vector-icons'
@@ -6,11 +6,13 @@ import AnimatedModal from './AnimatedModal'
 import { router, useLocalSearchParams } from 'expo-router'
 import { themeColors } from '../constants/Colors'
 import ProfileScreen from '../app/(user)/homepage/profile/profileModal'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaProvider, SafeAreaView, useSafeAreaFrame } from 'react-native-safe-area-context'
 import { Tables } from '../database.types'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime';
 import ActivityDetailsScreenModal from './ActivityDetails'
+import { useDeleteActivity } from '../api/activity'
+import { useUpdateUser, useUserData } from '../api/users'
 
 dayjs.extend(relativeTime);
 
@@ -19,8 +21,62 @@ type ClanMemberProps = {
 }
 
 const ActivityList = ({ activity }: ClanMemberProps) => {
+  const [isDeleting, setIsDeleting] = useState(false);
   const [modalVisible, setModalVisible] = useState(false)
-  const [profileModalVisible, setProfileModalVisible] = useState(false)
+  const [activityDetailsModalVisible, setActivityDetailsModalVisible] = useState(false)
+
+  const {
+    data: userData,
+    error: userDataError,
+    isLoading: userDataIsLoading,
+  } = useUserData(activity.user_id);
+
+  const { mutate: deleteActivity } = useDeleteActivity();
+  const { mutate: updateUser } = useUpdateUser();
+
+  if(userDataIsLoading) {
+    return <ActivityIndicator />
+  }
+
+  if(!userData) {
+    console.log("userData nor found.")
+    return
+  }
+
+  const handleDeleteActivity = () => {
+    setIsDeleting(true)
+
+    deleteActivity(
+      { activityId: activity.id, userId: activity.user_id }, 
+      {
+        onSuccess() {
+          if(dayjs(activity.created_at).isAfter(dayjs().subtract(30, 'day'))) {
+            updateUser(
+              {
+                id: activity.user_id,
+                active_score: userData?.active_score - activity.active_score
+              }, 
+              {
+                onSuccess() {
+                  console.log("Success")
+                  setModalVisible(false)
+                  setIsDeleting(false)
+                },
+                onError() {
+                  console.log("error in deleting activity")
+                  setIsDeleting(false)
+                }
+              }
+            )
+          } else {
+            console.log("Success")
+            setModalVisible(false)
+            setIsDeleting(false)
+          }
+        }
+      }
+    )
+  }
 
   return (
     <View>
@@ -59,6 +115,7 @@ const ActivityList = ({ activity }: ClanMemberProps) => {
         <AnimatedPressable 
           pressInValue={0.97}
           className='border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 bg-white'
+          onPress={() => setActivityDetailsModalVisible(true)}
         >
           <View className='flex-row'>
             <Image 
@@ -68,7 +125,7 @@ const ActivityList = ({ activity }: ClanMemberProps) => {
             <View className='flex-1 flex-row justify-between'>
               <View className='flex-col ml-4 my-auto'>
                 <Text className='text-lg font-bold'>{activity.activity_title}</Text>
-                <Text className='font-semibold text-slate-600'>3 days ago</Text>
+                <Text className='font-semibold text-slate-600'>{dayjs(activity.created_at).fromNow()}</Text>
               </View>
             </View>
           </View>
@@ -77,17 +134,25 @@ const ActivityList = ({ activity }: ClanMemberProps) => {
           <AnimatedPressable
             className='p-1 rounded-lg border border-slate-500 bg-white'
             pressInValue={0.95}
-            onPress={() => setProfileModalVisible(true)}
+            onPress={() => setActivityDetailsModalVisible(true)}
           >
             <Text style={{ color: themeColors.secondary }} className='text-lg text-center font-bold text-white'>View Details</Text>
           </AnimatedPressable>
 
           <AnimatedPressable
-            style={{ backgroundColor: themeColors.danger }}
+            style={{ backgroundColor: isDeleting ? themeColors.disabled : themeColors.danger }}
             className='p-1.5 rounded-lg mt-2'
             pressInValue={0.95}
+            onPress={handleDeleteActivity}
+            disabled={isDeleting}
           >
-            <Text className='text-lg text-center font-bold text-white'>Delete</Text>
+            {
+              isDeleting
+                ?
+              <ActivityIndicator />  
+                :
+              <Text className='text-lg text-center font-bold text-white'>Delete</Text>
+            }
           </AnimatedPressable>
         </View>
         </ImageBackground>
@@ -96,14 +161,14 @@ const ActivityList = ({ activity }: ClanMemberProps) => {
 
       <Modal
         animationType='fade'
-        visible={profileModalVisible}
+        visible={activityDetailsModalVisible}
         presentationStyle='overFullScreen'
         transparent={true}
-        onRequestClose={() =>setProfileModalVisible(false)}
+        onRequestClose={() =>setActivityDetailsModalVisible(false)}
       >
         <SafeAreaProvider className='flex-1'>
           <SafeAreaView className='flex-1' edges={['top']}>
-            <ActivityDetailsScreenModal activity={activity} onClose={() => setProfileModalVisible(false)} />
+            <ActivityDetailsScreenModal activity={activity} onClose={() => setActivityDetailsModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>

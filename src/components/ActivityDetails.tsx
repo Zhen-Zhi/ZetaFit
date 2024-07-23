@@ -60,7 +60,6 @@ const ActivityDetailsScreenModal = ({ activity, onClose }: ActivityDetailsScreen
       && selectedActivity?.activity == "Swimming"
     )
     {
-      console.log("Set swimming kilometer")
       setSelectedUnit("Kilometers")
     }
   }, [activity])
@@ -136,7 +135,7 @@ const ActivityDetailsScreenModal = ({ activity, onClose }: ActivityDetailsScreen
           <View>
             <Text className='font-medium text-lg'>Title *</Text>
             <Text
-              className='p-3 border rounded-lg border-slate-500 mt-1 bg-white'
+              className='p-3 border rounded-lg border-slate-500 mt-1 bg-white font-bold'
             >{activity.activity_title}</Text>
           </View>
           
@@ -144,15 +143,8 @@ const ActivityDetailsScreenModal = ({ activity, onClose }: ActivityDetailsScreen
             <Text className='font-medium text-lg'>Distance *</Text>
             <View className='flex-row bg-white'>
               <Text
-                className='flex-1 border border-slate-500 p-3 rounded-l-lg'
+                className='flex-1 border border-slate-500 p-3 rounded-l-lg font-bold'
               >
-                {/* {
-                  selectedUnit == "Kilometers"
-                    ?
-                  activity.distance ?? 0 / 1000
-                    :
-                  activity.distance
-                } */}
                 {
                   selectedUnit == "Kilometers"
                     ?
@@ -174,14 +166,14 @@ const ActivityDetailsScreenModal = ({ activity, onClose }: ActivityDetailsScreen
           <View>
             <Text className='font-bold text-lg'>Duration *</Text>
             <Text
-              className='border p-3 rounded-lg border-slate-500 mt-1 bg-white'
+              className='border p-3 rounded-lg border-slate-500 mt-1 bg-white font-bold'
             >{activity.duration}</Text>
           </View>
           
           <View>
             <Text className='font-medium text-lg'>Activity Descriptions</Text>
             <TextInput
-              className='border p-2 rounded-lg border-slate-500 mt-1 bg-white h-28'
+              className='border p-2 rounded-lg border-slate-500 mt-1 bg-white h-28 font-bold'
               value={activity.activity_description ?? ''}
               editable={false}
             />

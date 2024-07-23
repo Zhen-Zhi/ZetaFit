@@ -169,8 +169,9 @@ const ClanDetailsScreen = () => {
                             router.navigate('/clan')
                             return
                           },
-                          onError() {
+                          onError(e) {
                             console.log("Unable to delete clan")
+                            console.log(e)
                           }
                         }
                       )
@@ -315,7 +316,19 @@ const ClanDetailsScreen = () => {
               className='w-[75%] rounded-xl p-2'
               pressInValue={0.95}
               onPress={() => handleCLanInOut()}
-              disabled={userData.clan_id != null && !isClanMember}
+              disabled={
+                isClanMember 
+                  ? false 
+                  : (
+                    userData.clan_id != null
+                      ? false
+                      : (
+                        clanMembers.length >= 25
+                          ? true
+                          : false
+                      )
+                  )
+                }
               >
               { isClanMember
                 ? 

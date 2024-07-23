@@ -13,6 +13,8 @@ import EnterUsernameModal from '../../(auth)/username';
 import { useUserClanMemberData, useUserClanName, useUserData } from '@/src/api/users';
 import { useAuth } from '@/src/providers/AuthProvider';
 import * as NavigationBar from 'expo-navigation-bar';
+import ProfileScreen from './profile/profileModal';
+import RemoteImage from '@/src/components/RemoteImage';
 
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
@@ -33,6 +35,7 @@ const HomeScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [addActivityModalVisible, setAddActivityModalVisible] = useState(false);
+  const [profileModalVisible, setProfileModalVisible] = useState(false);
   const navigation = useNavigation();
   const [enterUsernameModalVisible, setEnterUsernameModalVisible] = useState(false);
 
@@ -94,14 +97,24 @@ const HomeScreen = () => {
       <View className='flex flex-row justify-between'>
 
         {/* Avartar Image, Level Bar, Username */}
-        <AnimatedPressable pressInValue={0.98} className='flex flex-row w-3/5'>
+        <AnimatedPressable 
+          pressInValue={0.98} 
+          className='flex flex-row w-3/5'
+          onPress={() => setProfileModalVisible(true)}
+        >
 
           {/* Avatar Image */}
-          <AnimatedPressable className='border rounded-lg m-2' pressInValue={0.93}>
+          <AnimatedPressable 
+            className='border rounded-lg m-2' 
+            pressInValue={0.93}
+            onPress={() => setProfileModalVisible(true)}
+          >
             <View className='bg-transparent'> 
-              <Image
-                className='h-16 w-16 aspect-square border'
-                source={require('@asset/images/CyberKongz.jpg')}  
+              <RemoteImage
+                classNameAsProps='h-16 w-16 aspect-square border' 
+                path={user.avatar_image} 
+                fallback={require('@asset/images/CyberKongz.jpg')}
+                bucket='avatars'
               />
             </View>
           </AnimatedPressable>
@@ -239,7 +252,7 @@ const HomeScreen = () => {
       >
         <SafeAreaProvider className='flex-1'>
           <SafeAreaView className='flex-1' edges={['top']}>
-            <MoreOptionsModal onClose={() => setModalVisible(false)} />
+            <MoreOptionsModal userData={user} onClose={() => setModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>
@@ -271,6 +284,21 @@ const HomeScreen = () => {
         <SafeAreaProvider className='flex-1'>
           <SafeAreaView edges={['top']} className='flex-1'>
             <EnterUsernameModal onClose={() => setEnterUsernameModalVisible(false)} />
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </Modal>
+
+      {/* Profile modal */}
+      <Modal
+        animationType='fade'
+        visible={profileModalVisible}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setProfileModalVisible(false)}
+      >
+        <SafeAreaProvider>
+          <SafeAreaView edges={['top']} className='flex-1'>
+            <ProfileScreen userData={user} onClose={() => setProfileModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>

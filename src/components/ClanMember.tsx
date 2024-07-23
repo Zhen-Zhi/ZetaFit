@@ -12,6 +12,7 @@ import { useAuth } from '../providers/AuthProvider'
 import { useEditClanMemberRole, useInsertClanLog, useLeaveClan } from '../api/clan'
 import ClanLoadingScreenComponent from './ClanLoadingScreen'
 import { useUpdateUserClanId } from '../api/users'
+import RemoteImage from './RemoteImage'
 
 type ClanMemberProps = {
   member: { users: Tables<'users'> | null } &Tables<'clan_members'> | null;
@@ -25,7 +26,7 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
     return <Redirect href={'/sign_in'} />
   }
 
-  if(!member) {
+  if(!member || !member.users) {
     console.log("Clan member not found. debug in '/components/ClanMember.tsx'")
     return <ClanLoadingScreenComponent />
   }
@@ -307,9 +308,15 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
         }
       >
         <View className='flex-row'>
-          <Image 
-          source={require('@asset/images/CyberKongz.jpg')}
-          className='aspect-square w-14 h-14 rounded-xl'
+          {/* <Image 
+            source={require('@asset/images/CyberKongz.jpg')}
+            className='aspect-square w-14 h-14 rounded-xl'
+          /> */}
+          <RemoteImage
+            classNameAsProps='h-16 w-16 aspect-square border' 
+            path={member.users.avatar_image} 
+            fallback={require('@asset/images/CyberKongz.jpg')}
+            bucket='avatars'
           />
           <View className='flex-1 flex-row justify-between'>
             <View className='flex-col ml-4 my-auto'>
@@ -347,9 +354,15 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
           }
         >
           <View className='flex-row'>
-            <Image 
-            source={require('@asset/images/CyberKongz.jpg')}
-            className='aspect-square w-14 h-14 rounded-xl'
+            {/* <Image 
+              source={require('@asset/images/CyberKongz.jpg')}
+              className='aspect-square w-14 h-14 rounded-xl'
+            /> */}
+            <RemoteImage
+              classNameAsProps='h-16 w-16 aspect-square border' 
+              path={member.users.avatar_image} 
+              fallback={require('@asset/images/CyberKongz.jpg')}
+              bucket='avatars'
             />
             <View className='flex-1 flex-row justify-between'>
               <View className='flex-col ml-4 my-auto'>
@@ -428,7 +441,7 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
       >
         <SafeAreaProvider className='flex-1'>
           <SafeAreaView className='flex-1' edges={['top']}>
-            <ProfileScreen onClose={() => setProfileModalVisible(false)} />
+            <ProfileScreen userData={member.users} onClose={() => setProfileModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>

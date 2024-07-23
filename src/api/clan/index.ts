@@ -78,11 +78,15 @@ export const useClanMembers = (clanId: number) => {
   )
 }
 
-export const useClanDetails = (clanId: number) => {
+export const useClanDetails = (clanId: number | null) => {
   return (
     useQuery({
       queryKey: ['clans', clanId],
       queryFn: async () => {
+        if (clanId == null || clanId == undefined) {
+          return null
+        }
+        
         const { data: clanDetail, error } = await supabase
           .from('clans')
           .select('*')
@@ -94,7 +98,8 @@ export const useClanDetails = (clanId: number) => {
         }
 
         return clanDetail
-      }
+      },
+      enabled: !!clanId
     })
   )
 }
