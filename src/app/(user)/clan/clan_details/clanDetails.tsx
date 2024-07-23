@@ -1,4 +1,4 @@
-import { Modal, Pressable, StyleSheet, Text, View, Image, TextInput } from 'react-native'
+import { Modal, Pressable, StyleSheet, Text, View, Image, TextInput, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons'
 import { themeColors } from '@/src/constants/Colors'
@@ -9,7 +9,7 @@ import EditRequireActiveScoreModal from './editRequireActiveScore';
 import AddClanHealthModal from './addClanHealth';
 import { RouteProp } from '@react-navigation/native';
 import { Tables } from '@/src/database.types';
-import { useClanActiveScore, useClanMembers, useClanRankings } from '@/src/api/clan';
+import { useClanActiveScore, useClanMembers, useClanRankings, useClanWarWin } from '@/src/api/clan';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { Redirect } from 'expo-router';
 
@@ -49,6 +49,18 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
     error: clanMembersError 
   } = useClanMembers(clanDetails.clan_id)
 
+  const {
+    data: clanWin,
+    isLoading: clanWinIsLoading,
+    error: clanWinError,
+  } = useClanWarWin(clanDetails.clan_id)
+
+  const {
+    data: clanLose,
+    isLoading: clanLoseIsLoading,
+    error: clanLoseError,
+  } = useClanWarWin(clanDetails.clan_id)
+
   const rank = clanRankings?.find((clan) => clan.clan_id == clanDetails.clan_id)?.rank ?? '-';
 
   const [editModalVisible, setEditModalVisible] = useState(false)
@@ -72,6 +84,10 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
   const decrement = () => {
     setAmount(prevAmount => prevAmount > 0 ? prevAmount - 100 : 0);
   };
+
+  if(!clanLose || !clanWin) {
+    return <ActivityIndicator />
+  }
   
   return (
     <View className='flex-1 p-4'>
@@ -89,7 +105,7 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
         <View className='flex-row justify-center'>
           <Text style={{ color: themeColors.tetiary }} className='font-bold text-[22px] mx-3'>Win</Text>
           <Progress.Bar className='my-2'
-            progress={0.65}
+            progress={clanWin.count / (clanWin.count + clanLose.count)}
             height={14}
             width={260}
             color={themeColors.tetiary}
@@ -100,9 +116,9 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
           <Text className='font-bold text-[22px] text-red-600 mx-3'>Lose</Text>
         </View>
         <View className='flex-row justify-center'>
-          <Text style={{ color: themeColors.tetiary }} className='font-extrabold text-[32px] mx-4'>65</Text>
+          <Text style={{ color: themeColors.tetiary }} className='font-extrabold text-[32px] mx-4'>{clanWin.count}</Text>
           <Text style={{ color: themeColors.primary }} className='font-extrabold text-[32px] mx-4'>:</Text>
-          <Text className='font-extrabold text-[32px] text-red-600 mx-4'>35</Text>
+          <Text className='font-extrabold text-[32px] text-red-600 mx-4'>{clanLose.count}</Text>
         </View>
       </View>
 

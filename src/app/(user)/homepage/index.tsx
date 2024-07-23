@@ -113,7 +113,7 @@ const HomeScreen = () => {
           />
           <View className='flex-col mt-2'>
             <Progress.Bar className='justify-center left-[24px]'
-              progress={user?.experience ?? 0 / calculateLevel()}
+              progress={user?.experience / calculateLevel()}
               width={130}
               height={24}
               color={themeColors.tetiary}
@@ -156,6 +156,7 @@ const HomeScreen = () => {
           style={[styles.image, styles.shadowAndriod]} 
           className='bg-white border border-slate-400 flex-1 flex-row mr-2 mt-1.5 rounded-lg shadow shadow-slate-400'
           pressInValue={0.97}
+          onPress={() => router.push('/clan')}
           >
           <Image
             className='w-12 h-14 mx-2'
@@ -200,7 +201,7 @@ const HomeScreen = () => {
               <FontAwesome6 name="bolt-lightning" size={24} color='orange' />
             </View>
             <View className='bg-slate-200 rounded-lg px-2 mx-2 flex-1'>
-              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>{user?.energy}</Text>
+              <Text style={{ color: themeColors.primary }} className='text-lg text-center font-semibold'>{user?.energy}/160</Text>
             </View>
           </View>
         </View>
@@ -253,7 +254,7 @@ const HomeScreen = () => {
       >
         <SafeAreaProvider className='flex-1'>
           <SafeAreaView edges={['top']} className='flex-1'>
-            <AddActivityScreenModal onClose={() => setAddActivityModalVisible(false)} />
+            <AddActivityScreenModal energy={user.energy} current_active_score={user.active_score} onClose={() => setAddActivityModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>

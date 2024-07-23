@@ -45,6 +45,8 @@ const ClanDetailsScreen = () => {
     error: userDataError,
   } = useUserData(session.user.id)
 
+  
+
   const { mutate: joinClan } = useJoinClan()
   const { mutate: leaveClan } = useLeaveClan()
   const { mutate: updateUserClanId } = useUpdateUserClanId()

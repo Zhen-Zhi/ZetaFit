@@ -11,17 +11,13 @@ import { Tables } from '../database.types';
 import { useAuth } from '../providers/AuthProvider';
 import { Redirect } from 'expo-router';
 import AnimatedModal from './AnimatedModal';
+import { useUpdateUser } from '../api/users';
 
 
 type AddActivityScreenModalProps = {
+  energy: number;
+  current_active_score: number;
   onClose : () => void;
-}
-
-type ActivityTypeProps = {
-  id: number;
-  activity: string;
-  image: any;
-  index ?: number;
 }
 
 const AnimatedButton = Animated.createAnimatedComponent(Pressable);
@@ -78,7 +74,7 @@ const items = [
 // ];
 
 
-const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
+const AddActivityScreenModal = ({ energy, current_active_score, onClose }: AddActivityScreenModalProps) => {
   const { session } = useAuth();
 
   if(!session) {
@@ -92,6 +88,7 @@ const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
   } = useActivityTypes()
 
   const { mutate: insertActivity } = useInsertActivity()
+  const { mutate: updateUser } = useUpdateUser()
   
   const [title, setTitle] = useState('')
   const [distance, setDistance] = useState('')
@@ -177,6 +174,14 @@ const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
       distanceInMeter = parseFloat(distance)
     }
 
+    let newEnergy = 0
+
+    if(160 - energy < 40) {
+      newEnergy = 160  
+    } else {
+      newEnergy = energy + 40
+    }
+
     insertActivity(
       {
         activity_type_id: selectedItem?.id,
@@ -185,17 +190,32 @@ const AddActivityScreenModal = ({ onClose }: AddActivityScreenModalProps) => {
         duration: duration,
         activity_description: description, 
         user_id: session.user.id,
+        active_score: 250
       }, 
       {
         onSuccess() {
-          setTitle('')
-          setDistance('')
-          setDuration('')
-          setDescription('')
-          setInsertComplete(true)
-          setTimeout(() => {
-            setInsertActivityLoading(false)
-          }, 1000)
+          updateUser(
+            {
+              id: session.user.id,
+              energy: newEnergy,
+              active_score: current_active_score + 250
+            }, 
+            {
+              onSuccess() {
+                setTitle('')
+                setDistance('')
+                setDuration('')
+                setDescription('')
+                setInsertComplete(true)
+                setTimeout(() => {
+                  setInsertActivityLoading(false)
+                }, 1000)
+              },
+              onError() {
+                console.log("Error in updating")
+              }
+            }
+          )
         }
       }
     )

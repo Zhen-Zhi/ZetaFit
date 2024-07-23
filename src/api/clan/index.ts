@@ -497,3 +497,47 @@ export const useUpdateClanWar = () => {
     })
   )
 }
+
+export const useClanWarWin = (clanId: number) => {
+  return (
+    useQuery({
+      queryKey: ['clan_war_win', clanId],
+      queryFn: async () => {
+        const { data: clanWarWin, error } = await supabase
+          .from('clan_war')
+          .select('winner_clan_id.count()')
+          .eq('winner_clan_id', clanId)
+          .single()
+
+        if (error) {
+          console.log(error)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return clanWarWin
+      }
+    })
+  )
+}
+
+export const useClanWarLose = (clanId: number) => {
+  return (
+    useQuery({
+      queryKey: ['clan_war_lose', clanId],
+      queryFn: async () => {
+        const { data: clanWarLose, error } = await supabase
+          .from('clan_war')
+          .select('defeat_clan_id.count()')
+          .eq('defeat_clan_id', clanId)
+          .single()
+
+        if (error) {
+          console.log(error)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return clanWarLose
+      }
+    })
+  )
+}

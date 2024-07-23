@@ -7,12 +7,18 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { themeColors } from '../constants/Colors'
 import ProfileScreen from '../app/(user)/homepage/profile/profileModal'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { Tables } from '../database.types'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime';
+import ActivityDetailsScreenModal from './ActivityDetails'
+
+dayjs.extend(relativeTime);
 
 type ClanMemberProps = {
-  id: number;
+  activity: Tables<'user_activities'>
 }
 
-const ActivityList = ({ id }: ClanMemberProps) => {
+const ActivityList = ({ activity }: ClanMemberProps) => {
   const [modalVisible, setModalVisible] = useState(false)
   const [profileModalVisible, setProfileModalVisible] = useState(false)
 
@@ -25,17 +31,17 @@ const ActivityList = ({ id }: ClanMemberProps) => {
       >
         <View className='flex-row'>
           <Image 
-          source={require('@asset/images/swimming.png')}
-          className='aspect-square w-14 h-14 rounded-xl'
+            source={require('@asset/images/swimming.png')}
+            className='my-auto aspect-square w-14 h-14 rounded-xl'
           />
           <View className='flex-1 flex-row justify-between'>
-            <View className='flex-col ml-4 my-auto'>
-              <Text className='text-lg font-bold'>Activity Title</Text>
-              <Text className='font-semibold text-slate-600'>3 days ago</Text>
+            <View className='flex-col ml-4 my-auto max-w-[60%]'>
+              <Text className='text-lg font-bold'>{activity.activity_title}</Text>
+              <Text className='font-semibold text-slate-600'>{dayjs(activity.created_at).fromNow()}</Text>
             </View>
             <View className='flex-row my-auto mr-2 bg-slate-200 rounded-lg p-2'>
               <FontAwesome6 name="fire" size={28} color="rgba(240, 93, 9, 0.8)" />
-              <Text className='text-center text-lg rounded font-semibold ml-2'>1000</Text>
+              <Text className='text-center text-lg rounded font-semibold ml-2'>{activity.active_score}</Text>
             </View>
           </View>
         </View>
@@ -61,7 +67,7 @@ const ActivityList = ({ id }: ClanMemberProps) => {
             />
             <View className='flex-1 flex-row justify-between'>
               <View className='flex-col ml-4 my-auto'>
-                <Text className='text-lg font-bold'>Activity Title</Text>
+                <Text className='text-lg font-bold'>{activity.activity_title}</Text>
                 <Text className='font-semibold text-slate-600'>3 days ago</Text>
               </View>
             </View>
@@ -93,11 +99,11 @@ const ActivityList = ({ id }: ClanMemberProps) => {
         visible={profileModalVisible}
         presentationStyle='overFullScreen'
         transparent={true}
-        onRequestClose={() =>setModalVisible(false)}
+        onRequestClose={() =>setProfileModalVisible(false)}
       >
         <SafeAreaProvider className='flex-1'>
           <SafeAreaView className='flex-1' edges={['top']}>
-            <ProfileScreen onClose={() => setProfileModalVisible(false)} />
+            <ActivityDetailsScreenModal activity={activity} onClose={() => setProfileModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>
