@@ -1,11 +1,13 @@
-import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, View, Image } from 'react-native'
+import { ImageBackground, ScrollView, StyleSheet, Text, TextInput, View, Image, Keyboard } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { Stack, router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
-import ChallengesCard from '@/src/components/ChallengesCard'
 import { themeColors } from '@/src/constants/Colors'
+import ChallengesCard from '@/src/components/ChallengesCard'
+import { useChallengesList, useChallengesListPagination } from '@/src/api/challenges'
+import { useQueryClient } from '@tanstack/react-query'
 
 type ChallengesType = {
   id: number;
@@ -32,13 +34,22 @@ const Challenges = [
 
 
 const AllChanllengesScreen = () => {
-  const itemsPerPage = 5;
+  const itemsPerPage = 2;
   const [currentPage, setCurrentPage] = useState(0); // 0 = page 1
-  const [displayedChallenges, setDisplayedChallenges] = useState(Challenges.slice(currentPage * itemsPerPage, currentPage + 1 * itemsPerPage));
+  // const [displayedChallenges, setDisplayedChallenges] = useState(Challenges.slice(currentPage * itemsPerPage, currentPage + 1 * itemsPerPage));
   const scrollViewRef = useRef<ScrollView>(null);
-  
+  const [searchValue, setSearchValue] = useState('')
+
+  const {
+    data: challengesList,
+    error: challengesListError,
+    isLoading: challengesListIsLoading,
+    refetch
+  } = useChallengesListPagination('%' + searchValue + '%', (currentPage * itemsPerPage), ((1 + currentPage) * itemsPerPage) - 1, currentPage)
+
   const previousPage = () => {
     setCurrentPage(currentPage - 1);
+    // queryClient.invalidateQueries({queryKey: ['all_challenges', currentPage]});
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
   }
 
@@ -47,9 +58,9 @@ const AllChanllengesScreen = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
   }
 
-  useEffect(() => {
-    setDisplayedChallenges(Challenges.slice(currentPage * itemsPerPage, currentPage * itemsPerPage + itemsPerPage));
-  }, [Challenges, currentPage]);
+  // useEffect(() => {
+  //   setDisplayedChallenges(Challenges.slice(currentPage * itemsPerPage, currentPage * itemsPerPage + itemsPerPage));
+  // }, [Challenges, currentPage]);
   
   return (
     <View className='flex-1'>
@@ -64,10 +75,16 @@ const AllChanllengesScreen = () => {
             <TextInput
               className='border border-slate-400 p-2 rounded-lg bg-white flex-1 mr-2'
               placeholder='Search by name'
+              onChangeText={setSearchValue}
             />
             <AnimatedPressable
               className='border border-slate-400 rounded-lg bg-white'
               pressInValue={0.9}
+              onPress={() => {
+                setCurrentPage(0)
+                Keyboard.dismiss();
+                refetch();
+              }}
             >
               <View className='my-auto mx-3'>
                 <FontAwesome6 name="magnifying-glass" size={20} color="black" />
@@ -84,7 +101,13 @@ const AllChanllengesScreen = () => {
               <Text className='text-3xl font-bold bg-white/50'>All Chanllenges</Text>
             </View>
           <View className='mx-2.5'>
-            { displayedChallenges.map(( challenge ) => <ChallengesCard key={challenge.id} classNameAsProps='my-3' data={challenge} onPress={() => router.push(`/challenges/${challenge.id}`)} />) }
+            { challengesList?.map(( challenge ) => <ChallengesCard key={challenge.id} classNameAsProps='my-3' challengeData={challenge} onPress={() => router.push(`/challenges/${challenge.id}`)} />) }
+            { challengesList?.length == 0 && 
+                // <View className='h-[200px]'>
+                <View className='h-[180px] bg-white/50 border border-slate-600/50 rounded-xl my-4'>
+                  <Text className='m-auto text-center text-md text-slate-500'>No More Challenges</Text>
+                </View> 
+            }
           </View>
           <View className='flex-row justify-between bg-white/50 mx-3'>
             <AnimatedPressable
@@ -101,11 +124,11 @@ const AllChanllengesScreen = () => {
             </AnimatedPressable>
             <Text className='font-bold flex-1 text-md text-center'>{currentPage + 1}</Text>
             <AnimatedPressable
-              style={ currentPage * itemsPerPage + itemsPerPage >= Challenges.length ? { opacity: 0.5 } : { opacity: 1 } }
+              style={ challengesList?.length == 0 ? { opacity: 0.5 } : { opacity: 1 } }
               className='flex-1'
               pressInValue={0.9}
               onPress={nextPage}
-              disabled={currentPage * itemsPerPage + itemsPerPage >= Challenges.length}
+              disabled={ challengesList?.length == 0}
             >
               <View className='flex-row self-end mx-1'>
                 <Text className='mx-2 font-medium'>Next</Text>

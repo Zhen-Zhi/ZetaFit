@@ -1,13 +1,18 @@
-import { ImageBackground, StyleSheet, Text, View, Image, TextInput, FlatList, TouchableWithoutFeedback, Keyboard, Modal, Platform } from 'react-native'
-import React, { useState } from 'react'
+import { ImageBackground, StyleSheet, Text, View, Image, TextInput, FlatList, TouchableWithoutFeedback, Keyboard, Modal, Platform, ActivityIndicator, Dimensions } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import ClanList from '@/src/components/ClanList'
-import { clanListData } from '@/src/constants/dummyData'
 import CreateClanScreen from './createClan';
-import { Stack, router } from 'expo-router';
+import { Redirect, Stack, router } from 'expo-router';
 import { themeColors } from '@/src/constants/Colors';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useClanDetails, useClanList } from '@/src/api/clan';
+import { fullHeight } from '@/src/constants/heigth';
+import ClanLoadingScreenComponent from '@/src/components/ClanLoadingScreen';
+import { useUserClanMemberData, useUserData } from '@/src/api/users';
+import { useAuth } from '@/src/providers/AuthProvider';
+import { useClanListSubscription } from '@/src/api/clan/subscription';
 
 type Clan = {
   clanName: string;
@@ -17,12 +22,33 @@ type Clan = {
 };
 
 const ClanScreen = () => {
+  const { session } = useAuth()
+
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
   const [modalVisible, setModalVisible] = useState(false);
+  const [searchValue, setSearchValue] = useState('')
+
+  const { data: clanListData, error, isLoading, refetch } = useClanList('%' + searchValue + '%');
+
+  const {
+    data: userData,
+    error: userDataError,
+    isLoading: userDataIsLoading,
+  } = useUserData(session.user.id)
+
+  if(userData?.clan_id != null) {
+    // router.replace(`/clan/clan_details/${userData.clan_id}`)
+    // return
+    return <Redirect href={`/clan/clan_details/${userData.clan_id}`} />
+  }
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
       <ImageBackground
-        className='flex-1'
+        style={{ height: fullHeight }}
         source={require('@asset/images/background_image.png')}
       >
       <Stack.Screen options={{ headerShown: false }} />
@@ -40,20 +66,6 @@ const ClanScreen = () => {
               </View>
             </AnimatedPressable>
           </View>
-        {/* <Stack.Screen options={{ 
-          title: 'Clan',
-          headerTitleStyle: { color: themeColors.primary },
-          headerRight: () => 
-            <AnimatedPressable 
-              pressInValue={0.9}
-              className='rounded'
-              onPress={() => setModalVisible(true)}
-            >
-              <View className=''>
-                <MaterialCommunityIcons name="shield-plus-outline" size={28} color={themeColors.primary} />
-              </View>
-            </AnimatedPressable>
-        }}/> */}
 
           {/* Top image - Clan */}
           <Image 
@@ -65,27 +77,44 @@ const ClanScreen = () => {
             {/* Search component */}
             <View className='bg-white/60 flex flex-row mx-4'>
               <TextInput 
+                value={searchValue}
                 className='border border-slate-400 rounded-lg py-2 px-4 flex-1 mr-2 bg-white shadow shadow-slate-400'
                 placeholder='Search clan......'
                 style={{ color: themeColors.primary }}
+                onChangeText={setSearchValue}
               />
               <AnimatedPressable 
                 pressInValue={0.9} 
                 className='border border-slate-400 rounded-lg justify-center p-3 bg-white shadow shadow-slate-400'
+                onPress={() => {
+                  Keyboard.dismiss();
+                  refetch();
+                }}
               >
                 <FontAwesome6 class name="magnifying-glass" size={18} color={themeColors.primary} />
               </AnimatedPressable>
             </View>
 
             {/* Clan list */}
-            <FlatList
-              className='mx-4 mt-2'
-              data={clanListData}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => <ClanList clan={item} />}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ gap: 3 }}
-            />
+            {
+              isLoading
+              ?
+              <View className='bg-white/50 mx-4 mt-2 mb-20'>
+                <ActivityIndicator 
+                  size={80}
+                  color={themeColors.secondary}
+                />
+              </View>
+              :
+              <FlatList
+                className='mx-4 mt-2 mb-20'
+                data={clanListData}
+                keyExtractor={(item) => item.clan_id.toString()}
+                renderItem={({ item }) => <ClanList clan={item} />}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ gap: 3 }}
+              />
+            }
           </View>
 
           <Modal

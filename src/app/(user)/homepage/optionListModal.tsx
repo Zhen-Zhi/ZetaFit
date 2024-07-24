@@ -8,8 +8,11 @@ import ProfileScreen from './profile/profileModal';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import ActivityLogScreen from '../pets/activityLog';
 import AnimatedModal from '@/src/components/AnimatedModal';
+import { supabase } from '@/src/lib/supabase';
+import { Tables } from '@/src/database.types';
 
 type MoreOptionsModalProps = {
+  userData: Tables<'users'>;
   onClose: () => void;
 };
 
@@ -24,7 +27,7 @@ const ListOptions: ListOptionsType[] = [
   {name: 'Activities', iconName: 'history'}
 ]
 
-const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
+const MoreOptionsModal = ({ userData, onClose }: MoreOptionsModalProps) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleOptionPress = (optionName: string) => {
@@ -65,7 +68,7 @@ const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
           style={{ backgroundColor: themeColors.backgroundColor }}
           pressInValue={0.95} 
           className='border border-slate-400 h-10 rounded-xl mb-1 mt-4 mx-1'
-          onPress={() => router.replace('/(auth)/sign_in')}
+          onPress={async () => await supabase.auth.signOut()}
         >
           <View className='flex-row flex-1 justify-center'>
             <View className='absolute left-5 top-1.5'>
@@ -85,7 +88,7 @@ const MoreOptionsModal = ({ onClose }: MoreOptionsModalProps) => {
       >
         <SafeAreaProvider>
           <SafeAreaView edges={['top']} className='flex-1'>
-            <ProfileScreen onClose={() => setModalVisible(false)} />
+            <ProfileScreen userData={userData} onClose={() => setModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>

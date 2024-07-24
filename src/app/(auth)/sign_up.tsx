@@ -18,6 +18,7 @@ const SignInScreen = () => {
     const passwordError = ['weak_password'];
 
     setLoading(true);
+    setErrorType('')
     if (password != conFirmPassword) {
       setErrorType('password');
       setErrorMessage('Password not same with confirm password')
@@ -44,7 +45,6 @@ const SignInScreen = () => {
       setLoading(false);
       return
     };
-    router.replace('/username')
   }
   
   return (

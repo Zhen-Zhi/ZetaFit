@@ -1,5 +1,5 @@
 import { ImageBackground, Image, StyleSheet, Text, View, FlatList, ScrollView, TextInput } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import * as ImagePicker from 'expo-image-picker';
 import { randomUUID } from 'expo-crypto';
 import { decode } from 'base64-arraybuffer';
@@ -10,14 +10,27 @@ import { themeColors } from '@/src/constants/Colors';
 import Checkbox from 'expo-checkbox';
 import AchievementElement from './achievementElement';
 import { LinearGradient } from 'expo-linear-gradient';
+import { supabase } from '@/src/lib/supabase';
+import { useUpdateUser } from '@/src/api/users';
+import { Tables } from '@/src/database.types';
+import RemoteImage from '@/src/components/RemoteImage';
 
 type ModalProps = {
+  userData: Tables<'users'>;
   onClose: () => void;
 };
 
-const EditProfileScreen = ({ onClose }: ModalProps) => {
+const EditProfileScreen = ({ userData, onClose }: ModalProps) => {
   const [image, setImage] = useState<string | null>(null);
-  const [username, setUsername] = useState('default username')
+  const [username, setUsername] = useState('')
+
+  const { mutate: updateUser } = useUpdateUser()
+
+  useEffect(() => {
+    if(userData.username) {
+      setUsername(userData.username)
+    }
+  }, [])
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -42,14 +55,30 @@ const EditProfileScreen = ({ onClose }: ModalProps) => {
     });
     const filePath = `${randomUUID()}.png`;
     const contentType = 'image/png';
-    // const { data, error } = await supabase.storage
-    //   .from('product-images')
-    //   .upload(filePath, decode(base64), { contentType });
+    const { data, error } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, decode(base64), { contentType });
   
-    // if (data) {
-    //   return data.path;
-    // }
+    if (data) {
+      return data.path;
+    }
   };
+
+  const handleUpdateProfile = async () => {
+    const imagePath = await uploadImage()
+
+    updateUser(
+      { 
+        id: userData.id,
+        username: username,
+        avatar_image: imagePath
+      }, 
+      {
+      onSuccess() {
+
+      }
+    })
+  }
 
   return (
     <ImageBackground
@@ -75,9 +104,15 @@ const EditProfileScreen = ({ onClose }: ModalProps) => {
       </View>
       
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Image
+        {/* <Image
           className='w-48 h-48 aspect-square rounded-xl mx-auto mt-6'
           source={image ? { uri: image } : require('@asset/images/CyberKongz.jpg')}
+        /> */}
+        <RemoteImage
+          classNameAsProps='w-48 h-48 aspect-square rounded-xl mx-auto mt-6'
+          path={userData.avatar_image} 
+          fallback={require('@asset/images/CyberKongz.jpg')}
+          bucket='avatars'
         />
         <AnimatedPressable pressInValue={0.98} onPress={pickImage}>
           <Text style={{ color: themeColors.secondary }} className='font-bold text-xl text-center mt-2.5'>Upload Image</Text>
@@ -118,7 +153,8 @@ const EditProfileScreen = ({ onClose }: ModalProps) => {
           style={{ backgroundColor: themeColors.secondary }}
           pressInValue={0.98}
           className='w-4/5 p-1.5 rounded-xl mb-6'
-          >
+          onPress={handleUpdateProfile}
+        >
           <Text style={{ color: themeColors.backgroundColor }} className='text-center text-xl my-auto font-bold'>Save</Text>
         </AnimatedPressable>
       </View>

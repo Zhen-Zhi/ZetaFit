@@ -1,15 +1,42 @@
-import { FlatList, ImageBackground, Modal, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, FlatList, ImageBackground, Modal, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
-import { Stack, router } from 'expo-router'
+import { Redirect, Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
 import { Entypo, FontAwesome, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons'
 import ActivityList from '@/src/components/ActivityList'
 import AddActivityScreenModal from '@/src/components/AddActivity'
+import { useUserActivities } from '@/src/api/activity'
+import { useAuth } from '@/src/providers/AuthProvider'
+import { useUserData } from '@/src/api/users'
 
 const ActivityLogScreen = () => {
+  const { session } = useAuth();
+
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
   const [addActivityModalVisible, setAddActivityModalVisible] = useState(false)
+
+  const { data: userData, error, isLoading } = useUserData(session.user.id)
+
+  const {
+    data: userActivities,
+    error: userActivitiesError,
+    isLoading: userActivitiesIsLoading,
+  } = useUserActivities(session?.user.id)
+
+  if(!userActivities) {
+    console.log("User activity not found. Debug in '/(user)/pets/activityLog'")
+    return <ActivityIndicator />
+  }
+
+  if(!userData) {
+    console.log("User data not found. Debug in '/(user)/pets/activityLog'")
+    return <ActivityIndicator />
+  }
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
@@ -42,9 +69,9 @@ const ActivityLogScreen = () => {
         
         <FlatList
           className='mt-3 mb-2 mx-0.5 px-2'
-          data={[1,2,3,4,5,6,7,8,9,10]}
-          renderItem={({ item }) => <ActivityList id={1} />}
-          keyExtractor={(item) => item.toString()}
+          data={userActivities}
+          renderItem={({ item }) => <ActivityList activity={item} />}
+          keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ gap: 3 }}
           // ListHeaderComponent={headerComponent}
@@ -62,7 +89,7 @@ const ActivityLogScreen = () => {
       >
         <SafeAreaProvider className='flex-1'>
           <SafeAreaView edges={['top']} className='flex-1'>
-            <AddActivityScreenModal onClose={() => setAddActivityModalVisible(false)} />
+            <AddActivityScreenModal energy={userData.energy} current_active_score={userData.active_score} onClose={() => setAddActivityModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>

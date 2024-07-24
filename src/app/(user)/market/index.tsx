@@ -168,6 +168,7 @@ const MarketplaceScreen = () => {
             contentContainerStyle={{ gap: 3 }}
             ListHeaderComponent={searchBar}
             ListFooterComponent={FlatListFooterComponent}
+            removeClippedSubviews={false}
           />
         </View>
 

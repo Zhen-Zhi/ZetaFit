@@ -12,7 +12,7 @@ const InventoryActionScreenModal = ({ onClose, currentRoute }: InventoryActionSc
   const handlePress = (destination: string) => {
     if (currentRoute !== destination) {
       if (destination == 'pets') {
-        router.replace('/pets')
+        router.navigate('/pets')
         onClose();
       }
       else {

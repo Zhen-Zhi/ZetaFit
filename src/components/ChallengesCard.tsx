@@ -5,21 +5,25 @@ import AnimatedPressable from './AnimatedPressable'
 import {LinearGradient} from 'expo-linear-gradient';
 import * as Progress from 'react-native-progress';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Tables } from '../database.types';
+import RemoteImage from './RemoteImage';
+import RemoteImageBackground from './RemoteImageBackground';
 
 type ChallengesCardProps = {
   onPress ?: () => void;
   classNameAsProps ?: string;
   fullWidth ?: number;
-  data ?: ChallengesType;
+  challengeData :  Tables<'challenges'> | null;
 }
 
-type ChallengesType = {
-  id: number;
-  name: string;
-  progress ?: number;
-};
+// type ChallengesType = {
+//   id: number;
+//   name: string;
+//   progress ?: number;
+// };
 
-const ChallengesCard = ({ classNameAsProps, fullWidth, data, onPress }: ChallengesCardProps) => {
+const ChallengesCard = ({ classNameAsProps, fullWidth, challengeData, onPress }: ChallengesCardProps) => {
+
   return (
     <AnimatedPressable
       className={classNameAsProps}
@@ -27,11 +31,17 @@ const ChallengesCard = ({ classNameAsProps, fullWidth, data, onPress }: Challeng
       onPress={onPress}
     >
       <View className='bg-white border-x border-slate-600 border-t rounded-xl overflow-hidden'>
-        <ImageBackground
+        {/* <ImageBackground
           style={{ width: fullWidth }}
           className='h-[180px]'
           imageStyle={{ borderRadius: 8 }}
           source={require('@asset/images/challenges_banner.png')}
+        > */}
+        <RemoteImageBackground
+          classNameAsProps='h-[180px]'
+          path={challengeData?.banner_image}
+          fallback={require('@asset/images/challenges_banner.png')}
+          bucket='challenges_banner'
         >
           <View className='flex-1 justify-end'>
             <LinearGradient
@@ -42,28 +52,36 @@ const ChallengesCard = ({ classNameAsProps, fullWidth, data, onPress }: Challeng
             >
               <View className='flex-row px-2 mb-1'>
                 <View className='my-auto mr-2'>
-                  {/* <Ionicons name="extension-puzzle-sharp" size={26} color={difficultiesColors.beginner} /> */}
-                  {/* <Ionicons name="extension-puzzle-sharp" size={26} color={difficultiesColors.intermediate} /> */}
-                  {/* <Ionicons name="extension-puzzle-sharp" size={26} color={difficultiesColors.expert} /> */}
-                  <MaterialCommunityIcons name="speedometer" size={28} color={difficultiesColors.expert} />
+                  {
+                    challengeData?.difficulty == "Beginner"
+                      ?
+                    <MaterialCommunityIcons name="speedometer-slow" size={28} color={difficultiesColors.beginner} />
+                      :
+                      challengeData?.difficulty == "Intermediate"
+                        ?
+                      <MaterialCommunityIcons name="speedometer-medium" size={28} color={difficultiesColors.intermediate} />
+                        :
+                      <MaterialCommunityIcons name="speedometer" size={28} color={difficultiesColors.expert} />
+                  }
                 </View>
                 <Text numberOfLines={1} className='flex-1 text-white text-2xl font-bold'>
-                  {data?.name}
+                  {challengeData?.title}
                 </Text>
               </View>
-              <Progress.Bar
+              {/* <Progress.Bar
                 width={fullWidth}
                 height={8}
-                progress={data?.progress}
+                // progress={data?.progress}
+                progress={challengeData?.damage ?? 0 / (challengeData?.challenges?.health ?? 99999)}
                 borderWidth={0}
                 color={themeColors.tetiary}
                 borderRadius={10}
                 unfilledColor='transparent'
-              />
+              /> */}
             </LinearGradient>
           </View>
           
-        </ImageBackground>
+        </RemoteImageBackground>
       </View>
     </AnimatedPressable>
   )

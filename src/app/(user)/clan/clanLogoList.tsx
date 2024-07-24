@@ -1,106 +1,85 @@
 import { Pressable, StyleProp, StyleSheet, Text, View, ViewStyle, Image, FlatList, ImageBackground } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable';
 import { themeColors } from '@/src/constants/Colors';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { supabase } from '@/src/lib/supabase';
+import { FileObject } from '@supabase/storage-js';
+import RemoteImage from '@/src/components/RemoteImage';
 
 type ClanLogoListModalProps = {
   onClose: () => void;
-  onSelectLogo: (clanLogoSource: { id: number; image: any }) => void;
+  onSelectLogo: (clanLogoSource: string) => void;
 }
 
-const clanLogo = [
-  {
-    id: 1,
-    image: require('@asset/images/clan_logo/clan_logo_1.png'),
-  },
-  {
-    id: 2,
-    image: require('@asset/images/clan_logo/clan_logo_2.png'),
-  },
-  {
-    id: 3,
-    image: require('@asset/images/clan_logo/clan_logo_3.png'),
-  },
-  {
-    id: 4,
-    image: require('@asset/images/clan_logo/clan_logo_4.png'),
-  },
-  {
-    id: 5,
-    image: require('@asset/images/clan_logo/clan_logo_5.png'),
-  },
-  {
-    id: 6,
-    image: require('@asset/images/clan_logo/clan_logo_6.png'),
-  },
-  {
-    id: 7,
-    image: require('@asset/images/clan_logo/clan_logo_7.png'),
-  },
-  {
-    id: 8,
-    image: require('@asset/images/clan_logo/clan_logo_8.png'),
-  },
-  {
-    id: 9,
-    image: require('@asset/images/clan_logo/clan_logo_9.png'),
-  },
-  {
-    id: 10,
-    image: require('@asset/images/clan_logo/clan_logo_1.png'),
-  },
-  {
-    id: 12,
-    image: require('@asset/images/clan_logo/clan_logo_2.png'),
-  },
-  {
-    id: 13,
-    image: require('@asset/images/clan_logo/clan_logo_3.png'),
-  },
-  {
-    id: 14,
-    image: require('@asset/images/clan_logo/clan_logo_4.png'),
-  },
-  {
-    id: 15,
-    image: require('@asset/images/clan_logo/clan_logo_5.png'),
-  },
-  {
-    id: 16,
-    image: require('@asset/images/clan_logo/clan_logo_6.png'),
-  },
-  {
-    id: 17,
-    image: require('@asset/images/clan_logo/clan_logo_7.png'),
-  },
-  {
-    id: 18,
-    image: require('@asset/images/clan_logo/clan_logo_8.png'),
-  },
-  {
-    id: 19,
-    image: require('@asset/images/clan_logo/clan_logo_9.png'),
-  },
-  {
-    id: 20,
-    image: require('@asset/images/clan_logo/clan_logo_7.png'),
-  },
-  {
-    id: 21,
-    image: require('@asset/images/clan_logo/clan_logo_8.png'),
-  },
-  {
-    id: 22,
-    image: require('@asset/images/clan_logo/clan_logo_9.png'),
-  }
-];
+// const clanLogo = [
+//   {
+//     id: 1,
+//     image: require('@asset/images/clan_logo/clan_logo_1.png'),
+//   },
+//   {
+//     id: 2,
+//     image: require('@asset/images/clan_logo/clan_logo_2.png'),
+//   },
+//   {
+//     id: 3,
+//     image: require('@asset/images/clan_logo/clan_logo_3.png'),
+//   },
+//   {
+//     id: 4,
+//     image: require('@asset/images/clan_logo/clan_logo_4.png'),
+//   },
+//   {
+//     id: 5,
+//     image: require('@asset/images/clan_logo/clan_logo_5.png'),
+//   },
+//   {
+//     id: 6,
+//     image: require('@asset/images/clan_logo/clan_logo_6.png'),
+//   },
+//   {
+//     id: 7,
+//     image: require('@asset/images/clan_logo/clan_logo_7.png'),
+//   },
+//   {
+//     id: 8,
+//     image: require('@asset/images/clan_logo/clan_logo_8.png'),
+//   },
+//   {
+//     id: 9,
+//     image: require('@asset/images/clan_logo/clan_logo_9.png'),
+//   },
+// ];
 
 const ClanLogoListModal = ({ onClose, onSelectLogo }: ClanLogoListModalProps) => {
-  const [clanLogoId, setClanLogoId] = useState<number>(1)
+  const [clanLogoId, setClanLogoId] = useState<string>('')
+  const [clanLogo, setClanLogo] = useState<FileObject[]>([]);
 
-  const passSelectedLogo = (clanLogo: { id: number; image: any }) => {
-    setClanLogoId(clanLogo.id);
+  useEffect(() => {
+    const fetchFiles = async () => {
+      try {
+        // List all files in the root directory of the bucket 'your-bucket-name'
+        const { data, error } = await supabase
+          .storage
+          .from('clan_logo')
+          .list('');
+
+        if (error) {
+          console.error('Error fetching files:', error);
+          return;
+        }
+
+        setClanLogo(data);
+      } catch (error) {
+        console.error('Error fetching files:', error);
+      }
+    };
+
+    fetchFiles();
+  }, []);
+
+  const passSelectedLogo = (clanLogo: string) => {
+    setClanLogoId(clanLogo);
     onSelectLogo(clanLogo);
     onClose();
   }
@@ -121,15 +100,23 @@ const ClanLogoListModal = ({ onClose, onSelectLogo }: ClanLogoListModalProps) =>
         <Text style={{ color: themeColors.primary }} className='text-lg font-bold text-center mb-2'>Clan Logo</Text>
         
         <FlatList
+          className='min-w-[90%] min-h-[40%]'
           data={clanLogo}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => 
             <AnimatedPressable pressInValue={0.95}
               onPress={
-                () => {passSelectedLogo(item)}
+                () => {passSelectedLogo(item.name)}
               }
             >
-              <Image className='w-20 h-24' source={item.image} />
+              {/* <Image className='w-20 h-24' source={item.name} /> */}
+              <RemoteImage
+                classNameAsProps='w-20 h-24'
+                path={item.name} 
+                fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+                bucket='clan_logo'
+              />
+
             </AnimatedPressable>
           }
           contentContainerStyle={{ gap: 10 }}
