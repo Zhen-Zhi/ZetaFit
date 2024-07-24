@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { Link, Redirect, Stack, router, useLocalSearchParams } from 'expo-router'
 import { Entypo, FontAwesome5 } from '@expo/vector-icons'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
-import TabLayout from './clanDetailTabs'
 import { themeColors } from '@/src/constants/Colors'
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AnimatedModal from '@/src/components/AnimatedModal'
@@ -12,6 +11,7 @@ import { useClanDetails, useClanMembers, useDeleteClan, useEditClanMemberRole, u
 import { useAuth } from '@/src/providers/AuthProvider'
 import ClanLoadingScreenComponent from '@/src/components/ClanLoadingScreen'
 import { useUpdateUserClanId, useUserData } from '@/src/api/users'
+import TabLayout from './clanDetailTabs'
 
 const ClanDetailsScreen = () => {
   const { id } = useLocalSearchParams()
@@ -171,7 +171,7 @@ const ClanDetailsScreen = () => {
                           },
                           onError(e) {
                             console.log("Unable to delete clan")
-                            console.log(e)
+                            console.log(e.message)
                           }
                         }
                       )
@@ -353,6 +353,7 @@ const ClanDetailsScreen = () => {
         </View>
       </View>
       <TabLayout isClanMember={isClanMember} clanId={clanId} clanDetails={clanDetails}/>
+      {/* <CustomTabLayout isClanMember={isClanMember} clanId={clanId} clanDetails={clanDetails}/> */}
       <Modal
         animationType='fade'
         visible={modalVisible}
@@ -361,18 +362,18 @@ const ClanDetailsScreen = () => {
         onRequestClose={() =>setModalVisible(false)}
       >
         <AnimatedModal modalVisible={modalVisible} onClose={() => setModalVisible(false)}>
-            <View className='p-4'>
-              <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Leave Clan</Text>
-              <Text style={{ color: themeColors.primary }} className='font-bold text-lg'>Are you sure you want to leave clan?</Text>
-              <View className='flex-row justify-around mt-6'>
-                <AnimatedPressable style={{ backgroundColor: themeColors.secondary }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => setModalVisible(false)}>
-                <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Stay</Text>
-                </AnimatedPressable>
-                <AnimatedPressable style={{ backgroundColor: themeColors.danger }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => handleLeaveClan()}>
-                <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Leave</Text>
-                </AnimatedPressable>
-              </View>
+          <View className='p-4'>
+            <Text style={{ color: themeColors.danger }} className='font-extrabold text-2xl'>Leave Clan</Text>
+            <Text style={{ color: themeColors.primary }} className='font-bold text-lg'>Are you sure you want to leave clan?</Text>
+            <View className='flex-row justify-around mt-6'>
+              <AnimatedPressable style={{ backgroundColor: themeColors.secondary }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => setModalVisible(false)}>
+              <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Stay</Text>
+              </AnimatedPressable>
+              <AnimatedPressable style={{ backgroundColor: themeColors.danger }} className='rounded-lg px-3 py-2 w-5/12' pressInValue={0.95} onPress={() => handleLeaveClan()}>
+              <Text style={{ color: themeColors.backgroundColor }} className='text-lg font-semibold text-center my-auto'>Leave</Text>
+              </AnimatedPressable>
             </View>
+          </View>
         </AnimatedModal>
       </Modal>
 

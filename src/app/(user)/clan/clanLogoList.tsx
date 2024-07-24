@@ -4,10 +4,11 @@ import AnimatedPressable from '@/src/components/AnimatedPressable';
 import { themeColors } from '@/src/constants/Colors';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { supabase } from '@/src/lib/supabase';
+import { FileObject } from '@supabase/storage-js';
 
 type ClanLogoListModalProps = {
   onClose: () => void;
-  onSelectLogo: (clanLogoSource: { id: number; image: any }) => void;
+  onSelectLogo: (clanLogoSource: string) => void;
 }
 
 // const clanLogo = [
@@ -50,8 +51,8 @@ type ClanLogoListModalProps = {
 // ];
 
 const ClanLogoListModal = ({ onClose, onSelectLogo }: ClanLogoListModalProps) => {
-  const [clanLogoId, setClanLogoId] = useState<number>(1)
-  const [files, setFiles] = useState([]);
+  const [clanLogoId, setClanLogoId] = useState<string>('')
+  const [files, setFiles] = useState<FileObject[]>([]);
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -76,8 +77,8 @@ const ClanLogoListModal = ({ onClose, onSelectLogo }: ClanLogoListModalProps) =>
     fetchFiles();
   }, []);
 
-  const passSelectedLogo = (clanLogo: { id: number; image: any }) => {
-    setClanLogoId(clanLogo.id);
+  const passSelectedLogo = (clanLogo: string) => {
+    setClanLogoId(clanLogo);
     onSelectLogo(clanLogo);
     onClose();
   }
@@ -98,15 +99,16 @@ const ClanLogoListModal = ({ onClose, onSelectLogo }: ClanLogoListModalProps) =>
         <Text style={{ color: themeColors.primary }} className='text-lg font-bold text-center mb-2'>Clan Logo</Text>
         
         <FlatList
-          data={clanLogo}
+          data={files}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => 
             <AnimatedPressable pressInValue={0.95}
               onPress={
-                () => {passSelectedLogo(item)}
+                () => {passSelectedLogo(item.name)}
               }
             >
-              <Image className='w-20 h-24' source={item.image} />
+              {/* <Image className='w-20 h-24' source={item.name} /> */}
+
             </AnimatedPressable>
           }
           contentContainerStyle={{ gap: 10 }}

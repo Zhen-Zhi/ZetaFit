@@ -1,4 +1,4 @@
-import { Modal, Pressable, StyleSheet, Text, View, Image, TextInput, ActivityIndicator } from 'react-native'
+import { Animated, Modal, Pressable, StyleSheet, Text, View, Image, TextInput, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons'
 import { themeColors } from '@/src/constants/Colors'
@@ -20,10 +20,15 @@ type ClanDetailsScreenRouteProp = RouteProp<{
 }, 'clanDetails'>;
 
 type ClanDetailsScreenProps = {
-  route: ClanDetailsScreenRouteProp;
+  route:ClanDetailsScreenRouteProp;
 };
 
+// type ClanDetailsScreenProps = {
+//   clanDetails: Tables<'clans'>
+// };
+
 const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
+// const ClanDetailsScreen = ({ clanDetails }: ClanDetailsScreenProps) => {
   const { clanDetails } = route.params;
   const { session } = useAuth();
 
@@ -105,7 +110,7 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
         <View className='flex-row justify-center'>
           <Text style={{ color: themeColors.tetiary }} className='font-bold text-[22px] mx-3'>Win</Text>
           <Progress.Bar className='my-2'
-            progress={clanWin.count / (clanWin.count + clanLose.count)}
+            progress={(clanWin.count + clanLose.count) == 0 ? 0.5 : (clanWin.count / (clanWin.count + clanLose.count))}
             height={14}
             width={260}
             color={themeColors.tetiary}

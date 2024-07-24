@@ -13,6 +13,7 @@ import ActiveChallengesCard from '@/src/components/ActiveChallengesCard';
 import { Mutation } from '@tanstack/react-query';
 import { Tables } from '@/src/database.types';
 import { useUpdateUserClanId, useUpdateUserCoin, useUserData } from '@/src/api/users';
+import RemoteImage from '@/src/components/RemoteImage';
 
 type CreateClanScreenProps = {
   onClose: () => void
@@ -21,7 +22,7 @@ type CreateClanScreenProps = {
 const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
   const { session } = useAuth()
   const [modalVisible, setModalVisible] = useState(false)
-  const [clanLogo, setClanLogo] = useState<{ id: number; image: any; }>({id: 1, image: require('@asset/images/clan_logo/clan_logo_1.png')})
+  const [clanLogo, setClanLogo] = useState<string>('')
   const [clanName, setClanName] = useState('');
   const [clanDescription, setClanDescription] = useState('');
   const [requiredActiveScore, setRequiredActiveScore] = useState(0);
@@ -122,11 +123,18 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
 
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} className=''>
         <View className='bg-[#f8f8f8]/50 mx-2 p-4 rounded-xl'>
-          <Image
+          {/* <Image
             style={{ width: 130, height: 160 }}
             className='mx-auto mt-4'
             // source={require(`@asset/images/clan_logo/clan_logo_1.png`)}
-            source={clanLogo.image}
+            source={clanLogo}
+          /> */}
+          <RemoteImage
+            style={{ width: 130, height: 160 }}
+            classNameAsProps='mx-auto mt-4'
+            path={clanLogo} 
+            fallback={require('@asset/images/clan_logo/clan_logo_1.png')}
+            bucket='avatars'
           />
           {/* <AwesomeButton style={{ margin: 'auto', marginTop: 10 }} width={160} backgroundColor={themeColors.primary} height={45} raiseLevel={4} springRelease={false} >
             <Text className='text-white font-bold'>Select Clan Logo</Text>

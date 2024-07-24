@@ -3,7 +3,7 @@ import React from 'react'
 import { Link, Redirect } from 'expo-router'
 import { useAuth } from '../providers/AuthProvider'
 
-const index = () => {
+const index = () => {  
   const { session } = useAuth()
 
   if(!session) {

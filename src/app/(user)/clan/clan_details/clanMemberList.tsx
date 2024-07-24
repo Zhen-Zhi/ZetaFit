@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native'
+import { Animated, FlatList, StyleSheet, Text, View } from 'react-native'
 import React, { memo, useEffect, useState } from 'react'
 import ClanMember from '@/src/components/ClanMember'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
@@ -24,8 +24,15 @@ type MemberScreenProps = {
   route: MemberScreenRouteProp;
 };
 
+// type MemberScreenProps = {
+//   clanDetails: Tables<'clans'>;
+//   clanId: number;
+// };
+
 const MemberScreen = ({ route }: MemberScreenProps) => {
+// const MemberScreen = ({ clanDetails, clanId }: MemberScreenProps) => {
   const { clanDetails, clanId } = route.params;
+  // const { clanDetails, clanId } = route;
   const { session } = useAuth();
 
   if(!session) {

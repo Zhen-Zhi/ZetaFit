@@ -515,7 +515,7 @@ export const useClanWarWin = (clanId: number) => {
           .single()
 
         if (error) {
-          console.log(error)
+          console.log(error.message)
           throw new Error(error.code + ":" + error.message)
         }
 
@@ -537,7 +537,7 @@ export const useClanWarLose = (clanId: number) => {
           .single()
 
         if (error) {
-          console.log(error)
+          console.log(error.message)
           throw new Error(error.code + ":" + error.message)
         }
 
