@@ -12,6 +12,7 @@ import { useAuth } from '@/src/providers/AuthProvider'
 import ClanLoadingScreenComponent from '@/src/components/ClanLoadingScreen'
 import { useUpdateUserClanId, useUserData } from '@/src/api/users'
 import TabLayout from './clanDetailTabs'
+import RemoteImage from '@/src/components/RemoteImage'
 
 const ClanDetailsScreen = () => {
   const { id } = useLocalSearchParams()
@@ -166,7 +167,7 @@ const ClanDetailsScreen = () => {
                           onSuccess() {
                             setLeaveClanLoading(false);
                             setIsClanMember(false);
-                            router.navigate('/clan')
+                            router.replace('/clan')
                             return
                           },
                           onError(e) {
@@ -193,7 +194,7 @@ const ClanDetailsScreen = () => {
                                 console.log("Msg insert successful")
                                 setLeaveClanLoading(false);
                                 setIsClanMember(false);
-                                router.navigate('/clan')
+                                router.replace('/clan')
                               }
                             }
                           )
@@ -217,7 +218,7 @@ const ClanDetailsScreen = () => {
                             onSuccess() {
                               setLeaveClanLoading(false);
                               setIsClanMember(false);
-                              router.navigate('/clan')
+                              router.replace('/clan')
                             }
                           }
                         )
@@ -225,8 +226,6 @@ const ClanDetailsScreen = () => {
                     }
                   )
                 }
-                setIsClanMember(false);
-                router.navigate('/clan')
                 insertClanLog(
                   { 
                     clan_id: clanId, 
@@ -237,7 +236,7 @@ const ClanDetailsScreen = () => {
                     onSuccess() {
                       setLeaveClanLoading(false);
                       setIsClanMember(false);
-                      router.navigate('/clan')
+                      router.replace('/clan')
                     }
                   }
                 )
@@ -273,7 +272,7 @@ const ClanDetailsScreen = () => {
           <AnimatedPressable 
             pressInValue={0.9} 
             className={`z-10 absolute left-3 bottom-2 ${userData.clan_id == clanId && 'hidden'}`}
-            onPress={() => router.navigate('/clan')}
+            onPress={() => router.replace('/clan')}
           >
             <View className='p-1'>
               <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
@@ -294,10 +293,17 @@ const ClanDetailsScreen = () => {
 
       <View className='flex-row my-3'>
         <View>
-          <Image 
+          {/* <Image 
             className='w-[120px] h-36 mx-4'
             source={require('@asset/images/clan_logo/clan_logo_1.png')}
+          /> */}
+          <RemoteImage
+            classNameAsProps='w-[120px] h-36 mx-4'
+            path={clanDetails.clan_logo} 
+            fallback={require('@asset/images/clan_logo/clan_logo_1.png')}
+            bucket='clan_logo'
           />
+
           { highLevelMember 
             &&
             <AnimatedPressable

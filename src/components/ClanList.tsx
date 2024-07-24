@@ -6,6 +6,7 @@ import { Link, router } from 'expo-router';
 import { themeColors } from '../constants/Colors';
 import { Tables } from '../database.types';
 import { useClanActiveScore, useClanMemberNumber } from '../api/clan';
+import RemoteImage from './RemoteImage';
 
 type ClanListProps = {
   clan: Tables<'clans'>;
@@ -41,9 +42,15 @@ const ClanList = ({ clan }: ClanListProps) => {
       onPress={() => router.push(`/clan/clan_details/${clan.clan_id}`)}
     >
       <View className='flex flex-row p-1'>
-        <Image
+        {/* <Image
           className='w-12 h-14 rounded-xl'
           source={require('@asset/images/clan_logo/clan_logo_8.png')}
+        /> */}
+        <RemoteImage
+          classNameAsProps='w-12 h-14 rounded-xl'
+          path={clan.clan_logo} 
+          fallback={require('@asset/images/clan_logo/clan_logo_1.png')}
+          bucket='clan_logo'
         />
         <View className='flex-1 flex-col ml-3'>
           <Text style={{ color: themeColors.primary }} numberOfLines={1} className='font-bold text-xl mb-1'>{clan.clan_name}</Text>

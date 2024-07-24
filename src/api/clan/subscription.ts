@@ -127,3 +127,27 @@ export const useClanWarSubscription = (clanId: number) => {
     }
   }, [])
 }
+
+export const useClanListSubscription = () => {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const clanList = supabase.channel('custom-filter-channel')
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'clans',
+        },
+        (payload) => {
+          queryClient.invalidateQueries({queryKey: ['clans']});
+        }
+      )
+      .subscribe();
+
+    return () => {
+      clanList.unsubscribe()
+    }
+  }, [])
+}

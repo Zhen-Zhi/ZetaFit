@@ -5,6 +5,7 @@ import { themeColors } from '@/src/constants/Colors';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { supabase } from '@/src/lib/supabase';
 import { FileObject } from '@supabase/storage-js';
+import RemoteImage from '@/src/components/RemoteImage';
 
 type ClanLogoListModalProps = {
   onClose: () => void;
@@ -52,7 +53,7 @@ type ClanLogoListModalProps = {
 
 const ClanLogoListModal = ({ onClose, onSelectLogo }: ClanLogoListModalProps) => {
   const [clanLogoId, setClanLogoId] = useState<string>('')
-  const [files, setFiles] = useState<FileObject[]>([]);
+  const [clanLogo, setClanLogo] = useState<FileObject[]>([]);
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -68,7 +69,7 @@ const ClanLogoListModal = ({ onClose, onSelectLogo }: ClanLogoListModalProps) =>
           return;
         }
 
-        setFiles(data);
+        setClanLogo(data);
       } catch (error) {
         console.error('Error fetching files:', error);
       }
@@ -99,7 +100,8 @@ const ClanLogoListModal = ({ onClose, onSelectLogo }: ClanLogoListModalProps) =>
         <Text style={{ color: themeColors.primary }} className='text-lg font-bold text-center mb-2'>Clan Logo</Text>
         
         <FlatList
-          data={files}
+          className='min-w-[90%] min-h-[40%]'
+          data={clanLogo}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => 
             <AnimatedPressable pressInValue={0.95}
@@ -108,6 +110,12 @@ const ClanLogoListModal = ({ onClose, onSelectLogo }: ClanLogoListModalProps) =>
               }
             >
               {/* <Image className='w-20 h-24' source={item.name} /> */}
+              <RemoteImage
+                classNameAsProps='w-20 h-24'
+                path={item.name} 
+                fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+                bucket='clan_logo'
+              />
 
             </AnimatedPressable>
           }

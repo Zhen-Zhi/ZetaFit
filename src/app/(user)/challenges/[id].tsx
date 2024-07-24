@@ -13,6 +13,7 @@ import ChallengesActionScreenModal from './challengesActions';
 import AnimatedModal from '@/src/components/AnimatedModal';
 import { Badge } from 'react-native-elements'
 import RewardsScreen from '@/src/components/Rewards';
+import RemoteImage from '@/src/components/RemoteImage';
 
 type ChallengesDetialsProps = {
   progress : number;
@@ -84,11 +85,17 @@ const ChallengesDetailsScreen = () => {
           <View className='mt-6 bg-white/50'>
             <Text className='font-bold text-2xl'>Rewards</Text>
           </View>
-          <Image
+          {/* <Image
             className='w-64 h-64 mx-auto'
             source={require('@asset/images/starter achievement.png')}
+          /> */}
+          <RemoteImage
+            classNameAsProps='w-64 h-64 mx-auto'
+            path={'cute_badges_1.png'} 
+            fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+            bucket='badges'
           />
-          <Text className='font-semibold text-lg text-center'>Starter Sprinter</Text>
+          <Text className='font-semibold text-lg text-center mt-4'>Elite Performer</Text>
           <View className='mt-6'>
             <Text className='font-bold text-2xl'>Leaderboard</Text>
             <LeaderboardMemberScreen />

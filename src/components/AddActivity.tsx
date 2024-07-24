@@ -105,7 +105,31 @@ const AddActivityScreenModal = ({ energy, current_active_score, onClose }: AddAc
 
   if(!activityTypes) {
     console.log("Activity type not found!")
-    return <ActivityIndicator />
+    return (
+      <ImageBackground
+        className='flex-1'
+        source={require('@asset/images/background_image.png')}
+      >
+        <View style={{ backgroundColor: themeColors.backgroundColor }} className='z-10 flex-row justify-between pt-3 pb-2 px-4 border-b border-slate-300'>
+          <AnimatedPressable 
+            pressInValue={0.9} 
+            className='z-10'
+            onPress={onClose}
+          >
+            {/* <View className='p-1'>
+              <FontAwesome5 name="arrow-left" size={24} color={themeColors.primary} />
+            </View> */}
+          </AnimatedPressable>
+          <Text style={{ color: themeColors.primary }} className='text-center my-auto text-2xl font-extrabold'>Add Activity</Text>
+          <AnimatedPressable pressInValue={0.9} className='z-10 h-0' onPress={() => {}} disabled>
+            <View className='p-1'>
+              <FontAwesome5 name="pencil-alt" size={24} color={themeColors.primary} />
+            </View>
+          </AnimatedPressable>
+        </View>
+        <ActivityIndicator className='m-auto' size={86} color={themeColors.secondary} />
+      </ImageBackground>
+    )
   }
   
   const calculateCenterItem = (event: any) => {
@@ -223,7 +247,7 @@ const AddActivityScreenModal = ({ energy, current_active_score, onClose }: AddAc
 
   return (
     <ImageBackground
-      className='flex-1'
+      className='h-full'
       source={require('@asset/images/background_image.png')}
     >
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

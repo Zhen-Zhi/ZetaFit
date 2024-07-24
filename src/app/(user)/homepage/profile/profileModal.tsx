@@ -12,6 +12,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Tables } from '@/src/database.types';
 import { useClanDetails } from '@/src/api/clan';
 import RemoteImage from '@/src/components/RemoteImage';
+import { router } from 'expo-router';
 
 type ModalProps = {
   userData: Tables<'users'>
@@ -77,12 +78,21 @@ const ProfileScreen = ({ userData, onClose }: ModalProps) => {
             style={[styles.image, styles.shadowAndriod]} 
             className='bg-white border border-slate-400 h-12 flex-row my-4 mx-2 rounded-lg shadow shadow-slate-400'
             pressInValue={0.97}
+            // onPress={() => {router.push('/clan'); onClose()}}
+            onPress={() => {router.push(`/clan/clan_details/${userData.clan_id}`); onClose()}}
+            disabled={!userData.clan_id}
             >
-            <Image
+            {/* <Image
               className='w-20 h-24 mx-2'
               source={require('@asset/images/clan_logo/clan_logo_6.png')} 
+            /> */}
+            <RemoteImage
+              classNameAsProps='w-20 h-24 mx-2' 
+              path={clanData?.clan_logo} 
+              fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+              bucket='clan_logo'
             />
-            <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{clanData?.clan_name}</Text>
+            <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{clanData?.clan_name ?? 'No Clan'}</Text>
           </AnimatedPressable>
 
           <View className='mt-4 p-2'>

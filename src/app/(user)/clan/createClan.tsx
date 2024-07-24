@@ -66,12 +66,16 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
     const userId = user?.id;
     const newUserCoin = user?.coin - 2000;
 
+    const sanitizedClanName = clanName.replace(/^\s+/, '');
+    const sanitizedClanDescription = clanDescription.replace(/^\s+/, '');
+
     createClan(
       { 
         founder_id: userId,
-        clan_name: clanName,
+        clan_name: sanitizedClanName,
         required_active_score: requiredActiveScore,
-        clan_description: clanDescription
+        clan_description: sanitizedClanDescription,
+        clan_logo: clanLogo,
       },
       {
         onSuccess(createdClan) {
@@ -134,7 +138,7 @@ const CreateClanScreen = ({ onClose }: CreateClanScreenProps) => {
             classNameAsProps='mx-auto mt-4'
             path={clanLogo} 
             fallback={require('@asset/images/clan_logo/clan_logo_1.png')}
-            bucket='avatars'
+            bucket='clan_logo'
           />
           {/* <AwesomeButton style={{ margin: 'auto', marginTop: 10 }} width={160} backgroundColor={themeColors.primary} height={45} raiseLevel={4} springRelease={false} >
             <Text className='text-white font-bold'>Select Clan Logo</Text>

@@ -9,6 +9,7 @@ import { useClanActiveScore, useClanActivityLog, useClanDetails, useInsertClanLo
 import { useUserData } from '@/src/api/users';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { useClanActivityLogSubscription } from '@/src/api/clan/subscription';
+import RemoteImage from '@/src/components/RemoteImage';
 
 const ClanActivityLogScreen = () => {
   const { session } = useAuth();
@@ -105,9 +106,15 @@ const ClanActivityLogScreen = () => {
         onPress={() => router.replace(`/clan/clan_details/${clanId}`)}
       >
         <View className='flex flex-row p-1'>
-          <Image
+          {/* <Image
             className='w-14 h-16 rounded-xl'
             source={require('@asset/images/clan_logo/clan_logo_4.png')}
+          /> */}
+          <RemoteImage
+            classNameAsProps='w-14 h-16 rounded-xl'
+            path={clanDetails?.clan_logo} 
+            fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+            bucket='clan_logo'
           />
           <View className='flex-1 flex-col ml-3'>
             <Text style={{ color: themeColors.primary }} numberOfLines={1} className='font-bold text-xl mb-1'>{clanDetails?.clan_name}</Text>

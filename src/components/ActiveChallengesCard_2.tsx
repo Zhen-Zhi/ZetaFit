@@ -13,16 +13,17 @@ type ChallengesCardProps = {
   onPress ?: () => void;
   classNameAsProps ?: string;
   fullWidth ?: number;
-  challengeData :  Tables<'challenges'> | null;
+  // data ?: ChallengesType;
+  challengeData : (Tables<'user_challenge_details'> & { challenges: Tables<'challenges'> | null }) | null;
 }
 
-// type ChallengesType = {
-//   id: number;
-//   name: string;
-//   progress ?: number;
-// };
+type ChallengesType = {
+  id: number;
+  name: string;
+  progress ?: number;
+};
 
-const ChallengesCard = ({ classNameAsProps, fullWidth, challengeData, onPress }: ChallengesCardProps) => {
+const ActiveChallengesCard_2 = ({ classNameAsProps, fullWidth, challengeData, onPress }: ChallengesCardProps) => {
 
   return (
     <AnimatedPressable
@@ -39,7 +40,7 @@ const ChallengesCard = ({ classNameAsProps, fullWidth, challengeData, onPress }:
         > */}
         <RemoteImageBackground
           classNameAsProps='h-[180px]'
-          path={challengeData?.banner_image}
+          path={challengeData?.challenges?.banner_image}
           fallback={require('@asset/images/challenges_banner.png')}
           bucket='challenges_banner'
         >
@@ -52,23 +53,23 @@ const ChallengesCard = ({ classNameAsProps, fullWidth, challengeData, onPress }:
             >
               <View className='flex-row px-2 mb-1'>
                 <View className='my-auto mr-2'>
-                  {
-                    challengeData?.difficulty == "Beginner"
+                {
+                  challengeData?.challenges?.difficulty == "Beginner"
+                    ?
+                  <MaterialCommunityIcons name="speedometer-slow" size={28} color={difficultiesColors.beginner} />
+                    :
+                    challengeData?.challenges?.difficulty == "Intermediate"
                       ?
-                    <MaterialCommunityIcons name="speedometer-slow" size={28} color={difficultiesColors.beginner} />
+                    <MaterialCommunityIcons name="speedometer-medium" size={28} color={difficultiesColors.intermediate} />
                       :
-                      challengeData?.difficulty == "Intermediate"
-                        ?
-                      <MaterialCommunityIcons name="speedometer-medium" size={28} color={difficultiesColors.intermediate} />
-                        :
-                      <MaterialCommunityIcons name="speedometer" size={28} color={difficultiesColors.expert} />
-                  }
+                    <MaterialCommunityIcons name="speedometer" size={28} color={difficultiesColors.expert} />
+                }
                 </View>
                 <Text numberOfLines={1} className='flex-1 text-white text-2xl font-bold'>
-                  {challengeData?.title}
+                  {challengeData?.challenges?.title}
                 </Text>
               </View>
-              {/* <Progress.Bar
+              <Progress.Bar
                 width={fullWidth}
                 height={8}
                 // progress={data?.progress}
@@ -77,7 +78,7 @@ const ChallengesCard = ({ classNameAsProps, fullWidth, challengeData, onPress }:
                 color={themeColors.tetiary}
                 borderRadius={10}
                 unfilledColor='transparent'
-              /> */}
+              />
             </LinearGradient>
           </View>
           
@@ -87,7 +88,7 @@ const ChallengesCard = ({ classNameAsProps, fullWidth, challengeData, onPress }:
   )
 }
 
-export default ChallengesCard
+export default ActiveChallengesCard_2
 
 const styles = StyleSheet.create({
   banner: {

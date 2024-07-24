@@ -15,6 +15,8 @@ import { useAuth } from '@/src/providers/AuthProvider';
 import * as NavigationBar from 'expo-navigation-bar';
 import ProfileScreen from './profile/profileModal';
 import RemoteImage from '@/src/components/RemoteImage';
+import { Tables } from '@/src/database.types';
+import { supabase } from '@/src/lib/supabase';
 
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
@@ -28,9 +30,10 @@ const HomeScreen = () => {
   const { data: user, error, isLoading } = useUserData(session?.user.id)
 
   const {
-    data: clanData,
+    data: clan,
     error: clanError,
-    isLoading: clanIsLoading
+    isLoading: clanIsLoading,
+    refetch
   } = useUserClanName(user?.clan_id, session.user.id)
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -38,6 +41,9 @@ const HomeScreen = () => {
   const [profileModalVisible, setProfileModalVisible] = useState(false);
   const navigation = useNavigation();
   const [enterUsernameModalVisible, setEnterUsernameModalVisible] = useState(false);
+  // const [d, sd] = useState<Tables<'clans'> | undefined | null>()
+  // const [clanIsLoading, setClanIsLoading] = useState(false)
+
 
   // define a event listerner to set modal visible false
   // come back from profile via back will not set to false without this
@@ -46,8 +52,10 @@ const HomeScreen = () => {
       setModalVisible(false);
     });
 
+    refetch()
+
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, user]);
 
   if (loading || isLoading || clanIsLoading || !user) {
     return (
@@ -73,8 +81,6 @@ const HomeScreen = () => {
       else {
         required_xp = 1230 + ((user.level - 29) * 100)
       }
-
-      return required_xp
     }
 
     return required_xp
@@ -171,11 +177,29 @@ const HomeScreen = () => {
           pressInValue={0.97}
           onPress={() => router.push('/clan')}
           >
-          <Image
-            className='w-12 h-14 mx-2'
-            source={require('@asset/images/clan_logo/clan_logo_3.png')} 
-          />
-          <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{clanData?.clan_name ?? 'No Clan'}</Text>
+            {
+              user.clan_id
+                ?
+              <RemoteImage
+                classNameAsProps='w-12 h-14 mx-2' 
+                path={clan?.clan_logo}
+                fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+                bucket='clan_logo'
+              />
+                :
+              <Image
+                className='w-12 h-14 mx-2'
+                source={require('@asset/images/clan_logo/clan_logo_no_clan.png')} 
+              />
+            }
+            <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{clan?.clan_name ?? 'No Clan'}</Text>
+            {/* {
+              user.clan_id
+                ?
+              <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>{clan?.clan_name ?? 'No Clan'}</Text>
+                :
+              <Text style={{ color: themeColors.primary }} className='text-center font-extrabold text-lg p-1'>No Clan</Text>
+            } */}
         </AnimatedPressable>
         
         {/* More functions list */}

@@ -6,7 +6,7 @@ import { InsertTables, UpdateTables } from "@/src/types"
 export const useClanList = (searchValue: string) => {
   return (
     useQuery({
-      refetchOnMount: false,
+      // refetchOnMount: false,
       queryKey: ['clans'],
       queryFn: async () => {
         if(searchValue.length > 2) {
@@ -284,13 +284,14 @@ export const useJoinClan = () => {
         return joinedMember
       },
       onSuccess: async (_, { clanId, userId }) => {
+        await queryClient.invalidateQueries({ queryKey: ['users', userId] })
+        await queryClient.invalidateQueries({queryKey: ['user_clan']});
         await queryClient.invalidateQueries({ queryKey: ['clan_members', clanId] })
+        await queryClient.invalidateQueries({ queryKey: ['clans', clanId] })
         await queryClient.invalidateQueries({ queryKey: ['clan_member_number', clanId] })
         await queryClient.invalidateQueries({ queryKey: ['clan_active_score', clanId] })
         await queryClient.invalidateQueries({ queryKey: ['clan_rankings'] })
         await queryClient.invalidateQueries({ queryKey: ['user_clan_member_data'] })
-        await queryClient.invalidateQueries({ queryKey: ['users'] })
-        await queryClient.invalidateQueries({ queryKey: ['user_clan'] })
       },
     })
   )
@@ -325,13 +326,14 @@ export const useLeaveClan = () => {
         return leavedMember
       },
       onSuccess: async (_, { clanId, userId }) => {
+        await queryClient.invalidateQueries({ queryKey: ['users', userId] })
+        await queryClient.invalidateQueries({queryKey: ['user_clan']});
         await queryClient.invalidateQueries({ queryKey: ['clan_members', clanId] })
+        await queryClient.invalidateQueries({ queryKey: ['clans', clanId] })
         await queryClient.invalidateQueries({ queryKey: ['clan_member_number', clanId] })
         await queryClient.invalidateQueries({ queryKey: ['clan_active_score', clanId] })
         await queryClient.invalidateQueries({ queryKey: ['clan_rankings'] })
-        await queryClient.invalidateQueries({ queryKey: ['user_clan_member_data', userId] })
-        await queryClient.invalidateQueries({ queryKey: ['users'] })
-        await queryClient.invalidateQueries({ queryKey: ['user_clan'] })
+        await queryClient.invalidateQueries({ queryKey: ['user_clan_member_data'] })
       },
     })
   )

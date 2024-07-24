@@ -12,6 +12,7 @@ import { fullHeight } from '@/src/constants/heigth';
 import ClanLoadingScreenComponent from '@/src/components/ClanLoadingScreen';
 import { useUserClanMemberData, useUserData } from '@/src/api/users';
 import { useAuth } from '@/src/providers/AuthProvider';
+import { useClanListSubscription } from '@/src/api/clan/subscription';
 
 type Clan = {
   clanName: string;
@@ -22,16 +23,15 @@ type Clan = {
 
 const ClanScreen = () => {
   const { session } = useAuth()
-  const [modalVisible, setModalVisible] = useState(false);
-  const [searchValue, setSearchValue] = useState('')
-  const [shouldRedirect, setShouldRedirect] = useState(false);
-  const [clanId, setClanId] = useState<number | null>(null);
-
-  const { data: clanListData, error, isLoading, refetch } = useClanList('%' + searchValue + '%');
 
   if(!session) {
     return <Redirect href={'/sign_in'} />
   }
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [searchValue, setSearchValue] = useState('')
+
+  const { data: clanListData, error, isLoading, refetch } = useClanList('%' + searchValue + '%');
 
   const {
     data: userData,
@@ -40,6 +40,8 @@ const ClanScreen = () => {
   } = useUserData(session.user.id)
 
   if(userData?.clan_id != null) {
+    // router.replace(`/clan/clan_details/${userData.clan_id}`)
+    // return
     return <Redirect href={`/clan/clan_details/${userData.clan_id}`} />
   }
 

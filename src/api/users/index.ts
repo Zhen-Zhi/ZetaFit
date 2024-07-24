@@ -6,14 +6,14 @@ import { UpdateTables } from "@/src/types";
 export const useUserData = (id: string) => {
   return (
     useQuery({
-      queryKey: ['users'],
+      queryKey: ['users', id],
       queryFn: async () => {
         const { data, error } = await supabase
           .from('users')
           .select('*')
           .eq('id', id)
           .single();
-        
+
         if (error) {
           throw new Error(error.code + ":" + error.message)
         }
@@ -92,8 +92,9 @@ export const useUpdateUsername = () => {
 
         return username
       },
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: ['users'] })
+      onSuccess: async (_, { user_id }) => {
+        console.log(user_id)
+        await queryClient.invalidateQueries({ queryKey: ['users', user_id] })
       },
     })
   )
@@ -183,8 +184,8 @@ export const useUpdateUser = () => {
 
         return updatedUserData
       },
-      onSuccess: async (_, { clan_id }) => {
-        await queryClient.invalidateQueries({ queryKey: ['users'] })
+      onSuccess: async (_, { id, clan_id }) => {
+        await queryClient.invalidateQueries({ queryKey: ['users', id] })
         await queryClient.invalidateQueries({ queryKey: ['clan_members', clan_id] })
       },
     })
