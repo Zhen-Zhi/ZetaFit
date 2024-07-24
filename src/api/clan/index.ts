@@ -24,7 +24,7 @@ export const useClanList = (searchValue: string) => {
         }
         else {
           const { data: clan, error } = await supabase
-          .rpc('get_random_clans')
+            .rpc('get_random_clans')
 
           if (error) {
             throw new Error(error.code + ":" + error.message)

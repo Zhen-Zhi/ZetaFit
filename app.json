@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.zhenzhi.ZetaFit"
     },
     "web": {
       "bundler": "metro",
@@ -33,6 +34,14 @@
     "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "8fc5804e-a2c1-4c9c-9c9f-ed968a733ce4"
+      }
     }
   }
 }

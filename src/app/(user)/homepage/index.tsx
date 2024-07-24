@@ -57,6 +57,10 @@ const HomeScreen = () => {
     return unsubscribe;
   }, [navigation, user]);
 
+  if(!user) {
+    console.log("User not found")
+  }
+
   if (loading || isLoading || clanIsLoading || !user) {
     return (
       <ImageBackground
