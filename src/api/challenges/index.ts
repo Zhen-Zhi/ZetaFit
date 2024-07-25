@@ -33,7 +33,7 @@ export const useUserJoinedChallenges = (userId: string) => {
       queryKey: ['user_joined_challenges', userId],
       queryFn: async () => {
         const { data: joinedChallenges, error } = await supabase
-          .from('user_challenge_details')
+          .from('user_challenges')
           .select('*, challenges(*)')
 
         if (error) {
@@ -42,6 +42,29 @@ export const useUserJoinedChallenges = (userId: string) => {
         }
 
         return joinedChallenges
+      }
+    })
+  )
+}
+
+export const useUserIsJoinedChallenge = (userId: string, challengeId: number) => {
+  return (
+    useQuery({
+      queryKey: ['user_is_joined_challenge', userId, challengeId],
+      queryFn: async () => {
+        const { data: isJoinedChallenge, error } = await supabase
+          .from('user_challenges')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('challenge_id', challengeId)
+          .maybeSingle()
+
+        if (error) {
+          console.log("Error in get user is joined challenge.  " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return !!isJoinedChallenge
       }
     })
   )
@@ -86,6 +109,28 @@ export const useChallengesListPagination = (searchValue: string, r1: number, r2:
 
           return challenges
         }
+      }
+    })
+  )
+}
+
+export const useChallengesDetails = (challengeId: number) => {
+  return (
+    useQuery({
+      queryKey: ['challenge_details', challengeId],
+      queryFn: async () => {
+        const { data: challenges, error } = await supabase
+          .from('challenges')
+          .select('*, badges(*)')
+          .eq('id', challengeId)
+          .single()
+
+        if (error) {
+          console.log("Error in fetching challenges details  " + error)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return challenges
       }
     })
   )

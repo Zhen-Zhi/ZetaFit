@@ -1,6 +1,6 @@
 import { ImageBackground, StyleSheet, Text, View, Image, FlatList, Platform, Modal } from 'react-native'
 import React, { useState } from 'react'
-import { Stack, router, useLocalSearchParams } from 'expo-router'
+import { Redirect, Stack, router, useLocalSearchParams } from 'expo-router'
 import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import { difficultiesColors, themeColors } from '@/src/constants/Colors';
 import { ScrollView } from 'react-native';
@@ -14,6 +14,8 @@ import AnimatedModal from '@/src/components/AnimatedModal';
 import { Badge } from 'react-native-elements'
 import RewardsScreen from '@/src/components/Rewards';
 import RemoteImage from '@/src/components/RemoteImage';
+import { useChallengesDetails, useUserIsJoinedChallenge } from '@/src/api/challenges';
+import { useAuth } from '@/src/providers/AuthProvider';
 
 type ChallengesDetialsProps = {
   progress : number;
@@ -21,11 +23,32 @@ type ChallengesDetialsProps = {
 
 const ChallengesDetailsScreen = () => {
   const { id } = useLocalSearchParams();
-  const [joinedChallenge, setJoinedChallenge] = useState(false);
+  const challengeId = parseInt(typeof id == 'string' ? id : id?.[0] ?? '0')
+
+  const { session } = useAuth()
+
+  if (!session) {
+    return <Redirect href={'/(auth)/sign_in'} />;
+  }
+
+  const {
+    data: isJoinedChallenge,
+    error: isJoinedChallengeError,
+    isLoading: isJoinedChallengeIsLoading, 
+  } = useUserIsJoinedChallenge(session.user.id, challengeId)
+
+  const {
+    data: challengeDetails,
+    error: challengeDetailsError,
+    isLoading: challengeDetailsIsLoading,
+  } = useChallengesDetails(challengeId)
+
+  const [joinedChallenge, setJoinedChallenge] = useState(isJoinedChallenge);
   const [actionModalVisible, setActionModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [rewardsModalVisible, setRewardsModalVisible] = useState(false)
-  const datass = { progress: true, claimed: false }
+  const [completed, setCompleted] = useState(false)
+  const [rewardClaimed, setRewardClaimed] = useState(false)
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
@@ -56,33 +79,63 @@ const ChallengesDetailsScreen = () => {
       </View>
         <ScrollView className='flex-1'>
         <View className='p-4'>
-          <Image
+          {/* <Image
             className='h-[220px] rounded-lg w-full'
             source={require('@asset/images/challenges_banner.png')}
+          /> */}
+          <RemoteImage
+            classNameAsProps='h-[220px] rounded-lg w-full'
+            path={challengeDetails?.banner_image} 
+            fallback={require('@asset/images/challenges_banner.png')}
+            bucket='challenges_banner'
           />
           <View className='flex-row mt-2 bg-white/50 justify-between'>
             <View className='flex-row'>
               <MaterialCommunityIcons name="calendar-month" size={28} color={themeColors.primary} />
-              <Text className='font-bold text-[16px] my-auto mx-2'>15/6/2024 - 21/6/2024</Text>
+              <Text className='font-bold text-[16px] my-auto ml-1 mr-2'>
+                {
+                  challengeDetails?.start_date
+                  + " - " +
+                  challengeDetails?.end_date
+                }
+              </Text>
             </View>
             <View className='flex-row'>
-              <MaterialCommunityIcons name="speedometer-slow" size={28} color={difficultiesColors.beginner_darker} />
-              {/* <MaterialCommunityIcons name="speedometer-medium" size={28} color={difficultiesColors.intermediate_darker} />
-              <MaterialCommunityIcons name="speedometer" size={28} color={difficultiesColors.expert_darker} /> */}
-              <Text style={{ color: difficultiesColors.expert_darker }} className='font-bold text-[16px] my-auto mx-2'>Intermediate</Text>
+              {
+                challengeDetails?.difficulty == "Beginner"
+                  ?
+                <MaterialCommunityIcons name="speedometer-slow" size={28} color={difficultiesColors.beginner_darker} />
+                  :
+                  challengeDetails?.difficulty == "Intermediate"
+                    ?
+                  <MaterialCommunityIcons name="speedometer-medium" size={28} color={difficultiesColors.intermediate_darker} />
+                    :
+                  <MaterialCommunityIcons name="speedometer" size={28} color={difficultiesColors.expert_darker} />
+                }
+              <Text 
+                style={
+                  { color: 
+                    challengeDetails?.difficulty == 'Beginner' 
+                      ? difficultiesColors.beginner_darker 
+                      : challengeDetails?.difficulty == "Intermediate"
+                        ? difficultiesColors.intermediate_darker
+                        : difficultiesColors.expert_darker
+                  }
+                } 
+                className='font-bold text-[16px] my-auto mx-2'
+              >
+                {challengeDetails?.difficulty}
+              </Text>
             </View>
           </View>
-          <Text className='text-center font-extrabold text-[36px] mt-3 bg-white/50'>Arctic Swin Adventure</Text>
-          <View className='mt-4 bg-white/50'>
+          <Text className='text-center font-extrabold text-[36px] mt-6 mx-4 bg-white/50'>{challengeDetails?.title}</Text>
+          <View className='mt-6 bg-white/50'>
             <Text className='font-bold text-2xl'>Challenges Details</Text>
             <Text className='font-medium text-md mt-2 text-justify'>
-              Commit to your fitness journey by completing 8 workout sessions this month. 
-              Whether it's yoga, running or any other exercise you prefer, 
-              the goal is to stay active and consistent.
-              To win the challenge, do as much damage as possible.
+              {challengeDetails?.description}
             </Text>
           </View>
-          <View className='mt-6 bg-white/50'>
+          <View className='mt-20 bg-white/50'>
             <Text className='font-bold text-2xl'>Rewards</Text>
           </View>
           {/* <Image
@@ -91,13 +144,16 @@ const ChallengesDetailsScreen = () => {
           /> */}
           <RemoteImage
             classNameAsProps='w-64 h-64 mx-auto'
-            path={'cute_badges_1.png'} 
+            path={challengeDetails?.badges?.image_name} 
             fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
             bucket='badges'
           />
-          <Text className='font-semibold text-lg text-center mt-4'>Elite Performer</Text>
-          <View className='mt-6'>
+          <Text className='font-semibold text-lg text-center mt-4'>{challengeDetails?.badges?.name}</Text>
+          <View className='mt-10'>
             <Text className='font-bold text-2xl'>Leaderboard</Text>
+            <LeaderboardMemberScreen />
+            <LeaderboardMemberScreen />
+            <LeaderboardMemberScreen />
             <LeaderboardMemberScreen />
             <LeaderboardMemberScreen />
           </View>
@@ -112,7 +168,7 @@ const ChallengesDetailsScreen = () => {
         >
         {joinedChallenge 
           ? 
-          datass.progress 
+          !completed 
             ? 
             <AnimatedPressable
               pressInValue={0.95}
@@ -138,17 +194,17 @@ const ChallengesDetailsScreen = () => {
             </AnimatedPressable>
             :
             <AnimatedPressable 
-              style={{ backgroundColor: datass.claimed ? themeColors.disabled : themeColors.secondary }}
+              style={{ backgroundColor: rewardClaimed ? themeColors.disabled : themeColors.secondary }}
               className='mx-3 mb-2 rounded-lg p-1.5'
               pressInValue={0.98}
-              disabled={datass.claimed}
+              disabled={rewardClaimed}
               onPress={() => {
                 setRewardsModalVisible(true);
-                datass.claimed = true
+                setRewardClaimed(true)
               }}
             >
-              <Text className='text-center text-lg text-white font-bold'>{ datass.claimed ? 'Claimed' : 'Claim Rewards'}</Text>
-              { !datass.claimed && <Badge
+              <Text className='text-center text-lg text-white font-bold'>{ rewardClaimed ? 'Claimed' : 'Claim Rewards'}</Text>
+              { !rewardClaimed && <Badge
                 value={1}
                 textStyle={{ fontSize: 16, fontWeight: 700 }}
                 containerStyle={{ position: 'absolute', top: -12, right: -6 }} 

@@ -8,13 +8,14 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tables } from '../database.types';
 import RemoteImage from './RemoteImage';
 import RemoteImageBackground from './RemoteImageBackground';
+import { router } from 'expo-router';
 
 type ChallengesCardProps = {
   onPress ?: () => void;
   classNameAsProps ?: string;
   fullWidth ?: number;
   // data ?: ChallengesType;
-  challengeData : (Tables<'user_challenge_details'> & { challenges: Tables<'challenges'> | null }) | null;
+  challengeData : (Tables<'user_challenges'> & { challenges: Tables<'challenges'> | null }) | null;
 }
 
 type ChallengesType = {
@@ -23,13 +24,13 @@ type ChallengesType = {
   progress ?: number;
 };
 
-const ActiveChallengesCard_2 = ({ classNameAsProps, fullWidth, challengeData, onPress }: ChallengesCardProps) => {
+const ActiveChallengesCard_2 = ({ classNameAsProps, fullWidth, challengeData }: ChallengesCardProps) => {
 
   return (
     <AnimatedPressable
       className={classNameAsProps}
       pressInValue={0.98}
-      onPress={onPress}
+      onPress={() => router.push(`/challenges/${challengeData?.challenge_id}`)}
     >
       <View className='bg-white border-x border-slate-600 border-t rounded-xl overflow-hidden'>
         {/* <ImageBackground
@@ -73,7 +74,9 @@ const ActiveChallengesCard_2 = ({ classNameAsProps, fullWidth, challengeData, on
                 width={fullWidth}
                 height={8}
                 // progress={data?.progress}
-                progress={challengeData?.damage ?? 0 / (challengeData?.challenges?.health ?? 99999)}
+
+                // need to modify
+                progress={ 0 / (challengeData?.challenges?.health ?? 99999)}
                 borderWidth={0}
                 color={themeColors.tetiary}
                 borderRadius={10}

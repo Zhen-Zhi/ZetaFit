@@ -45,9 +45,8 @@ const ChallengesScreen = () => {
     {
       challenge_id: number;
       created_at: string;
-      damage: number;
       id: number;
-      status: string;
+      completed: boolean;
       user_id: string;
       challenges: Tables<'challenges'> | null
   } | null >>(null);

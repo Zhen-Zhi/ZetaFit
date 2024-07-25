@@ -9,7 +9,7 @@ const LeaderboardMemberScreen = () => {
       <AnimatedPressable
         onLongPress={() => {}}
         pressInValue={0.97}
-        className='border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 bg-white'
+        className='border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 bg-white my-0.5'
       >
         <View className='flex-row'>
           <Text className='text-xl font-bold my-auto ml-0.5 mr-1.5'>1</Text>
