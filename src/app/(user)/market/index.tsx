@@ -7,6 +7,8 @@ import { FontAwesome, FontAwesome6 } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { TextInput } from 'react-native'
 import MarketItemsComponent from '@/src/components/MarketItems'
+import connection from '@/src/utility/solana'
+import { PublicKey } from '@solana/web3.js'
 
 const items = [
   {id: 1, name: 'Golden Statue', itemType: 'Item', image: require('@asset/images/golden_statue.png')},
@@ -50,6 +52,23 @@ const MarketplaceScreen = () => {
   const [currentPage, setCurrentPage] = useState(0); // 0 = page 1
   const [displayedItems, setDisplayedItems] = useState(items.slice(currentPage * itemsPerPage, currentPage + 1 * itemsPerPage));
   const flatListRef = useRef<FlatList>(null)
+
+  useEffect(() => {
+    const fetchSolanaData = async () => {
+      try {
+        const latestBlockhash = await connection.getLatestBlockhash();
+        console.log('Latest Blockhash:', latestBlockhash);
+
+        const publicKey = new PublicKey("4Xm3wpsUxMNa9FYqiJDayvsT3MWPhp4NPN4Biit9jGRQ")
+        const balanceInLamports = await connection.getBalance(publicKey);
+        console.log('Balance:', balanceInLamports);
+      } catch (error) {
+        console.error("Error fetching Solana data:", error);
+      }
+    };
+
+    fetchSolanaData();
+  }, []);
 
   const previousPage = () => {
     setCurrentPage(currentPage - 1);
