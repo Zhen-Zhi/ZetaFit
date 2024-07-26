@@ -1,16 +1,36 @@
 import { ImageBackground, Pressable, StyleSheet, Text, View, Image, FlatList, TouchableWithoutFeedback, requireNativeComponent } from 'react-native'
-import React, { useState } from 'react'
-import { Stack } from 'expo-router'
+import React, { ReactNode, useState } from 'react'
+import { Stack, useLocalSearchParams } from 'expo-router'
 import { FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { usePetAttackChallenge } from '@/src/api/pets'
+import { RouteProp } from '@react-navigation/native'
 
 const Tab = createMaterialTopTabNavigator();
+// type AttackProps = {
+//   route: RouteProp<{ params: { challengeId: number; onClose: () => void } }, 'params'>;
+// };
 
-const Attack = () => {
+const Attack = ({ route }: any) => {
+  const { userChallengeId, onClose } = route.params;
+  console.log(userChallengeId)
+
+  const { mutate: insertAttack } = usePetAttackChallenge();
   const [attackSelected, setAttackSelected] = useState(false);
   const [skillSelected, setSkillSelected] = useState(false);
+
+  const handleAttack = () => {
+    insertAttack(
+      { user_challenges_id: userChallengeId , damage: 20 }, 
+      {
+        onSuccess() {
+          onClose()
+        }
+      }
+    )
+  }
 
   return(
     <View className='flex-1'>
@@ -79,6 +99,7 @@ const Attack = () => {
         style={{ backgroundColor: themeColors.danger }}
         pressInValue={0.98}
         className='m-3 mt-auto border border-slate-400 rounded-lg p-2 bg-white'
+        onPress={() => handleAttack()}
       >
         <Text style={{ color: themeColors.backgroundColor }} className='font-bold my-auto text-lg text-center'>Attack</Text>
       </AnimatedPressable>
@@ -138,10 +159,11 @@ const Defense = () => {
 
 type ClanWarBattleLogProps = {
   actionType?: string;
+  userChallengeId: number;
   onClose: () => void
 }
 
-const ChallengesActionScreenModal = ({ onClose }: ClanWarBattleLogProps) => {
+const ChallengesActionScreenModal = ({ onClose, userChallengeId }: ClanWarBattleLogProps) => {
 
   return (
     <Pressable className='flex-1 bg-black/50' onPress={onClose}>
@@ -188,8 +210,17 @@ const ChallengesActionScreenModal = ({ onClose }: ClanWarBattleLogProps) => {
         },
       }}
     >
-      <Tab.Screen name='attack' component={Attack} options={{ tabBarLabel: 'Attack' }} />
-      <Tab.Screen name='defense' component={Defense} options={{ tabBarLabel: 'Defense' }} />
+      <Tab.Screen 
+        name='attack' 
+        component={Attack} 
+        initialParams={{ userChallengeId, onClose }} 
+        options={{ tabBarLabel: 'Attack' }} 
+      />
+      <Tab.Screen 
+        name='defense' 
+        component={Defense} 
+        options={{ tabBarLabel: 'Defense' }}
+      />
     </Tab.Navigator>
     </ImageBackground>
     </Pressable>

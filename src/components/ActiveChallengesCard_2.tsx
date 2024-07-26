@@ -15,7 +15,7 @@ type ChallengesCardProps = {
   classNameAsProps ?: string;
   fullWidth ?: number;
   // data ?: ChallengesType;
-  challengeData : (Tables<'user_challenges'> & { challenges: Tables<'challenges'> | null }) | null;
+  challengeData : (Tables<'user_challenges'> & { challenges: Tables<'challenges'> | null } & { user_challenge_details: Tables<'user_challenge_details'>[] }) | null;
 }
 
 type ChallengesType = {
@@ -25,6 +25,13 @@ type ChallengesType = {
 };
 
 const ActiveChallengesCard_2 = ({ classNameAsProps, fullWidth, challengeData }: ChallengesCardProps) => {
+  const calculateDamage = () => {
+    if (!challengeData || !challengeData.user_challenge_details) {
+      return 0; // Return 0 if challengeData or user_challenge_details is not defined
+    }
+  
+    return challengeData.user_challenge_details.reduce((acc, details) => acc + details.damage, 0);
+  };
 
   return (
     <AnimatedPressable
@@ -76,7 +83,7 @@ const ActiveChallengesCard_2 = ({ classNameAsProps, fullWidth, challengeData }: 
                 // progress={data?.progress}
 
                 // need to modify
-                progress={ 0 / (challengeData?.challenges?.health ?? 99999)}
+                progress={ calculateDamage() / (challengeData?.challenges?.health ?? 99999)}
                 borderWidth={0}
                 color={themeColors.tetiary}
                 borderRadius={10}

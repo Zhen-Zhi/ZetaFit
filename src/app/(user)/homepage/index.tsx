@@ -17,6 +17,7 @@ import ProfileScreen from './profile/profileModal';
 import RemoteImage from '@/src/components/RemoteImage';
 import { Tables } from '@/src/database.types';
 import { supabase } from '@/src/lib/supabase';
+import { useUserJoinedChallenges } from '@/src/api/challenges';
 
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
@@ -35,6 +36,12 @@ const HomeScreen = () => {
     isLoading: clanIsLoading,
     refetch
   } = useUserClanName(user?.clan_id, session.user.id)
+
+  const {
+    data: joinedChallenges,
+    error: joinedChallengesError,
+    isLoading: joinedChallengesIsLoading, 
+  } = useUserJoinedChallenges(session.user.id)
 
   const [modalVisible, setModalVisible] = useState(false);
   const [addActivityModalVisible, setAddActivityModalVisible] = useState(false);
@@ -261,9 +268,9 @@ const HomeScreen = () => {
       <View className='m-3 absolute bottom-0'>
         <Text style={{ color: themeColors.primary }} className='font-extrabold text-xl'>Active Challenges</Text>
         <FlatList
-          data={ListOptions}
-          renderItem={() => (
-            <ActiveChallengesCard />
+          data={joinedChallenges}
+          renderItem={({item}) => (
+            <ActiveChallengesCard challengeData={item} />
           )}
           horizontal
           showsHorizontalScrollIndicator={false}

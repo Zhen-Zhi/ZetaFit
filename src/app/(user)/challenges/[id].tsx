@@ -1,5 +1,5 @@
-import { ImageBackground, StyleSheet, Text, View, Image, FlatList, Platform, Modal } from 'react-native'
-import React, { useState } from 'react'
+import { ImageBackground, StyleSheet, Text, View, Image, FlatList, Platform, Modal, ActivityIndicator } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { Redirect, Stack, router, useLocalSearchParams } from 'expo-router'
 import { FontAwesome5, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import { difficultiesColors, themeColors } from '@/src/constants/Colors';
@@ -14,8 +14,9 @@ import AnimatedModal from '@/src/components/AnimatedModal';
 import { Badge } from 'react-native-elements'
 import RewardsScreen from '@/src/components/Rewards';
 import RemoteImage from '@/src/components/RemoteImage';
-import { useChallengesDetails, useUserIsJoinedChallenge } from '@/src/api/challenges';
+import { useChallengeAllUser, useChallengesDetails, useJoinChallenge, useUserChallengeDetails, useUserIsJoinedChallenge } from '@/src/api/challenges';
 import { useAuth } from '@/src/providers/AuthProvider';
+import { useUserData } from '@/src/api/users';
 
 type ChallengesDetialsProps = {
   progress : number;
@@ -32,6 +33,12 @@ const ChallengesDetailsScreen = () => {
   }
 
   const {
+    data: userData,
+    error: userDataError,
+    isLoading: userDataIsLoading,
+  } = useUserData(session.user.id)
+
+  const {
     data: isJoinedChallenge,
     error: isJoinedChallengeError,
     isLoading: isJoinedChallengeIsLoading, 
@@ -43,12 +50,93 @@ const ChallengesDetailsScreen = () => {
     isLoading: challengeDetailsIsLoading,
   } = useChallengesDetails(challengeId)
 
-  const [joinedChallenge, setJoinedChallenge] = useState(isJoinedChallenge);
+  const {
+    data: userChallengeDetails,
+    error: userChallengeDetailsError,
+    isLoading: userChallengeDetailsIsLoading,
+  } = useUserChallengeDetails(session.user.id, challengeId)
+
+  const {
+    data: challengeAllUser,
+    error: challengeAllUserError,
+    isLoading: challengeAllUserIsLoading,
+  } = useChallengeAllUser(challengeId)
+
+  const handleLeaderboard = () => {
+    if (challengeAllUser) {
+      const participants = challengeAllUser.map((challenge) => {
+        const totalDamage = challenge.user_challenge_details.reduce((acc, detail) => {
+          return acc + detail.damage;
+        }, 0);  
+
+        return {
+          user_id: challenge.user_id,
+          profile_image: challenge.users?.avatar_image,
+          user_name: challenge.users?.username, // Adjust the field name to match your schema
+          clan_name: challenge.users?.clan_members?.clans?.clan_name ?? 'No Clan', // Adjust the field name to match your schema
+          damageSum: totalDamage
+        };
+      });
+
+      return participants
+    }
+  }
+    
+  const { mutate: joinChallenge } = useJoinChallenge()
+
+  const [joinedChallenge, setJoinedChallenge] = useState(false);
   const [actionModalVisible, setActionModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [rewardsModalVisible, setRewardsModalVisible] = useState(false)
   const [completed, setCompleted] = useState(false)
   const [rewardClaimed, setRewardClaimed] = useState(false)
+
+  useEffect(() => {
+    if(isJoinedChallenge) {
+      setJoinedChallenge(isJoinedChallenge)
+    }
+
+    if(challengeDetails) {
+      if(calculateDamage() > challengeDetails?.health) {
+        setCompleted(true)
+      }
+    }
+
+  }, [isJoinedChallenge])
+
+  if(challengeDetailsIsLoading) {
+    return <ActivityIndicator />
+  }
+
+  if(!challengeDetails) {
+    console.log("challengeDetails not found.")
+    return <ActivityIndicator />
+  }
+
+  const handleJoinChallenge = () => {
+    joinChallenge(
+      { user_id: session.user.id, challenge_id: challengeId, completed: false }, 
+      {
+        onSuccess() {
+
+          setModalVisible(false);
+        },
+        onError(error) {
+          console.log("Failed to join challenge. " + error.message)
+        }
+      }
+    )
+  }
+
+  const calculateDamage = () => {
+    let userChallengeDamage = 0;
+    if(userChallengeDetails) {
+      userChallengeDamage = userChallengeDetails.user_challenge_details.reduce((detailsAcc, detail) => {
+        return detailsAcc + detail.damage;
+      }, 0);
+    }
+    return userChallengeDamage
+  }
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
@@ -151,11 +239,22 @@ const ChallengesDetailsScreen = () => {
           <Text className='font-semibold text-lg text-center mt-4'>{challengeDetails?.badges?.name}</Text>
           <View className='mt-10'>
             <Text className='font-bold text-2xl'>Leaderboard</Text>
-            <LeaderboardMemberScreen />
-            <LeaderboardMemberScreen />
-            <LeaderboardMemberScreen />
-            <LeaderboardMemberScreen />
-            <LeaderboardMemberScreen />
+            { 
+              handleLeaderboard()?.sort((a, b) => b.damageSum - a.damageSum).slice(0, 20).map((participant, index) => {
+                return (
+                  <LeaderboardMemberScreen 
+                    ranking={index + 1}
+                    isUser={participant.user_id == session.user.id}
+                    username={participant.user_name ?? 'Username Not Found'} 
+                    clanName={participant.clan_name} 
+                    damage={participant.damageSum} 
+                    key={participant.user_id} 
+                    profile_image={participant.profile_image}
+                  />
+                )
+              })
+            }
+            {/* <LeaderboardMemberScreen /> */}
           </View>
         </View>
         <View className='h-20' />
@@ -178,13 +277,14 @@ const ChallengesDetailsScreen = () => {
                   <Text className='font-bold text-lg mb-1'>Your Progress</Text>
                   <View className='flex-row'>
                     <Image className='w-6 h-8 mb-1 mr-1.5' source={require('@asset/images/attack_icon.png')}/>
-                    <Text className='font-bold text-lg mr-3 mb-1'>880/1000</Text>
+                    <Text className='font-bold text-lg mr-3 mb-1'>{calculateDamage()}/{challengeDetails.health}</Text>
                   </View>
                 </View>
                 <Progress.Bar
                   width={350}
                   height={10}
-                  progress={0.6}
+                  // progress={0.6}
+                  progress={calculateDamage() / (challengeDetails.health == 0 ? 99999 : challengeDetails.health)}
                   borderWidth={0}
                   color={themeColors.tetiary}
                   borderRadius={10}
@@ -233,7 +333,9 @@ const ChallengesDetailsScreen = () => {
         transparent={true}
         onRequestClose={() =>setActionModalVisible(false)}
       >
-        <ChallengesActionScreenModal onClose={() => setActionModalVisible(false)} />
+        { userChallengeDetails &&
+          <ChallengesActionScreenModal userChallengeId={userChallengeDetails.id} onClose={() => setActionModalVisible(false)} />
+        }
       </Modal>
 
       {/* Join challenges confirmation modal */}
@@ -249,10 +351,11 @@ const ChallengesDetailsScreen = () => {
             <Text className='font-bold text-2xl'>Join Challenge?</Text>
             <Text className='font-medium my-3 text-lg'>Join Challenges this challenges?</Text>
             <AnimatedPressable
-              style={{ backgroundColor: themeColors.secondary }}
+              style={{ backgroundColor: ((userData?.coin ?? 0) < 200) ? themeColors.disabled : themeColors.secondary }}
               pressInValue={0.98} 
               className='p-1 rounded-lg'
-              onPress={() => {setModalVisible(false);setJoinedChallenge(true)}}
+              onPress={handleJoinChallenge}
+              disabled={(userData?.coin ?? 0) < 200}
             >
               <View className='flex-row justify-center'>
                 <Image
