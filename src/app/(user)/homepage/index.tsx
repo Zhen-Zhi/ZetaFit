@@ -22,7 +22,7 @@ import { useUserJoinedChallenges } from '@/src/api/challenges';
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
 const HomeScreen = () => {
-  Platform.OS == 'android' && NavigationBar.setVisibilityAsync("hidden");
+  // Platform.OS == 'android' && NavigationBar.setVisibilityAsync("hidden");
   const { session, loading } = useAuth();
   if(!session) {
     return <Redirect href={'/sign_in'} />
@@ -103,6 +103,37 @@ const HomeScreen = () => {
       setEnterUsernameModalVisible(true);
     }
   }, 1000)
+
+  const emptyActiveChallenge = () => {
+    return (
+      <AnimatedPressable
+        className='border-x border-t border-slate-200 rounded-md h-auto m-2 bg-white shadow shadow-slate-400'
+        pressInValue={0.96}
+      >
+        <Image 
+          className='h-28 w-full rounded-t-md shadow-xl' 
+          source={require('@asset/images/challenges_banner.png')} 
+        />
+        <View className='mt-2'>
+          <Text 
+            numberOfLines={1}
+            className='text-md font-bold my-2 mx-3'
+            style={{ color: themeColors.primary }}
+          >No Active Challenge</Text>
+          <Progress.Bar
+            width={190}
+            height={2}
+            className='mx-auto'
+            // progress={0.4}
+            progress={0}
+            borderWidth={0}
+            color={themeColors.tetiary}
+            unfilledColor={themeColors.backgroundColor}
+          />
+        </View>
+      </AnimatedPressable>
+    )
+  }
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
@@ -274,6 +305,7 @@ const HomeScreen = () => {
           )}
           horizontal
           showsHorizontalScrollIndicator={false}
+          ListEmptyComponent={emptyActiveChallenge}
         />
       </View>
 

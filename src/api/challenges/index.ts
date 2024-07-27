@@ -54,6 +54,7 @@ export const useUserJoinedChallenges = (userId: string) => {
           .from('user_challenges')
           .select('*, challenges(*), user_challenge_details(*)')
           .eq('user_id', userId)
+          .eq('completed', false)
 
         if (error) {
           console.log("Error in get user joined challenges.  " + error.message)

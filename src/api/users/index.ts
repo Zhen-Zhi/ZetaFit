@@ -94,7 +94,7 @@ export const useUpdateUsername = () => {
       },
       onSuccess: async (_, { user_id }) => {
         console.log(user_id)
-        await queryClient.invalidateQueries({ queryKey: ['users', user_id] })
+        await queryClient.invalidateQueries({ queryKey: ['users'] })
       },
     })
   )

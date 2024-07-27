@@ -1,4 +1,4 @@
-import { ImageBackground, Pressable, StyleSheet, Text, View, Image, FlatList, TouchableWithoutFeedback } from 'react-native'
+import { ImageBackground, Pressable, StyleSheet, Text, View, Image, FlatList, TouchableWithoutFeedback, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { Stack } from 'expo-router'
 import { FontAwesome5 } from '@expo/vector-icons'
@@ -7,30 +7,62 @@ import { themeColors } from '@/src/constants/Colors'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import ClanWarAttackDetialsScreen from './clanWarAttackDetials'
 import ClanWarDefenseDetialsScreen from './clanWarDefenseDetails'
+import { useClanWarDetails } from '@/src/api/clan'
 
 const Tab = createMaterialTopTabNavigator();
 
-const Attack = () => (
-  <FlatList
-    className='mt-2'
-    data={[1,2,3,4,5]}
-    renderItem={({ item }) => <ClanWarAttackDetialsScreen />}
-  />
-);
+const Attack = ({ route }: any) => {
+  const { attackList } = route.params;
 
-const Defense = () => (
-  <FlatList
-    className='mt-2'
-    data={[1,2,3,4,5]}
-    renderItem={({ item }) => <ClanWarDefenseDetialsScreen />}
-  />
-);
+  return ( 
+    <FlatList
+      className='mt-2'
+      data={attackList}
+      renderItem={({ item }) => <ClanWarAttackDetialsScreen details={item} />}
+    />
+  )
+};
+
+const Defense = ({ route }: any) => {
+  const { defenseList } = route.params;
+
+  return ( 
+    <FlatList
+      className='mt-2'
+      data={defenseList}
+      renderItem={({ item }) => <ClanWarDefenseDetialsScreen details={item} />}
+    />
+  )
+};
+
+// const Defense = () => (
+//   <FlatList
+//     className='mt-2'
+//     data={[1,2,3,4,5]}
+//     renderItem={({ item }) => <ClanWarDefenseDetialsScreen />}
+//   />
+// );
 
 type ClanWarBattleLogProps = {
+  clanWarId: number;
+  clanId: number;
   onClose: () => void
 }
 
-const ClanWarBattleLogScreen = ({ onClose }: ClanWarBattleLogProps) => {
+const ClanWarBattleLogScreen = ({ onClose, clanWarId, clanId }: ClanWarBattleLogProps) => {
+  const {
+    data: clanWarDetails,
+    error: clanWarDetailsError,
+    isLoading: clanWarDetailsIsLoading,
+  } = useClanWarDetails(clanWarId, clanId)
+
+  const attackList = clanWarDetails?.filter(detail => detail.action === "attack");
+  const defenseList = clanWarDetails?.filter(detail => detail.action === "defense");
+
+  if(clanWarDetailsIsLoading) {
+    return <ActivityIndicator />
+  }
+
   return (
     <Pressable className='flex-1 bg-black/50' onPress={onClose}>
     <Pressable className='flex-1 my-16 mx-8' onPress={(event) => event.stopPropagation()}>
@@ -75,8 +107,18 @@ const ClanWarBattleLogScreen = ({ onClose }: ClanWarBattleLogProps) => {
         },
       }}
     >
-      <Tab.Screen name='attack' component={Attack} options={{ tabBarLabel: 'Attack' }} />
-      <Tab.Screen name='defense' component={Defense} options={{ tabBarLabel: 'Defense' }} />
+      <Tab.Screen 
+        name='attack' 
+        component={Attack} 
+        options={{ tabBarLabel: 'Attack' }} 
+        initialParams={{ attackList }}
+      />
+      <Tab.Screen 
+        name='defense' 
+        component={Defense} 
+        options={{ tabBarLabel: 'Defense' }} 
+        initialParams={{ defenseList }}
+      />
     </Tab.Navigator>
     </ImageBackground>
     </Pressable>

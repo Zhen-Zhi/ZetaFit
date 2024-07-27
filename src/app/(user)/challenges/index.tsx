@@ -51,7 +51,7 @@ const ChallengesScreen = () => {
       challenges: Tables<'challenges'> | null
       user_challenge_details: Tables<'user_challenge_details'>[]
   } | null >>(null);
-  // const flatListRef = useRef<any>(null);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flatListWidth, setFlatListWidth] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState('');

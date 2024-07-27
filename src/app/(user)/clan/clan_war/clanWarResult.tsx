@@ -48,7 +48,7 @@ const ClanWarResultScreen = ({ modalVisible, clanWarResultParam, onClose }: Clan
       source={require('@asset/images/background_image.png')}
       className='flex-1'
     >
-      <SafeAreaView edges={['top']} className={`flex-1 justify-center pb-16 ${ clanWarResult == 'defeat' && 'bg-slate-300/50' }`}>
+      <SafeAreaView edges={['top']} className={`flex-1 rounded-2xl justify-center pb-16 ${ clanWarResult == 'defeat' && 'bg-slate-300/50' }`}>
         <Stack.Screen options={{ headerShown: false }} />
         <AnimatedView style={{ transform: [{ scale: scaleAnimation }],opacity: opacityAnimation }}>
           { clanWarResult == 'victory' 

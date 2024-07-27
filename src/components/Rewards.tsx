@@ -2,6 +2,7 @@ import { ImageBackground, StyleSheet, Text, View, Image, Pressable, Animated } f
 import React, { useEffect, useRef, useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
+import { useUserData } from '../api/users';
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 

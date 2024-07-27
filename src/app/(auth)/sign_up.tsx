@@ -62,7 +62,7 @@ const SignInScreen = () => {
           {/* Top image logo */}
           <Image
             className='w-72 h-56 rounded-xl mx-auto mt-10 mb-3'
-            source={require('@asset/images/ZetaFit logo.png')} 
+            source={require('@asset/images/ZetaFit.png')} 
           />
 
           {/* sign up field */}

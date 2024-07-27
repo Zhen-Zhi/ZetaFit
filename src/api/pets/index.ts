@@ -25,6 +25,34 @@ export const usePetAttackChallenge = () => {
       },
       async onSuccess() {
         await queryClient.invalidateQueries({ queryKey: ['user_challenge_details'] })
+        await queryClient.invalidateQueries({ queryKey: ['user_joined_challenges'] })
+      }
+    })
+  )
+}
+
+export const usePetClanWarAction = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (attackDetails: InsertTables<'clan_war_details'>) => {
+        const { data: newClan, error } = await supabase
+          .from('clan_war_details')
+          .insert({ ...attackDetails })
+          .select()
+          .single()
+
+        if (error) {
+          console.log("Clan War Attack fail: " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return newClan
+      },
+      async onSuccess() {
+        await queryClient.invalidateQueries({ queryKey: ['user_challenge_details'] })
+        await queryClient.invalidateQueries({ queryKey: ['user_joined_challenges'] })
       }
     })
   )

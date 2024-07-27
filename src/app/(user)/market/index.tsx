@@ -12,6 +12,7 @@ import { connectToWallet, createAndSendTransaction } from '@/src/utility/solana'
 import { useUserData } from '@/src/api/users'
 import { useAuth } from '@/src/providers/AuthProvider'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { useMarketplaceItem } from '@/src/api/marketplace/index'
 
 
 const items = [
@@ -66,6 +67,12 @@ const MarketplaceScreen = () => {
   const [walletConnected, setWalletConnected] = useState(false);
   
   const { data: user, error, isLoading } = useUserData(session?.user.id)
+
+  const {
+    data: marketplaceItem,
+    error: marketplaceItemError,
+    isLoading: marketplaceItemIsLoading,
+  } = useMarketplaceItem()
 
   const handleConnectWallet = async () => {
     const walletConnection = await connectToWallet();
@@ -140,9 +147,7 @@ const MarketplaceScreen = () => {
         <AnimatedPressable
           className='border border-slate-400 rounded-lg bg-white'
           pressInValue={0.9}
-          onPress={() => {
-            createAndSendTransaction('6SjFLXqDRs6VUyUTwkNDo5oMLEKFwmSUkAnPEk4PbqNW', 1)
-          }}
+          onPress={() => {}}
         >
           <View className='my-auto mx-3'>
             <FontAwesome6 name="magnifying-glass" size={20} color="black" />
@@ -201,7 +206,7 @@ const MarketplaceScreen = () => {
           <FlatList
             className='mx-2'
             ref={flatListRef}
-            data={displayedItems}
+            data={marketplaceItem}
             renderItem={({ item }) => <MarketItemsComponent item={item} />}
             keyExtractor={(item) => item.id.toString()}
             showsVerticalScrollIndicator={false}

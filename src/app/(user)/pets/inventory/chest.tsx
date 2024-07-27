@@ -2,11 +2,14 @@ import { StyleSheet, Text, View, Image, ImageBackground, Dimensions, Animated, M
 import React, { useEffect, useRef, useState } from 'react'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
-import { Stack, router } from 'expo-router'
+import { Redirect, Stack, router } from 'expo-router'
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import AnimatedModal from '@/src/components/AnimatedModal'
 import InventoryActionScreenModal from '../modal/inventoryAction'
+import { useInventoryChest } from '@/src/api/pets/inventory'
+import { useAuth } from '@/src/providers/AuthProvider'
+import RemoteImage from '@/src/components/RemoteImage'
 
 const inventoryItems = [
   { id: 1, itemName: 'Chest', image: require('@asset/images/chest.png') },
@@ -25,12 +28,23 @@ const inventoryItems = [
 ]
 
 const InventoryChestScreen = () => {
+  const { session } = useAuth();
+
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
   const [inventoryActionModalVisible, setInventoryActionModalVisible] = useState(false)
   const [openChestModalVisible, setOpenChestModalVisible] = useState(false);
   const ITEMSIZE = Dimensions.get('window').width / 2 - 24;
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  const num = (ITEMSIZE + 8 + 20) * Math.floor(inventoryItems.length / 2) - (ITEMSIZE + 8 + 20) * 3
+  const {
+    data: inventoryItems,
+    error: inventoryItemsError,
+    isLoading: inventoryItemsIsLoading,
+  } = useInventoryChest(session.user.id)
+
+  const num = (ITEMSIZE + 8 + 20) * Math.floor(inventoryItems?.length ?? 0 / 2) - (ITEMSIZE + 8 + 20) * 3
   // itemsize (image height) + 8px margin + 20px text line height
   // minus top 3 row
 
@@ -69,11 +83,17 @@ const InventoryChestScreen = () => {
             className='m-1'
             onPress={() => setOpenChestModalVisible(true)}
           >
-            <Image
+            {/* <Image
               style={{ height: ITEMSIZE, width: ITEMSIZE }}
               source={item.image}
+            /> */}
+            <RemoteImage
+              style={{ height: ITEMSIZE, width: ITEMSIZE }}
+              path={item.image} 
+              fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+              bucket='items'
             />
-            <Text className='text-center text-sm font-medium'>{item.itemName}</Text>
+            <Text className='text-center text-sm font-medium'>{item.name}</Text>
           </AnimatedPressable>
         }
         numColumns={2}

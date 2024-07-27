@@ -61,26 +61,6 @@ const ChallengesDetailsScreen = () => {
     error: challengeAllUserError,
     isLoading: challengeAllUserIsLoading,
   } = useChallengeAllUser(challengeId)
-
-  const handleLeaderboard = () => {
-    if (challengeAllUser) {
-      const participants = challengeAllUser.map((challenge) => {
-        const totalDamage = challenge.user_challenge_details.reduce((acc, detail) => {
-          return acc + detail.damage;
-        }, 0);  
-
-        return {
-          user_id: challenge.user_id,
-          profile_image: challenge.users?.avatar_image,
-          user_name: challenge.users?.username, // Adjust the field name to match your schema
-          clan_name: challenge.users?.clan_members?.clans?.clan_name ?? 'No Clan', // Adjust the field name to match your schema
-          damageSum: totalDamage
-        };
-      });
-
-      return participants
-    }
-  }
     
   const { mutate: joinChallenge } = useJoinChallenge()
 
@@ -102,7 +82,9 @@ const ChallengesDetailsScreen = () => {
       }
     }
 
-  }, [isJoinedChallenge])
+  }, [isJoinedChallenge, userChallengeDetails])
+
+  // useChallengeAttackSubscription(userChallengeDetails?.id, session.user.id, challengeId)
 
   if(challengeDetailsIsLoading) {
     return <ActivityIndicator />
@@ -111,6 +93,26 @@ const ChallengesDetailsScreen = () => {
   if(!challengeDetails) {
     console.log("challengeDetails not found.")
     return <ActivityIndicator />
+  }
+
+  const handleLeaderboard = () => {
+    if (challengeAllUser) {
+      const participants = challengeAllUser.map((challenge) => {
+        const totalDamage = challenge.user_challenge_details.reduce((acc, detail) => {
+          return acc + detail.damage;
+        }, 0);  
+
+        return {
+          user_id: challenge.user_id,
+          profile_image: challenge.users?.avatar_image,
+          user_name: challenge.users?.username, // Adjust the field name to match your schema
+          clan_name: challenge.users?.clan_members?.clans?.clan_name ?? 'No Clan', // Adjust the field name to match your schema
+          damageSum: totalDamage
+        };
+      });
+
+      return participants
+    }
   }
 
   const handleJoinChallenge = () => {

@@ -90,7 +90,7 @@ export const createAndSendTransaction = async (toPublicKeyString: string, sol: n
         toByteArray(authorizationResult.accounts[0].address)
       );
 
-      const toPublicKey = new PublicKey(toPublicKeyString);
+      const toPublicKey = new PublicKey(toByteArray(toPublicKeyString));
 
       // Create a list of Program instructions to execute.
       const instructions = [

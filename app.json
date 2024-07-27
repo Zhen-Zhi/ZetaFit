@@ -2,18 +2,19 @@
   "expo": {
     "name": "ZetaFit",
     "slug": "ZetaFit",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/images/ZetaFit logo.png",
+      "image": "./assets/images/ZetaFit.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.zhenzhi.ZetaFit"
     },
     "android": {
       "adaptiveIcon": {
