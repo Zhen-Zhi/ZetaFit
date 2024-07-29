@@ -1,4 +1,4 @@
-import { ImageBackground, Image, StyleSheet, Text, View, FlatList, ScrollView, Modal } from 'react-native'
+import { ImageBackground, Image, StyleSheet, Text, View, FlatList, ScrollView, Modal, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import * as ImagePicker from 'expo-image-picker';
 import { randomUUID } from 'expo-crypto';
@@ -12,21 +12,58 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Tables } from '@/src/database.types';
 import { useClanDetails } from '@/src/api/clan';
 import RemoteImage from '@/src/components/RemoteImage';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
+import { useUserBadges, useUserData } from '@/src/api/users';
+import { useAuth } from '@/src/providers/AuthProvider';
 
 type ModalProps = {
-  userData: Tables<'users'>
+  userId: string;
+  userClanId: number | null;
   onClose: () => void;
 };
 
-const ProfileScreen = ({ userData, onClose }: ModalProps) => {
+const ProfileScreen = ({ userId, userClanId, onClose }: ModalProps) => {
+  const { session } = useAuth();
+
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
   const [modalVisible, setModalVisible] = useState(false);
+
+  const {
+    data: userData,
+    error: userDataError,
+    isLoading: userDataIsLoading,
+  } = useUserData(userId)
 
   const {
     data: clanData,
     error: clanDataError,
     isLoading: clanDataIsLoading,
-  } = useClanDetails(userData.clan_id)
+  } = useClanDetails(userClanId)
+
+  const {
+    data: userAchievement,
+    error: userAchievementError,
+    isLoading: userAchievementIsLoading,
+  } = useUserBadges(userId)
+
+  if(userDataIsLoading) {
+    return (
+      <ImageBackground
+        className='flex-1' 
+        source={require('@asset/images/background_image.png')}
+      >
+        <ActivityIndicator size={72} color={themeColors.secondary} />
+      </ImageBackground>
+    )
+  }
+
+  if(!userData) {
+    console.warn("User not found")
+    return
+  }
 
   return (
     <ImageBackground
@@ -44,8 +81,13 @@ const ProfileScreen = ({ userData, onClose }: ModalProps) => {
           </View>
         </AnimatedPressable>
         <Text style={{ color: themeColors.primary }} className='text-center my-auto text-2xl font-extrabold'>Profile</Text>
-        <AnimatedPressable pressInValue={0.9} className='z-10' onPress={() => setModalVisible(true)}>
-        <View className='p-1'>
+        <AnimatedPressable 
+          pressInValue={0.9} 
+          className={`z-10 ${session.user.id != userId && 'h-0'}`} 
+          onPress={() => setModalVisible(true)}
+          disabled={session.user.id != userId}
+        >
+          <View className='p-1'>
             <FontAwesome5 name="pencil-alt" size={24} color={themeColors.primary} />
           </View>
         </AnimatedPressable>
@@ -108,12 +150,28 @@ const ProfileScreen = ({ userData, onClose }: ModalProps) => {
             <Text style={{ color: themeColors.primary }} className='text-lg font-medium my-2'>Achivements</Text>
             {/* <View className='border-b border-slate-400' /> */}
             <FlatList
-              numColumns={3}
-              data={[1,2,3,4,5,6]}
-              renderItem={({ item }) => <View className='p-1'><Image className='w-24 h-24' source={require('@asset/images/badges.png')} /></View>}
+              numColumns={2}
+              data={userAchievement}
+              renderItem={({ item }) => (
+                <View className='p-1 w-[50%]'>
+                  {/* <Image className='w-24 h-24' source={require('@asset/images/badges.png')} /> */}
+                  <RemoteImage
+                    classNameAsProps='w-full aspect-square'
+                    path={item.badges?.image_name} 
+                    fallback={require('@asset/images/default.png')}
+                    bucket='badges'
+                  />
+                  <Text className='text-center'>{item.badges?.name}</Text>
+                </View>
+              )}
               scrollEnabled={false}
               contentContainerStyle={{ gap: 10 }}
               columnWrapperStyle={{ gap: 10 }}
+              ListEmptyComponent={() => { return (
+                <View className='h-24 border border-slate-500 bg-white/50 rounded-lg mb-4'>
+                  <Text className='text-center m-auto font-medium text-slate-500'>No displayed Achivements</Text>
+                </View>
+              )}}
             />
           </View>
         </View>

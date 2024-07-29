@@ -16,7 +16,7 @@ import RewardsScreen from '@/src/components/Rewards';
 import RemoteImage from '@/src/components/RemoteImage';
 import { useChallengeAllUser, useChallengesDetails, useJoinChallenge, useUpdateUserChallenge, useUserChallengeDetails, useUserIsJoinedChallenge } from '@/src/api/challenges';
 import { useAuth } from '@/src/providers/AuthProvider';
-import { useUpdateUser, useUserData, useUserInsertBadge } from '@/src/api/users';
+import { useUpdateUser, useUpdateUserCoin, useUserData, useUserInsertBadge } from '@/src/api/users';
 import { useInsertItems } from '@/src/api/pets/inventory';
 
 type ChallengesDetialsProps = {
@@ -236,7 +236,11 @@ const ChallengesDetailsScreen = () => {
       { user_id: session.user.id, challenge_id: challengeId, completed: false }, 
       {
         onSuccess() {
+          updateUser(
+            { id: session.user.id, coin: userData.coin -200 }
+          )
 
+          setJoinedChallenge(true)
           setModalVisible(false);
         },
         onError(error) {

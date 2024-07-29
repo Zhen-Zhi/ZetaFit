@@ -1,19 +1,20 @@
-import { ImageBackground, Image, StyleSheet, Text, View, FlatList, ScrollView, TextInput } from 'react-native'
+import { ImageBackground, Image, StyleSheet, Text, View, FlatList, ScrollView, TextInput, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import * as ImagePicker from 'expo-image-picker';
 import { randomUUID } from 'expo-crypto';
 import { decode } from 'base64-arraybuffer';
 import * as FileSystem from 'expo-file-system'
 import AnimatedPressable from '@/src/components/AnimatedPressable';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { themeColors } from '@/src/constants/Colors';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { difficultiesColors, themeColors } from '@/src/constants/Colors';
 import Checkbox from 'expo-checkbox';
 import AchievementElement from './achievementElement';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/src/lib/supabase';
-import { useUpdateUser } from '@/src/api/users';
+import { useUpdateUser, useUpdateUserShownBadges, useUserAllBadges } from '@/src/api/users';
 import { Tables } from '@/src/database.types';
 import RemoteImage from '@/src/components/RemoteImage';
+import AnimatedModal from '@/src/components/AnimatedModal';
 
 type ModalProps = {
   userData: Tables<'users'>;
@@ -25,8 +26,15 @@ const EditProfileScreen = ({ userData, onClose }: ModalProps) => {
   const [username, setUsername] = useState('')
   const [error, setError] = useState(false)
   const [blankUsername, setBlankUsername] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
 
   const { mutate: updateUser } = useUpdateUser()
+
+  const { 
+    data: userAllAchievements,
+    error: userAllAchievementsError,
+    isLoading: userAllAchievementsIsLoading,
+   } = useUserAllBadges(userData.id)
 
   useEffect(() => {
     if(userData.username) {
@@ -85,7 +93,7 @@ const EditProfileScreen = ({ userData, onClose }: ModalProps) => {
       }, 
       {
       onSuccess() {
-
+        onClose()
       },
       onError(error) {
         setError(true)
@@ -117,16 +125,19 @@ const EditProfileScreen = ({ userData, onClose }: ModalProps) => {
       </View>
       
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* <Image
-          className='w-48 h-48 aspect-square rounded-xl mx-auto mt-6'
-          source={image ? { uri: image } : require('@asset/images/CyberKongz.jpg')}
-        /> */}
-        <RemoteImage
-          classNameAsProps='w-48 h-48 aspect-square rounded-xl mx-auto mt-6'
-          path={userData.avatar_image} 
-          fallback={require('@asset/images/default_profile.png')}
-          bucket='avatars'
-        />
+        { image ?
+          <Image
+            className='w-48 h-48 aspect-square rounded-xl mx-auto mt-6'
+            source={{ uri: image }}
+          />
+          :
+          <RemoteImage
+            classNameAsProps='w-48 h-48 aspect-square rounded-xl mx-auto mt-6'
+            path={userData.avatar_image} 
+            fallback={require('@asset/images/default_profile.png')}
+            bucket='avatars'
+          />
+        }
         <AnimatedPressable pressInValue={0.98} onPress={pickImage}>
           <Text style={{ color: themeColors.secondary }} className='font-bold text-xl text-center mt-2.5'>Upload Image</Text>
         </AnimatedPressable>
@@ -144,15 +155,31 @@ const EditProfileScreen = ({ userData, onClose }: ModalProps) => {
           </View>
 
           <View className='mt-4 p-2'>
-            <Text style={{ color: themeColors.primary }} className='text-lg font-medium my-2'>Show Achivements</Text>
+            <View className='flex-row justify-between'>
+              <Text style={{ color: themeColors.primary }} className='text-lg font-medium my-2'>Show Achivements</Text>
+              <AnimatedPressable 
+                pressInValue={0.9}
+                onPress={() => setModalVisible(true)}
+              >
+
+                <View className='my-auto mr-2'>
+                  <FontAwesome5 name="question-circle" size={20} color="black" />
+                </View>
+              </AnimatedPressable>
+            </View>
             {/* <View className='border-b border-slate-400' /> */}
             <FlatList
-              data={[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}
+              data={userAllAchievements}
               initialNumToRender={5}
-              renderItem={({ item }) => <AchievementElement />}
+              renderItem={({ item }) => <AchievementElement achievement={item} />}
               scrollEnabled={false}
               contentContainerStyle={{ gap: 10 }}
-              ListFooterComponent={<View className='h-16' />}
+              ListFooterComponent={<View className='h-20' />}
+              ListEmptyComponent={
+                <View className='px-4 py-8 border rounded-lg border-slate-300 bg-white/50'>
+                  <Text className='text-slate-500 font-medium m-auto'>You have no achievements yet</Text>
+                </View>
+              }
             />
           </View>
         </View>
@@ -174,6 +201,45 @@ const EditProfileScreen = ({ userData, onClose }: ModalProps) => {
         </AnimatedPressable>
       </View>
       </LinearGradient>
+
+      <Modal
+        animationType='fade'
+        visible={modalVisible}
+        presentationStyle='overFullScreen'
+        transparent={true}
+        onRequestClose={() =>setModalVisible(false)}
+      >
+        <AnimatedModal
+          classNameAsProps='flex max-h-[90%]'
+          onClose={() => setModalVisible(false)}
+        >
+          <ImageBackground
+            source={require('@asset/images/background_image.png')}
+            className='p-4'
+          >
+            <ScrollView className='bg-white/30 px-2'>
+              <View className='flex-row justify-center mb-3'>
+                <Text className='text-2xl text-center font-extrabold mx-2'>Update Displayed Achievements</Text>
+              </View>
+              <Text className='text-[16px] font-medium text-center mt-2 mb-4'>
+                Achievements displayed status is autosaved when updated
+              </Text>
+
+              <AnimatedPressable 
+                pressInValue={0.98}
+                className='rounded-lg p-1'
+                style={{ backgroundColor: themeColors.secondary }}
+                onPress={() => setModalVisible(false)}
+              >
+                <View className=''>
+                  <Text className='text-center font-extrabold text-white text-xl'>Okay</Text>
+                </View>
+              </AnimatedPressable>
+            </ScrollView>
+          </ImageBackground>
+        </AnimatedModal>
+      </Modal>
+
     </ImageBackground>
   )
 }

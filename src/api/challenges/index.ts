@@ -178,6 +178,7 @@ export const useJoinChallenge = () => {
       async onSuccess(_, { user_id, challenge_id }) {
         await queryClient.invalidateQueries({ queryKey: ['user_is_joined_challenge', user_id, challenge_id] })
         await queryClient.invalidateQueries({ queryKey: ['user_joined_challenges', user_id] })
+        await queryClient.invalidateQueries({ queryKey: ['user_challenge_details', user_id] })
       }
     })
   )

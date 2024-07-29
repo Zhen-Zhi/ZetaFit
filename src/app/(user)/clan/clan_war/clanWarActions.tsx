@@ -1,4 +1,4 @@
-import { ImageBackground, Pressable, StyleSheet, Text, View, Image, FlatList, TouchableWithoutFeedback, requireNativeComponent } from 'react-native'
+import { ImageBackground, Pressable, StyleSheet, Text, View, Image, FlatList, TouchableWithoutFeedback, requireNativeComponent, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { Redirect, Stack } from 'expo-router'
 import { FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
@@ -37,8 +37,10 @@ const Attack = ({ route }: any) => {
   const { mutate: updateClanHealth } = useUpdateClanWar();
   const [attackSelected, setAttackSelected] = useState(false);
   const [skillSelected, setSkillSelected] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const handleAttack = () => {
+    setLoading(true)
     let damage = 0
     const currentEnergy = userData?.energy
     if(!currentEnergy || currentEnergy < 20) {
@@ -75,6 +77,7 @@ const Attack = ({ route }: any) => {
             }, 
             {
               onSuccess() {
+                setLoading(false)
                 onClose()
               }
             }
@@ -87,6 +90,7 @@ const Attack = ({ route }: any) => {
             }, 
             {
               onSuccess() {
+                setLoading(false)
                 onClose()
               }
             }
@@ -162,14 +166,19 @@ const Attack = ({ route }: any) => {
       <AnimatedPressable 
         // style={{ backgroundColor: userData?.energy ? userData.energy < 20 ? themeColors.disabled : themeColors.danger : themeColors.disabled }}
         style={{
-          backgroundColor: !userData?.energy || userData.energy < 20 || (!skillSelected && !attackSelected) ? themeColors.disabled : themeColors.danger
+          backgroundColor: !userData?.energy || userData.energy < 20 || (!skillSelected && !attackSelected) || loading ? themeColors.disabled : themeColors.danger
         }}
         pressInValue={0.98}
         className='m-3 mt-auto border border-slate-400 rounded-lg p-2 bg-white'
-        disabled={!userData?.energy || userData.energy < 10 || (!skillSelected && !attackSelected)}
+        disabled={!userData?.energy || userData.energy < 10 || (!skillSelected && !attackSelected) || loading}
         onPress={handleAttack}
       >
-        <Text style={{ color: themeColors.backgroundColor }} className='font-bold my-auto text-lg text-center'>Attack</Text>
+        { loading
+            ?
+          <ActivityIndicator color={themeColors.secondary} size={28} />
+            :
+          <Text style={{ color: themeColors.backgroundColor }} className='font-bold my-auto text-lg text-center'>Attack</Text>
+        }
       </AnimatedPressable>
     </View>
   )

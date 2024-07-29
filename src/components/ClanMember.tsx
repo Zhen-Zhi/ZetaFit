@@ -352,6 +352,7 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
             `border-2 shadow shadow-slate-400 border-slate-400 rounded-lg p-2 
             ${ member?.user_id == session?.user.id ? 'bg-green-200' : 'bg-white' } `
           }
+          onPress={() => setProfileModalVisible(true)}
         >
           <View className='flex-row'>
             {/* <Image 
@@ -441,7 +442,7 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
       >
         <SafeAreaProvider className='flex-1'>
           <SafeAreaView className='flex-1' edges={['top']}>
-            <ProfileScreen userData={member.users} onClose={() => setProfileModalVisible(false)} />
+            <ProfileScreen userId={member.user_id} userClanId={member.clan_id} onClose={() => setProfileModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>

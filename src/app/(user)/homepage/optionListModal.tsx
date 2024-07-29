@@ -92,7 +92,7 @@ const MoreOptionsModal = ({ userData, onClose }: MoreOptionsModalProps) => {
       >
         <SafeAreaProvider>
           <SafeAreaView edges={['top']} className='flex-1'>
-            <ProfileScreen userData={userData} onClose={() => setModalVisible(false)} />
+            <ProfileScreen userClanId={userData.clan_id} userId={userData.id} onClose={() => setModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>

@@ -216,3 +216,75 @@ export const useUserInsertBadge = () => {
     })
   )
 }
+
+export const useUserBadges= (userId: string) => {
+  return (
+    useQuery({
+      queryKey: ['user_badges', userId],
+      queryFn: async () => {
+        const { data: userBadges, error } = await supabase
+          .from('user_badges')
+          .select('*, badges(*)')
+          .eq('user_id', userId)
+          .eq('displayed', true)
+        
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return userBadges
+      },
+    })
+  )
+}
+
+export const useUserAllBadges= (userId: string) => {
+  return (
+    useQuery({
+      queryKey: ['user_all_badges', userId],
+      queryFn: async () => {
+        const { data: userBadges, error } = await supabase
+          .from('user_badges')
+          .select('*, badges(*)')
+          .eq('user_id', userId)
+        
+        if (error) {
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return userBadges
+      },
+    })
+  )
+}
+
+export const useUpdateUserShownBadges = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async ({ 
+        updateFields, 
+        userBadgeId 
+      }: { 
+        updateFields: UpdateTables<'user_badges'>, 
+        userBadgeId: number
+      }) => {
+        const { data: updatedUserData, error } = await supabase
+          .from('user_badges')
+          .update({...updateFields})
+          .eq('id', userBadgeId)
+
+        if (error) {
+          console.log("error in update user:  " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return updatedUserData
+      },
+      onSuccess: async (_, { updateFields }) => {
+        await queryClient.invalidateQueries({ queryKey: ['user_badges'] })
+      },
+    })
+  )
+}

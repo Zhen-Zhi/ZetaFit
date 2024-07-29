@@ -359,7 +359,7 @@ const HomeScreen = () => {
       >
         <SafeAreaProvider>
           <SafeAreaView edges={['top']} className='flex-1'>
-            <ProfileScreen userData={user} onClose={() => setProfileModalVisible(false)} />
+            <ProfileScreen userId={user.id} userClanId={user?.clan_id} onClose={() => setProfileModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>
