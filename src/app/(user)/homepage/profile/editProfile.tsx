@@ -23,6 +23,8 @@ type ModalProps = {
 const EditProfileScreen = ({ userData, onClose }: ModalProps) => {
   const [image, setImage] = useState<string | null>(null);
   const [username, setUsername] = useState('')
+  const [error, setError] = useState(false)
+  const [blankUsername, setBlankUsername] = useState(false)
 
   const { mutate: updateUser } = useUpdateUser()
 
@@ -65,6 +67,14 @@ const EditProfileScreen = ({ userData, onClose }: ModalProps) => {
   };
 
   const handleUpdateProfile = async () => {
+    setBlankUsername(false)
+    setError(false)
+    
+    if(username == '') {
+      setBlankUsername(true)
+      return
+    }
+
     const imagePath = await uploadImage()
 
     updateUser(
@@ -76,6 +86,9 @@ const EditProfileScreen = ({ userData, onClose }: ModalProps) => {
       {
       onSuccess() {
 
+      },
+      onError(error) {
+        setError(true)
       }
     })
   }
@@ -111,7 +124,7 @@ const EditProfileScreen = ({ userData, onClose }: ModalProps) => {
         <RemoteImage
           classNameAsProps='w-48 h-48 aspect-square rounded-xl mx-auto mt-6'
           path={userData.avatar_image} 
-          fallback={require('@asset/images/CyberKongz.jpg')}
+          fallback={require('@asset/images/default_profile.png')}
           bucket='avatars'
         />
         <AnimatedPressable pressInValue={0.98} onPress={pickImage}>
@@ -126,6 +139,8 @@ const EditProfileScreen = ({ userData, onClose }: ModalProps) => {
               value={username}
               onChangeText={setUsername}
             />
+            { blankUsername && <Text className='ml-8 font-medium mt-1 text-red-500'>Username is required</Text>}
+            { error && <Text className='ml-8 font-medium mt-1 text-red-500'>Username is already taken</Text>}
           </View>
 
           <View className='mt-4 p-2'>

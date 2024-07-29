@@ -30,7 +30,7 @@ export const useUserActivities = (userId: String) => {
       queryFn: async () => {
         const { data: userActivities, error } = await supabase
           .from('user_activities')
-          .select('*')
+          .select('*, activity_type(*)')
           .eq('user_id', userId)
           .order('created_at', { ascending: false })
         

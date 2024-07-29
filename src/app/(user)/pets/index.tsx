@@ -18,7 +18,7 @@ const petsData = [
   { id: 5, petsName: 'Fish', level: '5', image: require('@asset/images/pets/wolve.png') },
   { id: 6, petsName: 'Rabbit', level: '12', image: require('@asset/images/pets/unicorn.png') },
   { id: 7, petsName: 'Hamster', level: '18', image: require('@asset/images/pets/polar_bear.png') },
-  // { id: 8, petsName: 'Lizard', level: '20', image: require('@asset/images/pets/turtle.png') },
+  { id: 8, petsName: 'Lizard', level: '20', image: require('@asset/images/pets/turtle.png') },
   // { id: 9, petsName: 'Snake', level: '25', image: require('@asset/images/pets/dragon.png') },
   // { id: 10, petsName: 'Frog', level: '8', image: require('@asset/images/pets/golem.png') },
   // { id: 11, petsName: 'Hedgehog', level: '11', image: require('@asset/images/pets/wolve.png') },

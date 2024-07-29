@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, TextInput, KeyboardAvoidingView, Platform, ImageBackground, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native'
+import { StyleSheet, Text, View, Image, TextInput, KeyboardAvoidingView, Platform, ImageBackground, TouchableWithoutFeedback, Keyboard, Alert, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { Link, Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
@@ -123,8 +123,15 @@ const SignInScreen = () => {
               pressInValue={0.95}
               // onPress={() => router.replace('/username')}
               onPress={signUpWithEmail}
+              disabled={loading}
             >
-              <Text className='font-semibold text-white text-center my-auto text-lg'>Create Account</Text>
+              {
+                loading
+                  ?
+                <ActivityIndicator className='my-auto' size={28} color='white' />
+                  :
+                <Text className='font-semibold text-white text-center my-auto text-lg'>Create Account</Text>
+              }
             </AnimatedPressable>
 
             {/* sign in button */}

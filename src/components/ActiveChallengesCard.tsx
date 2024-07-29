@@ -34,7 +34,8 @@ const ActiveChallengesCard = ({challengeData}: ActiveChallengesCardProps) => {
       <RemoteImage
         classNameAsProps='h-28 w-full rounded-t-md shadow-xl' 
         path={challengeData?.challenges?.banner_image}
-        fallback={require('@asset/images/challenges_banner.png')}
+        // resizeMode='contain'
+        fallback={require('@asset/images/default.png')}
         bucket='challenges_banner'
       />
       <View className='mt-2'>

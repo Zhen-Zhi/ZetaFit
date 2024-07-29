@@ -78,7 +78,7 @@ const InventoryItemsScreen = () => {
     console.log(walletAddress)
 
     sellItem(
-      { item_id: itemId, selling_price: parseFloat(sellingPrice), wallet_address: walletAddress }, 
+      { item_id: itemId, selling_price: parseFloat(sellingPrice), wallet_address: walletAddress, status: "listed" }, 
       {
         onSuccess() {
           console.log("Sell success")
@@ -134,7 +134,7 @@ const InventoryItemsScreen = () => {
             <RemoteImage
               style={{ height: ITEMSIZE, width: ITEMSIZE }}
               path={item.image} 
-              fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+              fallback={require('@asset/images/default.png')}
               bucket='items'
             />
             <Text className='text-center font-medium'>{item.name}</Text>
@@ -200,7 +200,7 @@ const InventoryItemsScreen = () => {
             <RemoteImage
               classNameAsProps='w-32 h-32 self-center'
               path={selectedItem?.image} 
-              fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+              fallback={require('@asset/images/default.png')}
               bucket='items'
             />
             <Text className='font-semibold text-center'>{selectedItem?.name}</Text>

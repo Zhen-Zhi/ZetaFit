@@ -4,13 +4,13 @@
     "slug": "ZetaFit",
     "version": "1.1.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/ZetaFit.png",
     "scheme": "myapp",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/images/ZetaFit.png",
+      "image": "./assets/images/ZetaFit_splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#002443"
     },
     "ios": {
       "supportsTablet": true,

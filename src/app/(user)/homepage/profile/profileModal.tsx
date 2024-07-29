@@ -59,7 +59,7 @@ const ProfileScreen = ({ userData, onClose }: ModalProps) => {
         <RemoteImage
           classNameAsProps='w-48 h-48 aspect-square rounded-xl mx-auto mt-6'
           path={userData.avatar_image} 
-          fallback={require('@asset/images/CyberKongz.jpg')}
+          fallback={require('@asset/images/default_profile.png')}
           bucket='avatars'
         />
         <View className='px-4 h-full'>

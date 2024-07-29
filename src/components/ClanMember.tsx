@@ -313,9 +313,9 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
             className='aspect-square w-14 h-14 rounded-xl'
           /> */}
           <RemoteImage
-            classNameAsProps='h-16 w-16 aspect-square border' 
+            classNameAsProps='aspect-square w-14 h-14 rounded-xl'
             path={member.users.avatar_image} 
-            fallback={require('@asset/images/CyberKongz.jpg')}
+            fallback={require('@asset/images/default_profile.png')}
             bucket='avatars'
           />
           <View className='flex-1 flex-row justify-between'>
@@ -359,9 +359,9 @@ const ClanMember = ({ member, role, clanMemberViewerId }: ClanMemberProps) => {
               className='aspect-square w-14 h-14 rounded-xl'
             /> */}
             <RemoteImage
-              classNameAsProps='h-16 w-16 aspect-square border' 
+              classNameAsProps='aspect-square w-14 h-14 rounded-xl'
               path={member.users.avatar_image} 
-              fallback={require('@asset/images/CyberKongz.jpg')}
+              fallback={require('@asset/images/default_profile.png')}
               bucket='avatars'
             />
             <View className='flex-1 flex-row justify-between'>

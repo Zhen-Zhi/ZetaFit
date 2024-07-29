@@ -183,6 +183,40 @@ export const useJoinChallenge = () => {
   )
 }
 
+export const useUpdateUserChallenge = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async ({
+        updateChallenge, 
+        userChallengeId
+      }: {
+        updateChallenge: UpdateTables<'user_challenges'>,
+        userChallengeId: number 
+      }) => {
+        const { data: newClan, error } = await supabase
+          .from('user_challenges')
+          .update({ ...updateChallenge })
+          .eq('id', userChallengeId)
+          .select()
+          .single()
+
+        if (error) {
+          console.log("Update challenge fail: " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return newClan
+      },
+      async onSuccess(_, { updateChallenge }) {
+        await queryClient.invalidateQueries({ queryKey: ['user_is_joined_challenge', updateChallenge.user_id, updateChallenge.challenge_id] })
+        await queryClient.invalidateQueries({ queryKey: ['user_joined_challenges', updateChallenge.user_id] })
+      }
+    })
+  )
+}
+
 export const useUserChallengeDetails = (userId: string, ChallengeId: number) => {
   return (
     useQuery({

@@ -49,7 +49,8 @@ const ActiveChallengesCard_2 = ({ classNameAsProps, fullWidth, challengeData }: 
         <RemoteImageBackground
           classNameAsProps='h-[180px]'
           path={challengeData?.challenges?.banner_image}
-          fallback={require('@asset/images/challenges_banner.png')}
+          resizeMode='contain'
+          fallback={require('@asset/images/default.png')}
           bucket='challenges_banner'
         >
           <View className='flex-1 justify-end'>

@@ -31,7 +31,7 @@ const LeaderboardMemberScreen = ({ ranking, isUser, username, clanName, damage, 
           <RemoteImage
             classNameAsProps='aspect-square w-14 h-14 rounded-xl'
             path={profile_image} 
-            fallback={require('@asset/images/CyberKongz.jpg')}
+            fallback={require('@asset/images/default_profile.png')}
             bucket='avatars'
           />
           <View className='flex-1 flex-row justify-between'>

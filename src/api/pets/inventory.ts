@@ -73,3 +73,31 @@ export const useSellItemToMarketplace = () => {
     })
   )
 }
+
+export const useInsertItems = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (itemDetails: InsertTables<'inventory'>) => {
+        const { data: newInventoryItem, error } = await supabase
+          .from('inventory')
+          .insert({ ...itemDetails })
+          .select()
+          .single()
+
+        if (error) {
+          console.log("Insert new item to inventory fail: " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return newInventoryItem
+      },
+      async onSuccess(_, { user_id }) {
+        await queryClient.invalidateQueries({ queryKey: ['inventory_chest', user_id] })
+        await queryClient.invalidateQueries({ queryKey: ['invnetory_items', user_id] })
+      }
+    })
+  )
+}
+

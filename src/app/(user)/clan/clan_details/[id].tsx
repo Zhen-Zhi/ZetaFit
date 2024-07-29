@@ -300,7 +300,7 @@ const ClanDetailsScreen = () => {
           <RemoteImage
             classNameAsProps='w-[120px] h-36 mx-4'
             path={clanDetails.clan_logo} 
-            fallback={require('@asset/images/clan_logo/clan_logo_1.png')}
+            fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
             bucket='clan_logo'
           />
 

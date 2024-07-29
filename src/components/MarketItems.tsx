@@ -4,7 +4,7 @@ import { FontAwesome6 } from '@expo/vector-icons'
 import AnimatedPressable from './AnimatedPressable'
 import { Tables } from '../database.types'
 import RemoteImage from './RemoteImage'
-import { useDeleteMarketplaceItem, useInsertTransaction, useUpdateItemOwnership } from '../api/marketplace'
+import { useInsertTransaction, useUpdateItemOwnership, useUpdateMarketplaceItem } from '../api/marketplace'
 import { createAndSendTransaction } from '../utility/solana'
 import { useAuth } from '../providers/AuthProvider'
 import { Redirect } from 'expo-router'
@@ -30,7 +30,7 @@ const MarketItemsComponent = ({ item }: MarketItemsComponentProps) => {
 
   const { mutate: insertTransaction } = useInsertTransaction()
   const { mutate: updateItemOwnership } = useUpdateItemOwnership()
-  const { mutate: deleteListing } = useDeleteMarketplaceItem()
+  const { mutate: updateListing } = useUpdateMarketplaceItem()
 
   const handleBuy = async () => {
     const txSignature = await createAndSendTransaction(item.wallet_address, item.selling_price)
@@ -58,7 +58,7 @@ const MarketItemsComponent = ({ item }: MarketItemsComponentProps) => {
               }
             }
           )
-          deleteListing(marketplaceId)
+          updateListing(marketplaceId)
         }
       }
     )
@@ -79,7 +79,7 @@ const MarketItemsComponent = ({ item }: MarketItemsComponentProps) => {
           <RemoteImage
             classNameAsProps='aspect-square w-14 h-14 rounded-xl'
             path={item.inventory.image} 
-            fallback={require('@asset/images/challenges_banner.png')}
+            fallback={require('@asset/images/default.png')}
             bucket='items'
           />
           <View className='flex-1 flex-row justify-between'>

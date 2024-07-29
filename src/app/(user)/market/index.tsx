@@ -13,6 +13,7 @@ import { useUserData } from '@/src/api/users'
 import { useAuth } from '@/src/providers/AuthProvider'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { useMarketplaceItem } from '@/src/api/marketplace/index'
+import { useQueryClient } from '@tanstack/react-query'
 
 
 const items = [
@@ -65,6 +66,7 @@ const MarketplaceScreen = () => {
   const flatListRef = useRef<FlatList>(null)
   const [solBalance, setSolBalance] = useState(0)
   const [walletConnected, setWalletConnected] = useState(false);
+  const queryClient = useQueryClient()
   
   const { data: user, error, isLoading } = useUserData(session?.user.id)
 
@@ -169,10 +171,10 @@ const MarketplaceScreen = () => {
           <AnimatedPressable 
             pressInValue={0.9}
             className='z-10 absolute right-3 top-2.5'
-            onPress={() => router.push('/pets/activityLog')}
+            onPress={() => {queryClient.invalidateQueries({ queryKey: ['marketplace_item'] })}}
           >
             <View className='my-auto'>
-              <FontAwesome name='history' size={27} color={themeColors.primary} />
+              <FontAwesome name='refresh' size={27} color={themeColors.primary} />
             </View>
           </AnimatedPressable>
         </View>

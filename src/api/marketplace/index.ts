@@ -12,6 +12,7 @@ export const useMarketplaceItem = () => {
         const { data: marketplaceItem, error } = await supabase
           .from('marketplace')
           .select('*, inventory(*)')
+          .eq('status', 'listed')
 
         if (error) {
           console.log("Get marketplace item error.  " + error.message)
@@ -80,13 +81,12 @@ export const useUpdateItemOwnership = () => {
       },
       async onSuccess() {
         await queryClient.invalidateQueries({ queryKey: ['inventory_items'] })
-        // await queryClient.invalidateQueries({ queryKey: ['user_joined_challenges'] })
       }
     })
   )
 }
 
-export const useDeleteMarketplaceItem = () => {
+export const useUpdateMarketplaceItem = () => {
   const queryClient = useQueryClient()
 
   return (
@@ -94,18 +94,17 @@ export const useDeleteMarketplaceItem = () => {
       mutationFn: async (marketplaceId: number) => {
         const { error } = await supabase
           .from('marketplace')
-          .delete()
+          .update({ status: 'sold' })
           .eq('id', marketplaceId)
 
         if (error) {
-          console.log("Marketplace item remove fail: " + error.message)
+          console.log("Marketplace item update fail: " + error.message)
           throw new Error(error.code + ":" + error.message)
         }
 
       },
       async onSuccess() {
-        await queryClient.invalidateQueries({ queryKey: ['inventory_items'] })
-        // await queryClient.invalidateQueries({ queryKey: ['user_joined_challenges'] })
+        await queryClient.invalidateQueries({ queryKey: ['marketplace_item'] })
       }
     })
   )

@@ -1,6 +1,6 @@
 import { useQueryClient, useMutation, useQuery, QueryClient } from "@tanstack/react-query"
 import { supabase } from "@/src/lib/supabase"
-import { UpdateTables } from "@/src/types";
+import { InsertTables, Tables, UpdateTables } from "@/src/types";
 
 // select user data
 export const useUserData = (id: string) => {
@@ -187,6 +187,31 @@ export const useUpdateUser = () => {
       onSuccess: async (_, { id, clan_id }) => {
         await queryClient.invalidateQueries({ queryKey: ['users', id] })
         await queryClient.invalidateQueries({ queryKey: ['clan_members', clan_id] })
+      },
+    })
+  )
+}
+
+export const useUserInsertBadge = () => {
+  const queryClient = useQueryClient()
+
+  return (
+    useMutation({
+      mutationFn: async (updateFields: InsertTables<'user_badges'>) => {
+        const { data: updatedUserData, error } = await supabase
+          .from('user_badges')
+          .insert({...updateFields})
+          .single()
+
+        if (error) {
+          console.log("error in update user:  " + error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return updatedUserData
+      },
+      onSuccess: async (_, { user_id }) => {
+        await queryClient.invalidateQueries({ queryKey: ['user_badges', user_id] })
       },
     })
   )

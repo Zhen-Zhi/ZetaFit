@@ -90,7 +90,7 @@ const InventoryChestScreen = () => {
             <RemoteImage
               style={{ height: ITEMSIZE, width: ITEMSIZE }}
               path={item.image} 
-              fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+              fallback={require('@asset/images/default.png')}
               bucket='items'
             />
             <Text className='text-center text-sm font-medium'>{item.name}</Text>

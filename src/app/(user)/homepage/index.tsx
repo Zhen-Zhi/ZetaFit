@@ -23,7 +23,7 @@ const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}]
 
 const HomeScreen = () => {
   // Platform.OS == 'android' && NavigationBar.setVisibilityAsync("hidden");
-  const { session, loading } = useAuth();
+  const { session } = useAuth();
   if(!session) {
     return <Redirect href={'/sign_in'} />
   }
@@ -64,11 +64,7 @@ const HomeScreen = () => {
     return unsubscribe;
   }, [navigation, user]);
 
-  if(!user) {
-    console.log("User not found")
-  }
-
-  if (loading || isLoading || clanIsLoading || !user) {
+  if (isLoading || clanIsLoading) {
     return (
       <ImageBackground
         source={require('@asset/images/background_image.png')} 
@@ -76,6 +72,16 @@ const HomeScreen = () => {
       >
         <ActivityIndicator className='m-auto p-4 bg-white/50' size={100} color={themeColors.secondary} />
       </ImageBackground>
+    )
+  }
+
+  if(!user) {
+    console.log("User not found")
+    return (
+      <ImageBackground
+        className='flex-1 pt-2'
+        source={require('@asset/images/background_image.png')}
+      />  
     )
   }
   
@@ -107,29 +113,17 @@ const HomeScreen = () => {
   const emptyActiveChallenge = () => {
     return (
       <AnimatedPressable
-        className='border-x border-t border-slate-200 rounded-md h-auto m-2 bg-white shadow shadow-slate-400'
+        className='border border border-slate-600 rounded-md h-auto m-2 bg-white/50'
         pressInValue={0.96}
+        disabled
       >
-        <Image 
-          className='h-28 w-full rounded-t-md shadow-xl' 
-          source={require('@asset/images/challenges_banner.png')} 
-        />
-        <View className='mt-2'>
+        <View
+          className='h-36 w-full rounded-t-md shadow-xl w-[190]' 
+        >
           <Text 
             numberOfLines={1}
-            className='text-md font-bold my-2 mx-3'
-            style={{ color: themeColors.primary }}
+            className='text-md font-medium m-auto text-slate-500'
           >No Active Challenge</Text>
-          <Progress.Bar
-            width={190}
-            height={2}
-            className='mx-auto'
-            // progress={0.4}
-            progress={0}
-            borderWidth={0}
-            color={themeColors.tetiary}
-            unfilledColor={themeColors.backgroundColor}
-          />
         </View>
       </AnimatedPressable>
     )

@@ -14,9 +14,10 @@ import AnimatedModal from '@/src/components/AnimatedModal';
 import { Badge } from 'react-native-elements'
 import RewardsScreen from '@/src/components/Rewards';
 import RemoteImage from '@/src/components/RemoteImage';
-import { useChallengeAllUser, useChallengesDetails, useJoinChallenge, useUserChallengeDetails, useUserIsJoinedChallenge } from '@/src/api/challenges';
+import { useChallengeAllUser, useChallengesDetails, useJoinChallenge, useUpdateUserChallenge, useUserChallengeDetails, useUserIsJoinedChallenge } from '@/src/api/challenges';
 import { useAuth } from '@/src/providers/AuthProvider';
-import { useUserData } from '@/src/api/users';
+import { useUpdateUser, useUserData, useUserInsertBadge } from '@/src/api/users';
+import { useInsertItems } from '@/src/api/pets/inventory';
 
 type ChallengesDetialsProps = {
   progress : number;
@@ -63,6 +64,10 @@ const ChallengesDetailsScreen = () => {
   } = useChallengeAllUser(challengeId)
     
   const { mutate: joinChallenge } = useJoinChallenge()
+  const { mutate: updateUser } = useUpdateUser()
+  const { mutate: insertInventoryChest } = useInsertItems()
+  const { mutate: updateUserChallenge } = useUpdateUserChallenge()
+  const { mutate: insertBadges } = useUserInsertBadge()
 
   const [joinedChallenge, setJoinedChallenge] = useState(false);
   const [actionModalVisible, setActionModalVisible] = useState(false);
@@ -82,17 +87,128 @@ const ChallengesDetailsScreen = () => {
       }
     }
 
+    if(userChallengeDetails?.completed) {
+      setRewardClaimed(true)
+    }
+
   }, [isJoinedChallenge, userChallengeDetails])
 
-  // useChallengeAttackSubscription(userChallengeDetails?.id, session.user.id, challengeId)
-
-  if(challengeDetailsIsLoading) {
+  if(challengeDetailsIsLoading || userDataIsLoading) {
     return <ActivityIndicator />
   }
 
   if(!challengeDetails) {
     console.log("challengeDetails not found.")
     return <ActivityIndicator />
+  }
+
+  if(!userData) {
+    console.log("Userdata not found.")
+    return <ActivityIndicator />
+  }
+
+  const calculateLevel = (): number => {
+    let required_xp = 99999   // if no level found
+    if(userData?.level) {
+      
+      if (userData.level >= 1 && userData.level < 10) {
+        required_xp = 80 + (userData.level * 20)
+      }
+      else if (userData.level >= 10 && userData.level < 29) {
+        required_xp = 260 + ((userData.level - 9) * 50)
+      }
+      else {
+        required_xp = 1230 + ((userData.level - 29) * 100)
+      }
+    }
+
+    return required_xp
+  }
+
+  const handleClaimReward = () => {
+    if(!userData) {
+      console.warn("Userdata not found")
+      return
+    }
+
+    if(!userChallengeDetails) {
+      return
+    }
+
+    const newCoin = userData?.coin + 1500
+    const newDiamond = userData.diamond + 20
+    let newLv = userData.level
+    let newExp = userData.experience
+    
+    const required_xp = calculateLevel()
+
+    if(newExp + 40 >= required_xp) {
+      newLv = newLv + 1
+      newExp = newExp + 40 - required_xp
+    } else {
+      newExp = newExp + 40
+    }
+    
+    updateUserChallenge(
+      { 
+        updateChallenge: { completed: true }, 
+        userChallengeId: userChallengeDetails?.id 
+      }, 
+      {
+        onSuccess() {
+          insertInventoryChest(
+            {
+              image: 'chest.png',
+              name: 'Precious chest',
+              type: 'chest',
+              user_id: session.user.id
+            }, 
+            {
+              onSuccess() {
+                console.log("Chest inserted to user inventory")
+              },
+              onError() {
+                console.warn("Rewards not claimed")
+              }
+            }
+          )
+
+          updateUser(
+            {
+              id: session.user.id,
+              coin: newCoin,
+              diamond: newDiamond,
+              experience: newExp,
+              level: newLv,
+            }, 
+            {
+              onSuccess() {
+                console.log("Rewards claimed")
+              },
+              onError() {
+                console.warn("Rewards not claimed")
+              }
+            }
+          )
+
+          if(challengeDetails?.badge_id) {
+            insertBadges(
+              { user_id: session.user.id, badge_id: challengeDetails?.badge_id }, 
+              {
+                onSuccess() {
+                  console.log("Updated badges")
+                },
+                onError() {
+                  console.warn("Badges not claimed")
+                }
+              }
+            )
+          }
+          setRewardsModalVisible(true)
+          setRewardClaimed(true)
+        }
+      }
+    )
   }
 
   const handleLeaderboard = () => {
@@ -176,7 +292,8 @@ const ChallengesDetailsScreen = () => {
           <RemoteImage
             classNameAsProps='h-[220px] rounded-lg w-full'
             path={challengeDetails?.banner_image} 
-            fallback={require('@asset/images/challenges_banner.png')}
+            resizeMode='contain'
+            fallback={require('@asset/images/default.png')}
             bucket='challenges_banner'
           />
           <View className='flex-row mt-2 bg-white/50 justify-between'>
@@ -235,7 +352,7 @@ const ChallengesDetailsScreen = () => {
           <RemoteImage
             classNameAsProps='w-64 h-64 mx-auto'
             path={challengeDetails?.badges?.image_name} 
-            fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+            fallback={require('@asset/images/default.png')}
             bucket='badges'
           />
           <Text className='font-semibold text-lg text-center mt-4'>{challengeDetails?.badges?.name}</Text>
@@ -300,10 +417,7 @@ const ChallengesDetailsScreen = () => {
               className='mx-3 mb-2 rounded-lg p-1.5'
               pressInValue={0.98}
               disabled={rewardClaimed}
-              onPress={() => {
-                setRewardsModalVisible(true);
-                setRewardClaimed(true)
-              }}
+              onPress={handleClaimReward}
             >
               <Text className='text-center text-lg text-white font-bold'>{ rewardClaimed ? 'Claimed' : 'Claim Rewards'}</Text>
               { !rewardClaimed && <Badge
@@ -383,6 +497,7 @@ const ChallengesDetailsScreen = () => {
         <RewardsScreen
           onClose={() => setRewardsModalVisible(false)}
           modalVisible={rewardsModalVisible}
+          challengeBadge={challengeDetails.badges}
         />
       </Modal>
     </SafeAreaView>
