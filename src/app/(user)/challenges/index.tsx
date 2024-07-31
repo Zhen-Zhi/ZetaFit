@@ -1,5 +1,5 @@
 import { ImageBackground, Platform, StyleSheet, Text, View, Image, FlatList, LayoutChangeEvent, ScrollView, Modal, ActivityIndicator } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Redirect, Stack, router } from 'expo-router'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { difficultiesColors, themeColors } from '@/src/constants/Colors'
@@ -45,13 +45,13 @@ const ChallengesScreen = () => {
     {
       challenge_id: number;
       created_at: string;
-      damage: number;
       id: number;
-      status: string;
+      completed: boolean;
       user_id: string;
       challenges: Tables<'challenges'> | null
+      user_challenge_details: Tables<'user_challenge_details'>[]
   } | null >>(null);
-  // const flatListRef = useRef<any>(null);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flatListWidth, setFlatListWidth] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState('');
@@ -67,19 +67,22 @@ const ChallengesScreen = () => {
     data: challengesList,
     error: challengesListError,
     isLoading: challengesListIsLoading,
-  } = useChallengesList()
+    refetch
+  } = useChallengesList(selectedFilter)
+
+  useEffect(() => {
+    refetch()
+  },[selectedFilter])
 
   if(!challengesList) {
     console.log("challenges list not found")
     return <ActivityIndicator />
   }
-
-  console.log(joinedChallenges)
   
   const scrollToNextItem = () => {
-    if (flatListRef.current) {
+    if (flatListRef.current && joinedChallenges) {
       const nextIndex = currentIndex + 1;
-      if (nextIndex < challengesList.length) {
+      if (nextIndex < joinedChallenges.length) {
         flatListRef.current.scrollToIndex({ index: nextIndex });
         setCurrentIndex(nextIndex);
       }
@@ -87,7 +90,7 @@ const ChallengesScreen = () => {
   };
 
   const scrollToPreviousItem = () => {
-    if (flatListRef.current) {
+    if (flatListRef.current && joinedChallenges) {
       const prevIndex = currentIndex - 1;
       if (prevIndex >= 0) {
         flatListRef.current.scrollToIndex({ index: prevIndex });
@@ -164,11 +167,11 @@ const ChallengesScreen = () => {
                   </View>
                 </AnimatedPressable>
                 <AnimatedPressable
-                  style={ currentIndex == challengesList.length - 1 ? { opacity: 0.5 } : { opacity: 1 } }
+                  style={ currentIndex == joinedChallenges.length - 1 ? { opacity: 0.5 } : { opacity: 1 } }
                   className='mx-1'
                   pressInValue={0.9}
                   onPress={scrollToNextItem}
-                  disabled={ currentIndex == challengesList.length - 1 }
+                  disabled={ currentIndex == joinedChallenges.length - 1 }
                 >
                   <View className='flex-row'>
                     <Text className='mx-2 font-medium'>Next</Text>
@@ -183,20 +186,29 @@ const ChallengesScreen = () => {
           <View className='mt-8 flex-row bg-white/50'>
             <AnimatedPressable 
               pressInValue={0.95}
-              onPress={() => setSelectedFilter('Weekly')}
-              className={`border-2 rounded-lg p-2 mr-3 bg-white ${ selectedFilter == 'Weekly' ? 'border-emerald-500 bg-emerald-100/50' : 'border-slate-400' }`}
+              onPress={() => setSelectedFilter('Beginner')}
+              className={`border-2 rounded-lg p-2 mr-3 bg-white ${ selectedFilter == 'Beginner' ? 'border-emerald-500 bg-emerald-100/50' : 'border-slate-400' }`}
             >
               <View>
-                <Text className='font-bold'>Weekly</Text>
+                <Text className='font-bold'>Beginner</Text>
               </View>
             </AnimatedPressable>
             <AnimatedPressable 
               pressInValue={0.95}
-              onPress={() => setSelectedFilter('Advanced')}
-              className={`border-2 rounded-lg p-2 bg-white ${ selectedFilter == 'Advanced' ? 'border-emerald-500 bg-emerald-100/50' : 'border-slate-400' }`}
+              onPress={() => setSelectedFilter('Intermediate')}
+              className={`border-2 rounded-lg p-2 mr-3 bg-white ${ selectedFilter == 'Intermediate' ? 'border-emerald-500 bg-emerald-100/50' : 'border-slate-400' }`}
             >
               <View>
-                <Text className='font-bold'>Advanced</Text>
+                <Text className='font-bold'>Intermediate</Text>
+              </View>
+            </AnimatedPressable>
+            <AnimatedPressable 
+              pressInValue={0.95}
+              onPress={() => setSelectedFilter('Expert')}
+              className={`border-2 rounded-lg p-2 mr-3 bg-white ${ selectedFilter == 'Expert' ? 'border-emerald-500 bg-emerald-100/50' : 'border-slate-400' }`}
+            >
+              <View>
+                <Text className='font-bold'>Expert</Text>
               </View>
             </AnimatedPressable>
           </View>
@@ -265,10 +277,10 @@ const ChallengesScreen = () => {
                 </View>
               </View>
 
-              <Text className='font-semibold text-lg text-justify mt-2'>Challenges Refresh</Text>
+              {/* <Text className='font-semibold text-lg text-justify mt-2'>Challenges Refresh</Text>
               <Text className='text-[16px] font-medium text-justify mb-4'>
                 Every challenges ends on specific end date at <Text className='font-bold text-red-600'>4:00pm</Text>
-              </Text>
+              </Text> */}
 
               <AnimatedPressable 
                 pressInValue={0.98}

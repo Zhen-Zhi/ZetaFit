@@ -15,6 +15,7 @@ import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import dayjs from 'dayjs';
 import { useClanWarSubscription } from '@/src/api/clan/subscription'
+import RemoteImage from '@/src/components/RemoteImage'
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -32,8 +33,8 @@ const ClanWarScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [actionModalVisible, setActionModalVisible] = useState(false);
   const [actionType, setActionType] = useState('attack');
-  const [warEnded, setWarEnded] = useState(false);
-  const [clanWarResult, setClanWarResult] = useState('')
+  const [warEnded, setWarEnded] = useState(true);
+  const [clanWarResult, setClanWarResult] = useState('victory')
   const [isSecondClan, setIsSecondClan] = useState(false)
   const [countdown, setCountdown] = useState('');
   const timerRef: MutableRefObject<NodeJS.Timeout | null> = useRef(null);
@@ -71,8 +72,6 @@ const ClanWarScreen = () => {
   } = useClanDetails(opponentClanId)
 
   useClanWarSubscription(clanId)
-
-  const { mutate: updateClanWar } = useUpdateClanWar() // maybe used for attack and defense
 
   const updateCountdown = () => {
     if(!clanWar) {
@@ -164,7 +163,13 @@ const ClanWarScreen = () => {
         <View className='flex-1'>
           <View className='flex-row'>
             <View className='ml-4'>
-              <Image className='w-44 h-52 mt-2' source={require('@asset/images/clan_logo/clan_logo_5.png')} />
+              {/* <Image className='w-44 h-52 mt-2' source={require('@asset/images/clan_logo/clan_logo_5.png')} /> */}
+              <RemoteImage
+                classNameAsProps='w-44 h-52 mt-2'
+                path={clanDetails.clan_logo} 
+                fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+                bucket='clan_logo'
+              />
               <View className='flex-row justify-center'>
                 <View className='my-auto mx-1'>
                   <FontAwesome6 name="fire" size={22} color="rgba(240, 93, 9, 0.8)" />
@@ -219,7 +224,7 @@ const ClanWarScreen = () => {
                   borderColor={themeColors.primary}
                 />
               </View>
-              <Text>{isSecondClan ? clanWar.clan_1_health : clanWar.clan_2_health}/{clanDetails?.clan_health}</Text>
+              <Text>{isSecondClan ? clanWar.clan_1_health : clanWar.clan_2_health}/{opponentClanDetails.clan_health}</Text>
               <View className='flex-row mt-auto'>
                 <AnimatedPressable 
                   style={{ backgroundColor: themeColors.danger }}
@@ -240,7 +245,13 @@ const ClanWarScreen = () => {
               </View>
             </View>
             <View className='ml-auto mr-4 mb-2'>
-              <Image className='w-44 h-52 mt-2' source={require('@asset/images/clan_logo/clan_logo_2.png')} />
+              {/* <Image className='w-44 h-52 mt-2' source={require('@asset/images/clan_logo/clan_logo_2.png')} /> */}
+              <RemoteImage
+                classNameAsProps='w-44 h-52 mt-2'
+                path={opponentClanDetails.clan_logo} 
+                fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
+                bucket='clan_logo'
+              />
               <View className='flex-row justify-center'>
                 <View className='my-auto mx-1'>
                   <FontAwesome6 name="fire" size={22} color="rgba(240, 93, 9, 0.8)" />
@@ -258,7 +269,11 @@ const ClanWarScreen = () => {
         transparent={true}
         onRequestClose={() =>setModalVisible(false)}
       >
-        <ClanWarBattleLogScreen onClose={() => setModalVisible(false)}/>
+        <ClanWarBattleLogScreen 
+          clanWarId={clanWar.id}
+          clanId={clanDetails.clan_id}
+          onClose={() => setModalVisible(false)}
+        />
       </Modal>
       <Modal
         animationType='fade'
@@ -267,7 +282,14 @@ const ClanWarScreen = () => {
         transparent={true}
         onRequestClose={() =>setActionModalVisible(false)}
       >
-        <ClanWarActionScreenModal actionType={actionType} onClose={() => setActionModalVisible(false)} />
+        <ClanWarActionScreenModal 
+          clanId={clanDetails.clan_id} 
+          clanWar={clanWar} 
+          actionType={actionType} 
+          onClose={() => setActionModalVisible(false)} 
+          isSecondClan={isSecondClan}
+          clanMaxHealth={clanDetails.clan_health}
+        />
       </Modal>
       <Modal
         animationType='fade'

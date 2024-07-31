@@ -8,6 +8,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tables } from '../database.types';
 import RemoteImage from './RemoteImage';
 import RemoteImageBackground from './RemoteImageBackground';
+import { router } from 'expo-router';
 
 type ChallengesCardProps = {
   onPress ?: () => void;
@@ -22,13 +23,13 @@ type ChallengesCardProps = {
 //   progress ?: number;
 // };
 
-const ChallengesCard = ({ classNameAsProps, fullWidth, challengeData, onPress }: ChallengesCardProps) => {
+const ChallengesCard = ({ classNameAsProps, fullWidth, challengeData }: ChallengesCardProps) => {
 
   return (
     <AnimatedPressable
       className={classNameAsProps}
       pressInValue={0.98}
-      onPress={onPress}
+      onPress={() => router.push(`/challenges/${challengeData?.id}`)}
     >
       <View className='bg-white border-x border-slate-600 border-t rounded-xl overflow-hidden'>
         {/* <ImageBackground
@@ -40,7 +41,8 @@ const ChallengesCard = ({ classNameAsProps, fullWidth, challengeData, onPress }:
         <RemoteImageBackground
           classNameAsProps='h-[180px]'
           path={challengeData?.banner_image}
-          fallback={require('@asset/images/challenges_banner.png')}
+          // resizeMode='contain'
+          fallback={require('@asset/images/default.png')}
           bucket='challenges_banner'
         >
           <View className='flex-1 justify-end'>

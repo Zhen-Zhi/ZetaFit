@@ -91,7 +91,12 @@ const ClanScreen = () => {
                   refetch();
                 }}
               >
-                <FontAwesome6 class name="magnifying-glass" size={18} color={themeColors.primary} />
+                { isLoading
+                  ?
+                  <ActivityIndicator />
+                  :
+                  <FontAwesome6 class name="magnifying-glass" size={18} color={themeColors.primary} />
+                }
               </AnimatedPressable>
             </View>
 

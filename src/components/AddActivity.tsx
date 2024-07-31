@@ -95,13 +95,21 @@ const AddActivityScreenModal = ({ energy, current_active_score, onClose }: AddAc
   const [duration, setDuration] = useState('')
   const [description, setDescription] = useState('')
   const [selectedUnit, setSelectedUnit] = useState('Kilometers');
-  const [selectedItem, setSelectedItem] = useState(activityTypes?.[0])
+  const [selectedItem, setSelectedItem] = useState<Tables<'activity_type'> | null>(null)
   const [missingRequired, setMissingRequired] = useState(false);
   const [insertActivityLoading, setInsertActivityLoading] = useState(false)
   const [insertComplete, setInsertComplete] = useState(false);
+  const [invalidDistance, setInvalidDistance] = useState(false);
+  const [invalidDuration, setInvalidDuration] = useState(false);
 
   const flatListRef = useRef<FlatList<Tables<'activity_type'>>>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if(activityTypes) {
+      setSelectedItem(activityTypes[0])
+    }
+  }, [activityTypes])
 
   if(!activityTypes) {
     console.log("Activity type not found!")
@@ -182,9 +190,29 @@ const AddActivityScreenModal = ({ energy, current_active_score, onClose }: AddAc
   
   const handleAddActivity = () => {
     setInsertComplete(false)
+    setMissingRequired(false)
+    setInvalidDuration(false)
+    setInvalidDistance(false)
     setInsertActivityLoading(true)
     if(title == '' || distance == '' || duration == '') {
       setMissingRequired(true)
+      setInsertActivityLoading(false)
+      return
+    }
+
+    if(!selectedItem) {
+      setInsertActivityLoading(false)
+      return
+    }
+
+    if(!/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(duration)) {
+      setInvalidDuration(true)
+      setInsertActivityLoading(false)
+      return
+    }
+
+    if(!/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(distance)) {
+      setInvalidDistance(true)
       setInsertActivityLoading(false)
       return
     }
@@ -211,7 +239,7 @@ const AddActivityScreenModal = ({ energy, current_active_score, onClose }: AddAc
         activity_type_id: selectedItem?.id,
         activity_title: title,
         distance: distanceInMeter,
-        duration: duration,
+        duration: parseFloat(duration),
         activity_description: description, 
         user_id: session.user.id,
         active_score: 250
@@ -340,20 +368,29 @@ const AddActivityScreenModal = ({ energy, current_active_score, onClose }: AddAc
                 &&
               <Text className='text-red-500 mx-1 font-medium'>Distance is required</Text>
             }
+            {
+              invalidDistance &&
+              <Text className='text-red-500 mx-1 font-medium'>Distance must be a number</Text>
+            }
           </View>
 
           <View>
-            <Text className='font-bold text-lg'>Duration *</Text>
+            <Text className='font-bold text-lg'>Duration (min) *</Text>
             <TextInput
               placeholder='Enter activity name'
               className='border p-2 rounded-lg border-slate-500 mt-1 bg-white'
               onChangeText={setDuration}
               value={duration}
+              keyboardType="numeric"
             />
             { 
-              missingRequired && duration == '' 
+              missingRequired && duration == ''
                 &&
               <Text className='text-red-500 mx-1 font-medium'>Duration is required</Text>
+            }
+            {
+              invalidDuration &&
+              <Text className='text-red-500 mx-1 font-medium'>Duration must be a number</Text>
             }
           </View>
           

@@ -24,7 +24,7 @@ export const useClanList = (searchValue: string) => {
         }
         else {
           const { data: clan, error } = await supabase
-          .rpc('get_random_clans')
+            .rpc('get_random_clans')
 
           if (error) {
             throw new Error(error.code + ":" + error.message)
@@ -486,7 +486,7 @@ export const useUpdateClanWar = () => {
         }
 
         const { data: newRole, error } = await supabase
-          .from('clans')
+          .from('clan_war')
           .update(updatedClanWar)
           .eq('id', updatedClanWar.id)
 
@@ -544,6 +544,28 @@ export const useClanWarLose = (clanId: number) => {
         }
 
         return clanWarLose
+      }
+    })
+  )
+}
+
+export const useClanWarDetails = (clanWarId: number, clanId: number) => {
+  return (
+    useQuery({
+      queryKey: ['clan_war_details', clanId],
+      queryFn: async () => {
+        const { data: clanWarDetails, error } = await supabase
+          .from('clan_war_details')
+          .select('*, users(*)')
+          .eq('clan_war_id', clanWarId)
+          .eq('clan_id', clanId)
+
+        if (error) {
+          console.log(error.message)
+          throw new Error(error.code + ":" + error.message)
+        }
+
+        return clanWarDetails
       }
     })
   )

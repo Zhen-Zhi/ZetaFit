@@ -1,16 +1,77 @@
-import { ImageBackground, Pressable, StyleSheet, Text, View, Image, FlatList, TouchableWithoutFeedback, requireNativeComponent } from 'react-native'
-import React, { useState } from 'react'
-import { Stack } from 'expo-router'
+import { ImageBackground, Pressable, StyleSheet, Text, View, Image, FlatList, TouchableWithoutFeedback, requireNativeComponent, ScrollView, ActivityIndicator } from 'react-native'
+import React, { ReactNode, useState } from 'react'
+import { Redirect, Stack, useLocalSearchParams, useNavigation } from 'expo-router'
 import { FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { usePetAttackChallenge } from '@/src/api/pets'
+import { useAuth } from '@/src/providers/AuthProvider'
+import { useUpdateUser, useUserData } from '@/src/api/users'
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+]);
 
 const Tab = createMaterialTopTabNavigator();
+// type AttackProps = {
+//   route: RouteProp<{ params: { challengeId: number; onClose: () => void } }, 'params'>;
+// };
 
-const Attack = () => {
+const Attack = ({ route }: any) => {
+  const { userChallengeId, onClose } = route.params;
+
+  const { session } = useAuth()
+  if(!session) {
+    onClose();
+    return <Redirect href={'/sign_in'} />
+  }
+  
+  const {
+    data: userData,
+    error: userDataError,
+    isLoading: userDataIsLoading,
+  } = useUserData(session.user.id)
+
+  const { mutate: insertAttack } = usePetAttackChallenge();
+  const { mutate: updateUserEnergy } = useUpdateUser();
   const [attackSelected, setAttackSelected] = useState(false);
   const [skillSelected, setSkillSelected] = useState(false);
+  const [loading, setLoading] = useState(false)
+
+  const handleAttack = () => {
+    setLoading(true)
+    let damage = 0
+    const currentEnergy = userData?.energy
+    if(!currentEnergy || currentEnergy < 20) {
+      onClose()
+      return
+    }
+
+    if(skillSelected) {
+      damage = 80
+    } else {
+      damage = 40
+    }
+
+    insertAttack(
+      { user_challenges_id: userChallengeId , damage }, 
+      {
+        onSuccess() {
+          updateUserEnergy(
+            { id: session.user.id, energy: currentEnergy - 20 }, 
+            {
+              onSuccess() {
+                setLoading(false)
+                onClose()
+              }
+            }
+          )    
+        }
+      }
+    )
+  }
 
   return(
     <View className='flex-1'>
@@ -20,7 +81,7 @@ const Attack = () => {
           <View className='my-auto mr-1'>
             <FontAwesome6 name="bolt-lightning" size={24} color='orange' />
           </View>
-          <Text className='font-bold text-[16px]'>100/100</Text>
+          <Text className='font-bold text-[16px]'>{userData?.energy} /160</Text>
         </View>
       </View>
       <AnimatedPressable
@@ -37,7 +98,7 @@ const Attack = () => {
                 <View className='my-auto mr-1'>
                   <FontAwesome name="bomb" size={24} color="black" />
                 </View>
-                <Text className='font-semibold my-auto text-lg'>20</Text>
+                <Text className='font-semibold my-auto text-lg'>40</Text>
               </View>
               <View className='flex-row mr-4'>
                 <View className='my-auto mr-1'>
@@ -63,7 +124,7 @@ const Attack = () => {
                 <View className='my-auto mr-1'>
                   <FontAwesome name="bomb" size={24} color="black" />
                 </View>
-                <Text className='font-semibold my-auto text-lg'>20</Text>
+                <Text className='font-semibold my-auto text-lg'>80</Text>
               </View>
               <View className='flex-row mr-4'>
                 <View className='my-auto mr-1'>
@@ -76,11 +137,21 @@ const Attack = () => {
         </View>
       </AnimatedPressable>
       <AnimatedPressable 
-        style={{ backgroundColor: themeColors.danger }}
+        // style={{ backgroundColor: userData?.energy ? userData.energy < 20 ? themeColors.disabled : themeColors.danger : themeColors.disabled }}
+        style={{
+          backgroundColor: !userData?.energy || userData.energy < 20 || (!skillSelected && !attackSelected) || loading ? themeColors.disabled : themeColors.danger
+        }}
         pressInValue={0.98}
         className='m-3 mt-auto border border-slate-400 rounded-lg p-2 bg-white'
+        disabled={!userData?.energy || userData.energy < 10 || (!skillSelected && !attackSelected) || loading}
+        onPress={handleAttack}
       >
-        <Text style={{ color: themeColors.backgroundColor }} className='font-bold my-auto text-lg text-center'>Attack</Text>
+        { loading
+            ?
+          <ActivityIndicator color={themeColors.secondary} size={28} />
+            :
+          <Text style={{ color: themeColors.backgroundColor }} className='font-bold my-auto text-lg text-center'>Attack</Text>
+        }
       </AnimatedPressable>
     </View>
   )
@@ -88,6 +159,17 @@ const Attack = () => {
 
 const Defense = () => {
   const [defenseSelected, setDefenseSelected] = useState(false);
+  const { session } = useAuth()
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
+  const {
+    data: userData,
+    error: userDataError,
+    isLoading: userDataIsLoading,
+  } = useUserData(session.user.id)
+
   return (
     <View className='flex-1'>
     <View className='mx-3 my-2 flex-row justify-between'>
@@ -96,7 +178,7 @@ const Defense = () => {
         <View className='my-auto mr-1'>
           <FontAwesome6 name="bolt-lightning" size={24} color='orange' />
         </View>
-        <Text className='font-bold text-[16px]'>100/100</Text>
+        <Text className='font-bold text-[16px]'>{userData?.energy} /160</Text>
       </View>
     </View>
     <AnimatedPressable
@@ -125,10 +207,12 @@ const Defense = () => {
         </View>
       </View>
     </AnimatedPressable>
+    <Text className='mt-auto mx-3 text-red-600 font-medium'>Defense are disabled in challenge mode</Text>
     <AnimatedPressable 
-      style={{ backgroundColor: themeColors.secondary }}
+      style={{ backgroundColor: themeColors.disabled }}
       pressInValue={0.98}
-      className='m-3 mt-auto border border-slate-400 rounded-lg p-2 bg-white'
+      className='m-3 mt-2 border border-slate-400 rounded-lg p-2 bg-white'
+      disabled
     >
       <Text style={{ color: themeColors.backgroundColor }} className='font-bold my-auto text-lg text-center'>Defense</Text>
     </AnimatedPressable>
@@ -138,10 +222,11 @@ const Defense = () => {
 
 type ClanWarBattleLogProps = {
   actionType?: string;
+  userChallengeId: number;
   onClose: () => void
 }
 
-const ChallengesActionScreenModal = ({ onClose }: ClanWarBattleLogProps) => {
+const ChallengesActionScreenModal = ({ onClose, userChallengeId }: ClanWarBattleLogProps) => {
 
   return (
     <Pressable className='flex-1 bg-black/50' onPress={onClose}>
@@ -188,8 +273,17 @@ const ChallengesActionScreenModal = ({ onClose }: ClanWarBattleLogProps) => {
         },
       }}
     >
-      <Tab.Screen name='attack' component={Attack} options={{ tabBarLabel: 'Attack' }} />
-      <Tab.Screen name='defense' component={Defense} options={{ tabBarLabel: 'Defense' }} />
+      <Tab.Screen 
+        name='attack' 
+        component={Attack} 
+        initialParams={{ userChallengeId, onClose }} 
+        options={{ tabBarLabel: 'Attack' }} 
+      />
+      <Tab.Screen 
+        name='defense' 
+        component={Defense} 
+        options={{ tabBarLabel: 'Defense' }}
+      />
     </Tab.Navigator>
     </ImageBackground>
     </Pressable>

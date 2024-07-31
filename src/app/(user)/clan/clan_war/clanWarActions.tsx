@@ -1,16 +1,104 @@
-import { ImageBackground, Pressable, StyleSheet, Text, View, Image, FlatList, TouchableWithoutFeedback, requireNativeComponent } from 'react-native'
+import { ImageBackground, Pressable, StyleSheet, Text, View, Image, FlatList, TouchableWithoutFeedback, requireNativeComponent, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
-import { Stack } from 'expo-router'
+import { Redirect, Stack } from 'expo-router'
 import { FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
 import AnimatedPressable from '@/src/components/AnimatedPressable'
 import { themeColors } from '@/src/constants/Colors'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { useAuth } from '@/src/providers/AuthProvider'
+import { useUpdateUser, useUserData } from '@/src/api/users'
+import { LogBox } from 'react-native';
+import { usePetClanWarAction } from '@/src/api/pets'
+import { Tables } from '@/src/database.types'
+import { useUpdateClanWar } from '@/src/api/clan'
+
+LogBox.ignoreLogs([
+  'Non-serializable values were found in the navigation state',
+]);
 
 const Tab = createMaterialTopTabNavigator();
 
-const Attack = () => {
+const Attack = ({ route }: any) => {
+  const { onClose, clanId, clanWarId, isSecondClan, opponentClanHealth } = route.params;
+  const { session } = useAuth();
+
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
+  const {
+    data: userData,
+    error: userDataError,
+    isLoading: userDataIsLoading,
+  } = useUserData(session.user.id)
+
+  const { mutate: insertAttack } = usePetClanWarAction();
+  const { mutate: updateUserEnergy } = useUpdateUser();
+  const { mutate: updateClanHealth } = useUpdateClanWar();
   const [attackSelected, setAttackSelected] = useState(false);
   const [skillSelected, setSkillSelected] = useState(false);
+  const [loading, setLoading] = useState(false)
+
+  const handleAttack = () => {
+    setLoading(true)
+    let damage = 0
+    const currentEnergy = userData?.energy
+    if(!currentEnergy || currentEnergy < 20) {
+      onClose()
+      return
+    }
+
+    if(skillSelected) {
+      damage = 80
+    } else {
+      damage = 40
+    }
+
+    insertAttack(
+      {
+        clan_war_id: clanWarId,
+        clan_id: clanId,
+        user_id: session.user.id,
+        action: 'attack',
+        contribute: damage
+      }, 
+      {
+        onSuccess() {
+          updateUserEnergy(
+            { id: session.user.id, energy: currentEnergy - 20 }, 
+          )
+
+          isSecondClan 
+            ?
+          updateClanHealth(
+            { 
+              id: clanWarId,
+              clan_1_health: opponentClanHealth - damage
+            }, 
+            {
+              onSuccess() {
+                setLoading(false)
+                onClose()
+              }
+            }
+          )
+            :
+          updateClanHealth(
+            { 
+              id: clanWarId,
+              clan_2_health: opponentClanHealth - damage
+            }, 
+            {
+              onSuccess() {
+                setLoading(false)
+                onClose()
+              }
+            }
+          )
+        }
+      }
+    )
+  }
 
   return(
     <View className='flex-1'>
@@ -20,7 +108,7 @@ const Attack = () => {
           <View className='my-auto mr-1'>
             <FontAwesome6 name="bolt-lightning" size={24} color='orange' />
           </View>
-          <Text className='font-bold text-[16px]'>100/100</Text>
+          <Text className='font-bold text-[16px]'>{userData?.energy} /160</Text>
         </View>
       </View>
       <AnimatedPressable
@@ -37,7 +125,7 @@ const Attack = () => {
                 <View className='my-auto mr-1'>
                   <FontAwesome name="bomb" size={24} color="black" />
                 </View>
-                <Text className='font-semibold my-auto text-lg'>20</Text>
+                <Text className='font-semibold my-auto text-lg'>40</Text>
               </View>
               <View className='flex-row mr-4'>
                 <View className='my-auto mr-1'>
@@ -63,7 +151,7 @@ const Attack = () => {
                 <View className='my-auto mr-1'>
                   <FontAwesome name="bomb" size={24} color="black" />
                 </View>
-                <Text className='font-semibold my-auto text-lg'>20</Text>
+                <Text className='font-semibold my-auto text-lg'>80</Text>
               </View>
               <View className='flex-row mr-4'>
                 <View className='my-auto mr-1'>
@@ -76,18 +164,105 @@ const Attack = () => {
         </View>
       </AnimatedPressable>
       <AnimatedPressable 
-        style={{ backgroundColor: themeColors.danger }}
+        // style={{ backgroundColor: userData?.energy ? userData.energy < 20 ? themeColors.disabled : themeColors.danger : themeColors.disabled }}
+        style={{
+          backgroundColor: !userData?.energy || userData.energy < 20 || (!skillSelected && !attackSelected) || loading ? themeColors.disabled : themeColors.danger
+        }}
         pressInValue={0.98}
         className='m-3 mt-auto border border-slate-400 rounded-lg p-2 bg-white'
+        disabled={!userData?.energy || userData.energy < 10 || (!skillSelected && !attackSelected) || loading}
+        onPress={handleAttack}
       >
-        <Text style={{ color: themeColors.backgroundColor }} className='font-bold my-auto text-lg text-center'>Attack</Text>
+        { loading
+            ?
+          <ActivityIndicator color={themeColors.secondary} size={28} />
+            :
+          <Text style={{ color: themeColors.backgroundColor }} className='font-bold my-auto text-lg text-center'>Attack</Text>
+        }
       </AnimatedPressable>
     </View>
   )
 };
 
-const Defense = () => {
+const Defense = ({ route }: any) => {
+  const { onClose, clanId, clanWarId, isSecondClan, clanHealth, clanMaxHealth } = route.params;
+  const { session } = useAuth();
+
+  if(!session) {
+    return <Redirect href={'/sign_in'} />
+  }
+
+  const {
+    data: userData,
+    error: userDataError,
+    isLoading: userDataIsLoading,
+  } = useUserData(session.user.id)
+
+  const { mutate: insertDefense } = usePetClanWarAction();
+  const { mutate: updateUserEnergy } = useUpdateUser();
+  const { mutate: updateClanHealth } = useUpdateClanWar();
   const [defenseSelected, setDefenseSelected] = useState(false);
+
+  const handleDefense = () => {
+    let heal = 20
+    let clanHealthAfterHeal = 0
+    const currentEnergy = userData?.energy
+    if(!currentEnergy || currentEnergy < 10) {
+      onClose()
+      return
+    }
+
+    if(clanHealth + heal >= clanMaxHealth) {
+      clanHealthAfterHeal = clanMaxHealth
+    } else {
+      clanHealthAfterHeal = clanHealth + heal
+    }
+
+    insertDefense(
+      {
+        clan_war_id: clanWarId,
+        clan_id: clanId,
+        user_id: session.user.id,
+        action: 'defense',
+        contribute: heal
+      }, 
+      {
+        onSuccess() {
+          updateUserEnergy(
+            { id: session.user.id, energy: currentEnergy - 10 }, 
+          )
+
+          isSecondClan 
+            ?
+          updateClanHealth(
+            { 
+              id: clanWarId,
+              clan_2_health: clanHealthAfterHeal
+            }, 
+            {
+              onSuccess() {
+                onClose()
+              }
+            }
+          )
+            :
+          updateClanHealth(
+            { 
+              id: clanWarId,
+              clan_1_health: clanHealthAfterHeal
+            }, 
+            {
+              onSuccess() {
+                onClose()
+              }
+            }
+          )
+        }
+      }
+    )
+  }
+
+
   return (
     <View className='flex-1'>
     <View className='mx-3 my-2 flex-row justify-between'>
@@ -96,7 +271,7 @@ const Defense = () => {
         <View className='my-auto mr-1'>
           <FontAwesome6 name="bolt-lightning" size={24} color='orange' />
         </View>
-        <Text className='font-bold text-[16px]'>100/100</Text>
+        <Text className='font-bold text-[16px]'>{userData?.energy} /160</Text>
       </View>
     </View>
     <AnimatedPressable
@@ -119,16 +294,19 @@ const Defense = () => {
               <View className='my-auto mr-1'>
                 <FontAwesome6 name="bolt-lightning" size={24} color='orange' />
               </View>
-              <Text className='font-semibold my-auto text-lg'>20</Text>
+              <Text className='font-semibold my-auto text-lg'>10</Text>
             </View>
           </View>
         </View>
       </View>
     </AnimatedPressable>
     <AnimatedPressable 
-      style={{ backgroundColor: themeColors.secondary }}
+      // style={{ backgroundColor: userData?.energy ? ((userData.energy < 10 && !defenseSelected) ? themeColors.disabled : themeColors.secondary) : themeColors.disabled }}
+      style={{ backgroundColor: !userData?.energy || userData.energy < 10 || !defenseSelected ? themeColors.disabled : themeColors.secondary }}
       pressInValue={0.98}
       className='m-3 mt-auto border border-slate-400 rounded-lg p-2 bg-white'
+      disabled={!userData?.energy || userData.energy < 10 || !defenseSelected}
+      onPress={handleDefense}
     >
       <Text style={{ color: themeColors.backgroundColor }} className='font-bold my-auto text-lg text-center'>Defense</Text>
     </AnimatedPressable>
@@ -137,11 +315,18 @@ const Defense = () => {
 };
 
 type ClanWarBattleLogProps = {
+  clanId: number;
+  clanWar: Tables<'clan_war'>;
   actionType: string;
+  isSecondClan: boolean;
+  clanMaxHealth: number;
   onClose: () => void
 }
 
-const ClanWarActionScreenModal = ({ actionType, onClose }: ClanWarBattleLogProps) => {
+const ClanWarActionScreenModal = ({ clanId, clanWar, actionType, isSecondClan, clanMaxHealth, onClose }: ClanWarBattleLogProps) => {
+  const clanWarId = clanWar.id
+  const opponentClanHealth = isSecondClan ? clanWar.clan_1_health : clanWar.clan_2_health
+  const clanHealth = isSecondClan ? clanWar.clan_2_health : clanWar.clan_1_health
 
   return (
     <Pressable className='flex-1 bg-black/50' onPress={onClose}>
@@ -189,8 +374,18 @@ const ClanWarActionScreenModal = ({ actionType, onClose }: ClanWarBattleLogProps
         },
       }}
     >
-      <Tab.Screen name='attack' component={Attack} options={{ tabBarLabel: 'Attack' }} />
-      <Tab.Screen name='defense' component={Defense} options={{ tabBarLabel: 'Defense' }} />
+      <Tab.Screen 
+        name='attack' 
+        component={Attack} 
+        options={{ tabBarLabel: 'Attack' }} 
+        initialParams={{ onClose, clanWarId, clanId, isSecondClan, opponentClanHealth }} 
+      />
+      <Tab.Screen 
+        name='defense' 
+        component={Defense} 
+        options={{ tabBarLabel: 'Defense' }}
+        initialParams={{ onClose, clanWarId, clanId, isSecondClan, clanHealth, clanMaxHealth }}  
+      />
     </Tab.Navigator>
     </ImageBackground>
     </Pressable>

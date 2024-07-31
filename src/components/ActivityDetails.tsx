@@ -12,6 +12,7 @@ import { useAuth } from '../providers/AuthProvider';
 import { Redirect } from 'expo-router';
 import AnimatedModal from './AnimatedModal';
 import { useUpdateUser } from '../api/users';
+import RemoteImage from './RemoteImage';
 
 
 type ActivityDetailsScreenModalProps = {
@@ -87,9 +88,16 @@ const ActivityDetailsScreenModal = ({ activity, onClose }: ActivityDetailsScreen
       <View
         className='my-8 mx-auto bg-white/50 rounded-lg border-0 items-center'
       >
-        <Image
+        {/* <Image
           className='w-44 h-44'
           source={require("@asset/images/swimming.png")}
+        /> */}
+        <RemoteImage
+          classNameAsProps='w-44 h-44'
+          path={activity_image} 
+          resizeMode='contain'
+          fallback={require('@asset/images/default.png')}
+          bucket='activity_type'
         />
         <Text style={{ color: themeColors.primary }} className='text-lg text-center font-bold'>{activity}</Text>
       </View>
@@ -164,7 +172,7 @@ const ActivityDetailsScreenModal = ({ activity, onClose }: ActivityDetailsScreen
           </View>
 
           <View>
-            <Text className='font-bold text-lg'>Duration *</Text>
+            <Text className='font-bold text-lg'>Duration (min) *</Text>
             <Text
               className='border p-3 rounded-lg border-slate-500 mt-1 bg-white font-bold'
             >{activity.duration}</Text>

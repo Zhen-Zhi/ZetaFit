@@ -17,12 +17,13 @@ import ProfileScreen from './profile/profileModal';
 import RemoteImage from '@/src/components/RemoteImage';
 import { Tables } from '@/src/database.types';
 import { supabase } from '@/src/lib/supabase';
+import { useUserJoinedChallenges } from '@/src/api/challenges';
 
 const ListOptions = [{name: 'Profile'},{name: 'Setting'},{name: 'Activities'}] 
 
 const HomeScreen = () => {
-  Platform.OS == 'android' && NavigationBar.setVisibilityAsync("hidden");
-  const { session, loading } = useAuth();
+  // Platform.OS == 'android' && NavigationBar.setVisibilityAsync("hidden");
+  const { session } = useAuth();
   if(!session) {
     return <Redirect href={'/sign_in'} />
   }
@@ -35,6 +36,12 @@ const HomeScreen = () => {
     isLoading: clanIsLoading,
     refetch
   } = useUserClanName(user?.clan_id, session.user.id)
+
+  const {
+    data: joinedChallenges,
+    error: joinedChallengesError,
+    isLoading: joinedChallengesIsLoading, 
+  } = useUserJoinedChallenges(session.user.id)
 
   const [modalVisible, setModalVisible] = useState(false);
   const [addActivityModalVisible, setAddActivityModalVisible] = useState(false);
@@ -57,7 +64,7 @@ const HomeScreen = () => {
     return unsubscribe;
   }, [navigation, user]);
 
-  if (loading || isLoading || clanIsLoading || !user) {
+  if (isLoading || clanIsLoading) {
     return (
       <ImageBackground
         source={require('@asset/images/background_image.png')} 
@@ -65,6 +72,16 @@ const HomeScreen = () => {
       >
         <ActivityIndicator className='m-auto p-4 bg-white/50' size={100} color={themeColors.secondary} />
       </ImageBackground>
+    )
+  }
+
+  if(!user) {
+    console.log("User not found")
+    return (
+      <ImageBackground
+        className='flex-1 pt-2'
+        source={require('@asset/images/background_image.png')}
+      />  
     )
   }
   
@@ -92,6 +109,25 @@ const HomeScreen = () => {
       setEnterUsernameModalVisible(true);
     }
   }, 1000)
+
+  const emptyActiveChallenge = () => {
+    return (
+      <AnimatedPressable
+        className='border border border-slate-600 rounded-md h-auto m-2 bg-white/50'
+        pressInValue={0.96}
+        disabled
+      >
+        <View
+          className='h-36 w-full rounded-t-md shadow-xl w-[190]' 
+        >
+          <Text 
+            numberOfLines={1}
+            className='text-md font-medium m-auto text-slate-500'
+          >No Active Challenge</Text>
+        </View>
+      </AnimatedPressable>
+    )
+  }
 
   return (
     <SafeAreaView edges={['top']} className='flex-1'>
@@ -257,12 +293,13 @@ const HomeScreen = () => {
       <View className='m-3 absolute bottom-0'>
         <Text style={{ color: themeColors.primary }} className='font-extrabold text-xl'>Active Challenges</Text>
         <FlatList
-          data={ListOptions}
-          renderItem={() => (
-            <ActiveChallengesCard />
+          data={joinedChallenges}
+          renderItem={({item}) => (
+            <ActiveChallengesCard challengeData={item} />
           )}
           horizontal
           showsHorizontalScrollIndicator={false}
+          ListEmptyComponent={emptyActiveChallenge}
         />
       </View>
 
@@ -322,7 +359,7 @@ const HomeScreen = () => {
       >
         <SafeAreaProvider>
           <SafeAreaView edges={['top']} className='flex-1'>
-            <ProfileScreen userData={user} onClose={() => setProfileModalVisible(false)} />
+            <ProfileScreen userId={user.id} userClanId={user?.clan_id} onClose={() => setProfileModalVisible(false)} />
           </SafeAreaView>
         </SafeAreaProvider>
       </Modal>

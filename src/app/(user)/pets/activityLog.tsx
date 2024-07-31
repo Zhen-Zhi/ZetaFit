@@ -28,11 +28,6 @@ const ActivityLogScreen = () => {
     isLoading: userActivitiesIsLoading,
   } = useUserActivities(session?.user.id)
 
-  if(!userActivities) {
-    console.log("User activity not found. Debug in '/(user)/pets/activityLog'")
-    return <ActivityIndicator />
-  }
-
   if(!userData) {
     console.log("User data not found. Debug in '/(user)/pets/activityLog'")
     return <ActivityIndicator />

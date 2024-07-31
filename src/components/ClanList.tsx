@@ -49,7 +49,7 @@ const ClanList = ({ clan }: ClanListProps) => {
         <RemoteImage
           classNameAsProps='w-12 h-14 rounded-xl'
           path={clan.clan_logo} 
-          fallback={require('@asset/images/clan_logo/clan_logo_1.png')}
+          fallback={require('@asset/images/clan_logo/clan_logo_no_clan.png')}
           bucket='clan_logo'
         />
         <View className='flex-1 flex-col ml-3'>
