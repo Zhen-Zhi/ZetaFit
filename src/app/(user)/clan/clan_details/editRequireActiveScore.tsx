@@ -10,11 +10,12 @@ type EditRequireActiveScoreModalProps = {
   onClose: () => void;
   increment: () => void;
   decrement: () => void;
+  setConfirmedAmount: (newRequriedActiveScore: number) => void;
   amount: number;
   clanId: number;
 }
 
-const EditRequireActiveScoreModal = ({ onClose, increment, decrement, amount: requiredActiveScore, clanId }: EditRequireActiveScoreModalProps) => {
+const EditRequireActiveScoreModal = ({ onClose, increment, decrement, setConfirmedAmount, amount: requiredActiveScore, clanId }: EditRequireActiveScoreModalProps) => {
   const { mutate: updateRequiredActiveScore, error } = useUpdateRequiredActiveScore()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -29,6 +30,7 @@ const EditRequireActiveScoreModal = ({ onClose, increment, decrement, amount: re
       {
         onSuccess() {
           console.log("Inside success")
+          setConfirmedAmount(requiredActiveScore)
           onClose();
           setIsLoading(false)
         },

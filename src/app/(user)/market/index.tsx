@@ -54,7 +54,7 @@ const items = [
 ]
 
 const MarketplaceScreen = () => {
-  const { session, loading } = useAuth();
+  const { session } = useAuth();
 
   if(!session) {
     return <Redirect href={'/sign_in'} />

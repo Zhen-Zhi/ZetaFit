@@ -123,7 +123,6 @@ export const useClanWarSubscription = (clanId: number) => {
 
     return () => {
       clanWar1.unsubscribe()
-      // clanWar2.unsubscribe()
     }
   }, [])
 }

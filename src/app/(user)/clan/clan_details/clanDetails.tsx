@@ -12,6 +12,7 @@ import { Tables } from '@/src/database.types';
 import { useClanActiveScore, useClanMembers, useClanRankings, useClanWarWin } from '@/src/api/clan';
 import { useAuth } from '@/src/providers/AuthProvider';
 import { Redirect } from 'expo-router';
+import { configureProps } from 'react-native-reanimated/lib/typescript/ConfigHelper';
 
 type ClanDetailsScreenRouteProp = RouteProp<{
   clanDetails: {
@@ -72,6 +73,7 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
   const [healthModalVisible, setHealthModalVisible] = useState(false)
   const [isMember, setIsMember] = useState(false)
   const [amount, setAmount] = useState(clanDetails.required_active_score);
+  const [confirmedAmount, setConfirmedAmount] = useState(clanDetails.required_active_score);
   const [highLevelMember, setHighLevelMember] = useState(false);
 
   useEffect(() => {
@@ -135,7 +137,7 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
             <View className='my-auto mx-3'>
               <FontAwesome6 name="fire" size={22} color="rgba(240, 93, 9, 0.8)" />
             </View>
-            <Text style={{ color: themeColors.primary }} className='text-[22px] font-bold text-center rounded-2xl'>{clanDetails.required_active_score}</Text>
+            <Text style={{ color: themeColors.primary }} className='text-[22px] font-bold text-center rounded-2xl'>{confirmedAmount}</Text>
             {
               isMember
                 &&
@@ -197,9 +199,10 @@ const ClanDetailsScreen = ({ route }: ClanDetailsScreenProps) => {
         onRequestClose={() =>setEditModalVisible(false)}
       >
         <EditRequireActiveScoreModal 
-          onClose={() => setEditModalVisible(false)}
+          onClose={() => {setEditModalVisible(false);setAmount(confirmedAmount)}}
           increment={increment}
           decrement={decrement}
+          setConfirmedAmount={(newActiveScore: number) => {setConfirmedAmount(newActiveScore)}}
           amount={amount}
           clanId={clanDetails.clan_id}
         />

@@ -12,6 +12,7 @@ import { useAuth } from '@/src/providers/AuthProvider'
 import RemoteImage from '@/src/components/RemoteImage'
 import { Tables } from '@/src/database.types'
 import { connectToWallet } from '@/src/utility/solana'
+import { useMarketplaceItem } from '@/src/api/marketplace'
 
 // const inventoryItems = [
 //   { id: 1, itemName: 'Gold Statue', image: require('@asset/images/golden_statue.png') },
@@ -53,6 +54,12 @@ const InventoryItemsScreen = () => {
     isLoading: inventoryItemsIsLoading,
   } = useInventoryItems(session.user.id)
 
+  const {
+    data: marketplaceItem,
+    error: marketplaceItemError,
+    isLoading: marketplaceItemIsLoading,
+  } = useMarketplaceItem()
+
   const num = (ITEMSIZE + 8 + 20) * Math.floor(inventoryItems?.length ?? 0 / 2) - (ITEMSIZE + 8 + 20) * 3
   // itemsize (image height) + 8px margin + 20px text line height
   // minus top 3 row
@@ -71,6 +78,14 @@ const InventoryItemsScreen = () => {
   }
 
   const handleSell = async (itemId: number) => {
+    if (marketplaceItem && marketplaceItem.some(item => item.item_id === itemId)) {
+      setIsError(true);
+      setTimeout(() => {
+        setIsError(false);
+      }, 5000);
+      return;
+    }
+
     console.log(itemId)
     const walletConnection = await connectToWallet();
     const walletAddress = walletConnection.authorizationResult.accounts[0].address
